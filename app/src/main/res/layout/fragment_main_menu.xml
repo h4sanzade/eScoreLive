@@ -7,7 +7,9 @@
     android:background="@color/background_color"
     tools:context=".MainMenuFragment">
 
+    <!-- Header with app name and icons -->
     <TextView
+        android:id="@+id/app_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="eScoreLive"
@@ -39,6 +41,71 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="32dp" />
 
+    <!-- Live Scores Section -->
+    <LinearLayout
+        android:id="@+id/live_header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/app_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Live Now"
+                android:textSize="18sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/mulish_bold" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/see_more_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="See More"
+            android:textSize="14sp"
+            android:textColor="#F63D68"
+            android:fontFamily="@font/mulish_bold"
+            android:background="?android:attr/selectableItemBackground"
+            android:padding="8dp" />
+
+    </LinearLayout>
+
+    <!-- Horizontal RecyclerView for Live Matches -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/live_matches_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        android:clipToPadding="false"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@id/live_header_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/item_live_match" />
+
     <!-- Weekly Calendar Container -->
     <androidx.cardview.widget.CardView
         android:id="@+id/calendar_card"
@@ -50,7 +117,7 @@
         app:cardCornerRadius="12dp"
         app:cardElevation="4dp"
         app:cardBackgroundColor="@color/background_color"
-        app:layout_constraintTop_toBottomOf="@id/search_id"
+        app:layout_constraintTop_toBottomOf="@id/live_matches_recycler"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -71,7 +138,6 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/vector_left"
-
                     android:background="?android:attr/selectableItemBackgroundBorderless"
                     android:padding="4dp" />
 
@@ -126,9 +192,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="14"
-
                         android:textSize="16sp"
-                       android:textColor="@color/white"
+                        android:textColor="@color/white"
                         android:layout_marginTop="4dp" />
 
                 </LinearLayout>
@@ -312,9 +377,5 @@
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
-
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
