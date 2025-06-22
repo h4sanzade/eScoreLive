@@ -1,3 +1,6 @@
+package com.materialdesign.escorelive
+
+
 import javax.inject.Inject
 import javax.inject.Singleton
 

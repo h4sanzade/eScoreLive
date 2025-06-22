@@ -1,3 +1,6 @@
+package com.materialdesign.escorelive
+
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
