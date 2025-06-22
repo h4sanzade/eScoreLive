@@ -55,20 +55,15 @@ class MainMenuFragment : Fragment() {
     }
 
     private fun setupCalendar(view: View) {
-        // Setup calendar with current week
         updateWeekCalendar()
 
-        // Setup day click listeners
         setupDayClickListeners(view)
 
-        // Setup week navigation
         view.findViewById<View>(R.id.prev_week_btn).setOnClickListener {
-            // Navigate to previous week
             navigateWeek(-7)
         }
 
         view.findViewById<View>(R.id.next_week_btn).setOnClickListener {
-            // Navigate to next week
             navigateWeek(7)
         }
     }
@@ -96,7 +91,6 @@ class MainMenuFragment : Fragment() {
     private fun updateWeekCalendar() {
         val calendar = Calendar.getInstance()
 
-        // Start from Monday of current week
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
         val daysFromMonday = if (dayOfWeek == Calendar.SUNDAY) 6 else dayOfWeek - Calendar.MONDAY
         calendar.add(Calendar.DAY_OF_MONTH, -daysFromMonday)
@@ -110,7 +104,6 @@ class MainMenuFragment : Fragment() {
             dayNameTextView?.text = dayNames[i - 1]
             dayDateTextView?.text = calendar.get(Calendar.DAY_OF_MONTH).toString()
 
-            // Check if it's today
             val today = Calendar.getInstance()
             if (calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                 calendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)) {
@@ -142,7 +135,6 @@ class MainMenuFragment : Fragment() {
     }
 
     private fun navigateWeek(days: Int) {
-        // Implementation for week navigation
         updateWeekCalendar()
     }
 
@@ -152,8 +144,7 @@ class MainMenuFragment : Fragment() {
         })
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
-            // Show/hide loading indicator
-            // You can add a progress bar to your layout
+
         })
 
         viewModel.error.observe(viewLifecycleOwner, Observer { error ->

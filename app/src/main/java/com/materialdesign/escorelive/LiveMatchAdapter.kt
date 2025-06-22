@@ -57,7 +57,6 @@ class LiveMatchAdapter(
             awayScore.text = match.awayScore.toString()
             loadImage(awayTeamLogo, match.awayTeam.logo)
 
-            // Click listeners
             itemView.setOnClickListener { onMatchClick(match) }
             detailsBtn.setOnClickListener { onMatchClick(match) }
         }

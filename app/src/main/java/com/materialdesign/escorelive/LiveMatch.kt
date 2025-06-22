@@ -28,7 +28,6 @@ data class League(
     val country: String
 )
 
-// API Response Models
 data class FixturesResponse(
     val response: List<FixtureData>
 )
@@ -91,7 +90,6 @@ data class ScoreDetail(
     val away: Int?
 )
 
-// Extension function to convert API response to LiveMatch
 fun FixtureData.toLiveMatch(): LiveMatch {
     return LiveMatch(
         id = fixture.id,
