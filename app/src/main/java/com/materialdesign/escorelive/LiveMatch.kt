@@ -1,3 +1,4 @@
+// Data Models
 data class LiveMatch(
     val id: Long,
     val homeTeam: Team,
@@ -87,82 +88,6 @@ data class ScoreDetail(
     val home: Int?,
     val away: Int?
 )
-
-// API Service
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Query
-import retrofit2.Response
-
-interface FootballApiService {
-
-    @GET("fixtures")
-    suspend fun getLiveFixtures(
-        @Header("X-RapidAPI-Key") apiKey: String = "acc13599400653ba46e1defb6d242255",
-        @Header("X-RapidAPI-Host") host: String = "v3.football.api-sports.io",
-        @Query("live") live: String = "all"
-    ): Response<FixturesResponse>
-
-    @GET("fixtures")
-    suspend fun getFixturesByDate(
-        @Header("X-RapidAPI-Key") apiKey: String = "acc13599400653ba46e1defb6d242255",
-        @Header("X-RapidAPI-Host") host: String = "v3.football.api-sports.io",
-        @Query("date") date: String,
-        @Query("timezone") timezone: String = "Europe/London"
-    ): Response<FixturesResponse>
-
-    @GET("fixtures")
-    suspend fun getFixturesByLeague(
-        @Header("X-RapidAPI-Key") apiKey: String = "acc13599400653ba46e1defb6d242255",
-        @Header("X-RapidAPI-Host") host: String = "v3.football.api-sports.io",
-        @Query("league") leagueId: Int,
-        @Query("season") season: Int,
-        @Query("live") live: String = "all"
-    ): Response<FixturesResponse>
-}
-
-import javax.inject.Inject
-import javax.inject.Singleton
-
-@Singleton
-class FootballRepository @Inject constructor(
-    private val apiService: FootballApiService
-) {
-
-    suspend fun getLiveMatches(): Result<List<LiveMatch>> {
-        return try {
-            val response = apiService.getLiveFixtures()
-            if (response.isSuccessful) {
-                val fixtures = response.body()?.response ?: emptyList()
-                val liveMatches = fixtures.map { fixture ->
-                    fixture.toLiveMatch()
-                }
-                Result.success(liveMatches)
-            } else {
-                Result.failure(Exception("API Error: ${response.code()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    suspend fun getMatchesByDate(date: String): Result<List<LiveMatch>> {
-        return try {
-            val response = apiService.getFixturesByDate(date = date)
-            if (response.isSuccessful) {
-                val fixtures = response.body()?.response ?: emptyList()
-                val matches = fixtures.map { fixture ->
-                    fixture.toLiveMatch()
-                }
-                Result.success(matches)
-            } else {
-                Result.failure(Exception("API Error: ${response.code()}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-}
 
 // Extension function to convert API response to LiveMatch
 fun FixtureData.toLiveMatch(): LiveMatch {
