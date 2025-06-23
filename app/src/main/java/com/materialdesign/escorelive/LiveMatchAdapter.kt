@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -43,18 +44,64 @@ class LiveMatchAdapter(
             leagueName.text = match.league.name
             loadImage(leagueLogo, match.league.logo)
 
-            // Match minute and live indicator
+            // Match minute and status indicator
             matchMinute.text = match.matchMinute
-            liveIndicator.visibility = if (match.isLive) View.VISIBLE else View.GONE
+
+            // Configure display based on match status
+            when {
+                match.isLive -> {
+                    // Live match
+                    liveIndicator.visibility = View.VISIBLE
+                    matchMinute.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
+                    homeScore.visibility = View.VISIBLE
+                    awayScore.visibility = View.VISIBLE
+                    detailsBtn.text = "Live Details"
+                    detailsBtn.setBackgroundColor(ContextCompat.getColor(itemView.context, android.R.color.holo_red_dark))
+                }
+                match.isFinished -> {
+                    // Finished match
+                    liveIndicator.visibility = View.GONE
+                    matchMinute.setTextColor(ContextCompat.getColor(itemView.context, android.R.color.darker_gray))
+                    homeScore.visibility = View.VISIBLE
+                    awayScore.visibility = View.VISIBLE
+                    detailsBtn.text = "Match Report"
+                    detailsBtn.setBackgroundColor(ContextCompat.getColor(itemView.context, android.R.color.darker_gray))
+                }
+                match.isUpcoming -> {
+                    // Upcoming match
+                    liveIndicator.visibility = View.GONE
+                    matchMinute.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
+                    // For upcoming matches, show "-" instead of scores
+                    homeScore.visibility = View.VISIBLE
+                    awayScore.visibility = View.VISIBLE
+                    homeScore.text = "-"
+                    awayScore.text = "-"
+                    detailsBtn.text = "Preview"
+                    detailsBtn.setBackgroundColor(ContextCompat.getColor(itemView.context, android.R.color.holo_blue_dark))
+                }
+                else -> {
+                    // Default case
+                    liveIndicator.visibility = View.GONE
+                    matchMinute.setTextColor(ContextCompat.getColor(itemView.context, android.R.color.darker_gray))
+                    homeScore.visibility = View.VISIBLE
+                    awayScore.visibility = View.VISIBLE
+                    detailsBtn.text = "Details"
+                    detailsBtn.setBackgroundColor(ContextCompat.getColor(itemView.context, android.R.color.darker_gray))
+                }
+            }
 
             // Home team
             homeTeamName.text = match.homeTeam.name
-            homeScore.text = match.homeScore.toString()
+            if (!match.isUpcoming) {
+                homeScore.text = match.homeScore.toString()
+            }
             loadImage(homeTeamLogo, match.homeTeam.logo)
 
             // Away team
             awayTeamName.text = match.awayTeam.name
-            awayScore.text = match.awayScore.toString()
+            if (!match.isUpcoming) {
+                awayScore.text = match.awayScore.toString()
+            }
             loadImage(awayTeamLogo, match.awayTeam.logo)
 
             itemView.setOnClickListener { onMatchClick(match) }

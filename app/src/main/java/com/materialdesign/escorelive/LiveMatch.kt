@@ -1,5 +1,8 @@
 package com.materialdesign.escorelive
 
+import java.text.SimpleDateFormat
+import java.util.*
+
 // Data Models
 data class LiveMatch(
     val id: Long,
@@ -11,7 +14,10 @@ data class LiveMatch(
     val matchStatus: String,
     val league: League,
     val isLive: Boolean,
-    val kickoffTime: String? = null
+    val kickoffTime: String? = null,
+    val isFinished: Boolean = false,
+    val isUpcoming: Boolean = false,
+    val kickoffTimeFormatted: String? = null
 )
 
 data class Team(
@@ -91,6 +97,21 @@ data class ScoreDetail(
 )
 
 fun FixtureData.toLiveMatch(): LiveMatch {
+    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
+
+    val kickoffTimeFormatted = try {
+        val date = inputFormat.parse(fixture.date)
+        date?.let { timeFormat.format(it) }
+    } catch (e: Exception) {
+        null
+    }
+
+    // Determine match state
+    val isLive = fixture.status.short in listOf("LIVE", "1H", "2H", "HT")
+    val isFinished = fixture.status.short in listOf("FT", "AET", "PEN", "PST", "CANC", "ABD", "AWD", "WO")
+    val isUpcoming = fixture.status.short in listOf("NS", "TBD")
+
     return LiveMatch(
         id = fixture.id,
         homeTeam = Team(
@@ -108,12 +129,17 @@ fun FixtureData.toLiveMatch(): LiveMatch {
         homeScore = goals.home ?: 0,
         awayScore = goals.away ?: 0,
         matchMinute = when {
-            fixture.status.short == "LIVE" || fixture.status.short == "1H" || fixture.status.short == "2H" -> {
-                "${fixture.status.elapsed ?: 0}'"
-            }
+            isLive && fixture.status.elapsed != null -> "${fixture.status.elapsed}'"
             fixture.status.short == "HT" -> "HT"
             fixture.status.short == "FT" -> "FT"
-            fixture.status.short == "NS" -> "VS"
+            fixture.status.short == "AET" -> "AET"
+            fixture.status.short == "PEN" -> "PEN"
+            fixture.status.short == "PST" -> "PST"
+            fixture.status.short == "CANC" -> "CANC"
+            fixture.status.short == "ABD" -> "ABD"
+            fixture.status.short == "AWD" -> "AWD"
+            fixture.status.short == "WO" -> "WO"
+            isUpcoming -> kickoffTimeFormatted ?: "TBD"
             else -> fixture.status.short
         },
         matchStatus = fixture.status.long,
@@ -123,7 +149,10 @@ fun FixtureData.toLiveMatch(): LiveMatch {
             logo = league.logo,
             country = league.country
         ),
-        isLive = fixture.status.short in listOf("LIVE", "1H", "2H", "HT"),
-        kickoffTime = fixture.date
+        isLive = isLive,
+        isFinished = isFinished,
+        isUpcoming = isUpcoming,
+        kickoffTime = fixture.date,
+        kickoffTimeFormatted = kickoffTimeFormatted
     )
 }

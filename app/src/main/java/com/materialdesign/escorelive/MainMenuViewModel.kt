@@ -1,6 +1,5 @@
 package com.materialdesign.escorelive
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -47,7 +46,8 @@ class MainMenuViewModel @Inject constructor(
 
             repository.getLiveMatches()
                 .onSuccess { matches ->
-                    _liveMatches.value = matches
+                    val actuallyLive = matches.filter { it.isLive }
+                    _liveMatches.value = actuallyLive
                 }
                 .onFailure { exception ->
                     _error.value = exception.message
@@ -64,7 +64,9 @@ class MainMenuViewModel @Inject constructor(
 
             repository.getMatchesByDate(date)
                 .onSuccess { matches ->
-                    _todayMatches.value = matches
+                    // Show all matches for the selected date (past, present, future)
+                    val sortedMatches = sortMatchesByStatus(matches)
+                    _todayMatches.value = sortedMatches
                 }
                 .onFailure { exception ->
                     _error.value = exception.message
@@ -74,9 +76,32 @@ class MainMenuViewModel @Inject constructor(
         }
     }
 
+    private fun sortMatchesByStatus(matches: List<LiveMatch>): List<LiveMatch> {
+        return matches.sortedWith(compareBy<LiveMatch> { match ->
+            when {
+                match.isLive -> 0
+                match.isUpcoming -> 1
+                match.isFinished -> 2
+                else -> 3
+            }
+        }.thenBy { match ->
+            try {
+                val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
+                match.kickoffTime?.let { inputFormat.parse(it)?.time } ?: Long.MAX_VALUE
+            } catch (e: Exception) {
+                Long.MAX_VALUE
+            }
+        })
+    }
+
     fun selectDate(date: String) {
         _selectedDate.value = date
         loadMatchesByDate(date)
+
+        val today = dateFormat.format(Date())
+        if (date == today) {
+            loadLiveMatches()
+        }
     }
 
     fun refreshData() {
@@ -88,5 +113,62 @@ class MainMenuViewModel @Inject constructor(
 
     fun clearError() {
         _error.value = null
+    }
+
+    fun isSelectedDateToday(): Boolean {
+        val today = dateFormat.format(Date())
+        return _selectedDate.value == today
+    }
+
+    fun isSelectedDateInPast(): Boolean {
+        val today = Calendar.getInstance()
+        val selectedDateStr = _selectedDate.value ?: return false
+
+        return try {
+            val selectedDate = dateFormat.parse(selectedDateStr)
+            val selectedCalendar = Calendar.getInstance().apply {
+                time = selectedDate ?: Date()
+            }
+
+            selectedCalendar.set(Calendar.HOUR_OF_DAY, 0)
+            selectedCalendar.set(Calendar.MINUTE, 0)
+            selectedCalendar.set(Calendar.SECOND, 0)
+            selectedCalendar.set(Calendar.MILLISECOND, 0)
+
+            today.set(Calendar.HOUR_OF_DAY, 0)
+            today.set(Calendar.MINUTE, 0)
+            today.set(Calendar.SECOND, 0)
+            today.set(Calendar.MILLISECOND, 0)
+
+            selectedCalendar.before(today)
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    fun isSelectedDateInFuture(): Boolean {
+        val today = Calendar.getInstance()
+        val selectedDateStr = _selectedDate.value ?: return false
+
+        return try {
+            val selectedDate = dateFormat.parse(selectedDateStr)
+            val selectedCalendar = Calendar.getInstance().apply {
+                time = selectedDate ?: Date()
+            }
+
+            selectedCalendar.set(Calendar.HOUR_OF_DAY, 0)
+            selectedCalendar.set(Calendar.MINUTE, 0)
+            selectedCalendar.set(Calendar.SECOND, 0)
+            selectedCalendar.set(Calendar.MILLISECOND, 0)
+
+            today.set(Calendar.HOUR_OF_DAY, 0)
+            today.set(Calendar.MINUTE, 0)
+            today.set(Calendar.SECOND, 0)
+            today.set(Calendar.MILLISECOND, 0)
+
+            selectedCalendar.after(today)
+        } catch (e: Exception) {
+            false
+        }
     }
 }
