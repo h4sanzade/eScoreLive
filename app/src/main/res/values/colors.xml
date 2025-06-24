@@ -4,4 +4,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="background_color">#161616</color>
     <color name="button_color">#F63D68</color>
+    <color name="card_background">#1E1E1E</color>
 </resources>
