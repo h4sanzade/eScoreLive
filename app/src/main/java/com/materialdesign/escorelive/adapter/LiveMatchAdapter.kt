@@ -62,7 +62,7 @@ class LiveMatchAdapter(
                     matchMinute.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
                     homeScore.visibility = android.view.View.VISIBLE
                     awayScore.visibility = android.view.View.VISIBLE
-                    // Show final scores for finished matches
+                    // Show final scores for finished matches from API
                     homeScore.text = match.homeScore.toString()
                     awayScore.text = match.awayScore.toString()
                     detailsBtn.text = "Match Report"
@@ -83,9 +83,14 @@ class LiveMatchAdapter(
                     matchMinute.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
                     homeScore.visibility = android.view.View.VISIBLE
                     awayScore.visibility = android.view.View.VISIBLE
-                    // For any other state, show scores if available
-                    homeScore.text = if (match.homeScore > 0 || match.awayScore > 0) match.homeScore.toString() else "-"
-                    awayScore.text = if (match.homeScore > 0 || match.awayScore > 0) match.awayScore.toString() else "-"
+                    // For any other state, show scores if available from API
+                    if (match.homeScore > 0 || match.awayScore > 0) {
+                        homeScore.text = match.homeScore.toString()
+                        awayScore.text = match.awayScore.toString()
+                    } else {
+                        homeScore.text = "-"
+                        awayScore.text = "-"
+                    }
                     detailsBtn.text = "Details"
                     detailsBtn.setBackgroundColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
                 }

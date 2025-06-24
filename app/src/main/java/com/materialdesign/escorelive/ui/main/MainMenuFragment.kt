@@ -97,10 +97,20 @@ class MainMenuFragment : Fragment() {
 
     private fun updateWeekCalendar() {
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.WEEK_OF_YEAR, currentWeekOffset)
+        calendar.add(Calendar.DAY_OF_MONTH, currentWeekOffset * 7)
 
+        // Find the Monday of the current week
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
-        val daysFromMonday = if (dayOfWeek == Calendar.SUNDAY) 6 else dayOfWeek - Calendar.MONDAY
+        val daysFromMonday = when (dayOfWeek) {
+            Calendar.SUNDAY -> 6
+            Calendar.MONDAY -> 0
+            Calendar.TUESDAY -> 1
+            Calendar.WEDNESDAY -> 2
+            Calendar.THURSDAY -> 3
+            Calendar.FRIDAY -> 4
+            Calendar.SATURDAY -> 5
+            else -> 0
+        }
         calendar.add(Calendar.DAY_OF_MONTH, -daysFromMonday)
 
         val mondayDate = calendar.time
@@ -110,6 +120,7 @@ class MainMenuFragment : Fragment() {
 
         binding.weekRangeText.text = "${weekRangeFormat.format(mondayDate)} - ${weekRangeFormat.format(sundayDate)}"
 
+        // Day names in correct order: Monday to Sunday
         val dayNames = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
         val dayNameViews = listOf(
             binding.day1Name, binding.day2Name, binding.day3Name, binding.day4Name,
@@ -123,10 +134,14 @@ class MainMenuFragment : Fragment() {
         val today = Calendar.getInstance()
         var todayIndex = -1
 
+        // Set Monday as starting point
+        calendar.add(Calendar.DAY_OF_MONTH, -daysFromMonday)
+
         for (i in 0..6) {
             dayNameViews[i].text = dayNames[i]
             dayDateViews[i].text = calendar.get(Calendar.DAY_OF_MONTH).toString()
 
+            // Check if this day is today
             if (calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                 calendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)) {
                 dayNameViews[i].text = "Today"
@@ -136,6 +151,7 @@ class MainMenuFragment : Fragment() {
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
 
+        // Select today if it's in the current week, otherwise select the first day
         if (todayIndex != -1) {
             updateSelectedDay(todayIndex)
             val todayDate = getDateForDayIndex(todayIndex)
@@ -151,10 +167,20 @@ class MainMenuFragment : Fragment() {
 
     private fun getDateForDayIndex(dayIndex: Int): String {
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.WEEK_OF_YEAR, currentWeekOffset)
+        calendar.add(Calendar.DAY_OF_MONTH, currentWeekOffset * 7)
 
+        // Find Monday of the current week
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
-        val daysFromMonday = if (dayOfWeek == Calendar.SUNDAY) 6 else dayOfWeek - Calendar.MONDAY
+        val daysFromMonday = when (dayOfWeek) {
+            Calendar.SUNDAY -> 6
+            Calendar.MONDAY -> 0
+            Calendar.TUESDAY -> 1
+            Calendar.WEDNESDAY -> 2
+            Calendar.THURSDAY -> 3
+            Calendar.FRIDAY -> 4
+            Calendar.SATURDAY -> 5
+            else -> 0
+        }
         calendar.add(Calendar.DAY_OF_MONTH, -daysFromMonday + dayIndex)
 
         return dateFormat.format(calendar.time)
@@ -195,7 +221,6 @@ class MainMenuFragment : Fragment() {
                     val displayDate = displayDateFormat.format(selectedCalendar.time)
                     binding.liveHeaderText.text = "Fixtures - $displayDate"
                 }
-
             }
         } catch (e: Exception) {
             binding.liveHeaderText.text = "Matches"
