@@ -11,6 +11,8 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.materialdesign.escorelive.LiveMatch
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.ItemLiveMatchBinding
+import java.text.SimpleDateFormat
+import java.util.*
 
 class LiveMatchAdapter(
     private val onMatchClick: (LiveMatch) -> Unit
@@ -33,6 +35,14 @@ class LiveMatchAdapter(
             leagueName.text = match.league.name
             loadImage(leagueLogo, match.league.logo)
 
+            // Team names
+            homeTeamName.text = match.homeTeam.name
+            awayTeamName.text = match.awayTeam.name
+
+            // Team logos
+            loadImage(homeTeamLogo, match.homeTeam.logo)
+            loadImage(awayTeamLogo, match.awayTeam.logo)
+
             // Match minute and status indicator
             matchMinute.text = match.matchMinute
 
@@ -42,6 +52,8 @@ class LiveMatchAdapter(
                     matchMinute.setTextColor(ContextCompat.getColor(root.context, R.color.white))
                     homeScore.visibility = android.view.View.VISIBLE
                     awayScore.visibility = android.view.View.VISIBLE
+                    homeScore.text = match.homeScore.toString()
+                    awayScore.text = match.awayScore.toString()
                     detailsBtn.text = "Live Details"
                     detailsBtn.setBackgroundColor(ContextCompat.getColor(root.context, android.R.color.holo_red_dark))
                 }
@@ -50,6 +62,9 @@ class LiveMatchAdapter(
                     matchMinute.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
                     homeScore.visibility = android.view.View.VISIBLE
                     awayScore.visibility = android.view.View.VISIBLE
+                    // Show final scores for finished matches
+                    homeScore.text = match.homeScore.toString()
+                    awayScore.text = match.awayScore.toString()
                     detailsBtn.text = "Match Report"
                     detailsBtn.setBackgroundColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
                 }
@@ -68,22 +83,13 @@ class LiveMatchAdapter(
                     matchMinute.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
                     homeScore.visibility = android.view.View.VISIBLE
                     awayScore.visibility = android.view.View.VISIBLE
+                    // For any other state, show scores if available
+                    homeScore.text = if (match.homeScore > 0 || match.awayScore > 0) match.homeScore.toString() else "-"
+                    awayScore.text = if (match.homeScore > 0 || match.awayScore > 0) match.awayScore.toString() else "-"
                     detailsBtn.text = "Details"
                     detailsBtn.setBackgroundColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
                 }
             }
-
-            homeTeamName.text = match.homeTeam.name
-            if (!match.isUpcoming) {
-                homeScore.text = match.homeScore.toString()
-            }
-            loadImage(homeTeamLogo, match.homeTeam.logo)
-
-            awayTeamName.text = match.awayTeam.name
-            if (!match.isUpcoming) {
-                awayScore.text = match.awayScore.toString()
-            }
-            loadImage(awayTeamLogo, match.awayTeam.logo)
 
             root.setOnClickListener { onMatchClick(match) }
             detailsBtn.setOnClickListener { onMatchClick(match) }

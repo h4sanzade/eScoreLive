@@ -25,11 +25,11 @@ class MainMenuFragment : Fragment() {
     private lateinit var liveMatchesAdapter: LiveMatchAdapter
     private lateinit var liveMatchesRecycler: RecyclerView
     private lateinit var weekRangeText: TextView
+    private lateinit var liveHeaderText: TextView
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private val displayDateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
     private val weekRangeFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
-
 
     private var currentWeekOffset = 0
 
@@ -47,6 +47,8 @@ class MainMenuFragment : Fragment() {
         setupCalendar(view)
         observeViewModel()
         setupClickListeners(view)
+
+        liveHeaderText = view.findViewById(R.id.live_header_text)
     }
 
     private fun setupRecyclerView(view: View) {
@@ -92,28 +94,24 @@ class MainMenuFragment : Fragment() {
                 val selectedDate = getDateForDayIndex(index)
                 viewModel.selectDate(selectedDate)
                 updateSelectedDay(index)
+                updateHeaderBasedOnSelectedDate(selectedDate)
             }
         }
     }
 
     private fun updateWeekCalendar() {
         val calendar = Calendar.getInstance()
-
         calendar.add(Calendar.WEEK_OF_YEAR, currentWeekOffset)
 
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
         val daysFromMonday = if (dayOfWeek == Calendar.SUNDAY) 6 else dayOfWeek - Calendar.MONDAY
         calendar.add(Calendar.DAY_OF_MONTH, -daysFromMonday)
 
-        // Store Monday's date for week range calculation
         val mondayDate = calendar.time
-
-        // Calculate Sunday (end of week)
         val sundayCalendar = calendar.clone() as Calendar
         sundayCalendar.add(Calendar.DAY_OF_MONTH, 6)
         val sundayDate = sundayCalendar.time
 
-        // Update week range text
         weekRangeText.text = "${weekRangeFormat.format(mondayDate)} - ${weekRangeFormat.format(sundayDate)}"
 
         val dayNames = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
@@ -127,7 +125,6 @@ class MainMenuFragment : Fragment() {
             dayNameTextView?.text = dayNames[i - 1]
             dayDateTextView?.text = calendar.get(Calendar.DAY_OF_MONTH).toString()
 
-
             if (calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                 calendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)) {
                 dayNameTextView?.text = "Today"
@@ -137,25 +134,23 @@ class MainMenuFragment : Fragment() {
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
 
-        // Auto-select today if it's in current week, otherwise select first day
         if (todayIndex != -1) {
             updateSelectedDay(todayIndex)
             val todayDate = getDateForDayIndex(todayIndex)
             viewModel.selectDate(todayDate)
+            updateHeaderBasedOnSelectedDate(todayDate)
         } else {
             updateSelectedDay(0)
             val firstDayDate = getDateForDayIndex(0)
             viewModel.selectDate(firstDayDate)
+            updateHeaderBasedOnSelectedDate(firstDayDate)
         }
     }
 
     private fun getDateForDayIndex(dayIndex: Int): String {
         val calendar = Calendar.getInstance()
-
-        // Apply week offset
         calendar.add(Calendar.WEEK_OF_YEAR, currentWeekOffset)
 
-        // Get to Monday of current week
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
         val daysFromMonday = if (dayOfWeek == Calendar.SUNDAY) 6 else dayOfWeek - Calendar.MONDAY
         calendar.add(Calendar.DAY_OF_MONTH, -daysFromMonday + dayIndex)
@@ -174,6 +169,32 @@ class MainMenuFragment : Fragment() {
         }
     }
 
+    private fun updateHeaderBasedOnSelectedDate(selectedDate: String) {
+        val today = dateFormat.format(Date())
+        val selectedCalendar = Calendar.getInstance()
+        val todayCalendar = Calendar.getInstance()
+
+        try {
+            selectedCalendar.time = dateFormat.parse(selectedDate) ?: Date()
+
+            when {
+                selectedDate == today -> {
+                    liveHeaderText.text = "Live Now"
+                }
+                selectedCalendar.before(todayCalendar) -> {
+                    val displayDate = displayDateFormat.format(selectedCalendar.time)
+                    liveHeaderText.text = "Results - $displayDate"
+                }
+                selectedCalendar.after(todayCalendar) -> {
+                    val displayDate = displayDateFormat.format(selectedCalendar.time)
+                    liveHeaderText.text = "Fixtures - $displayDate"
+                }
+            }
+        } catch (e: Exception) {
+            liveHeaderText.text = "Matches"
+        }
+    }
+
     private fun navigateWeek(days: Int) {
         currentWeekOffset += if (days > 0) 1 else -1
         updateWeekCalendar()
@@ -181,16 +202,15 @@ class MainMenuFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.liveMatches.observe(viewLifecycleOwner, Observer { matches ->
-            liveMatchesAdapter.submitList(matches)
-        })
-
-        // Observe matches by selected date (for calendar selection)
-        viewModel.todayMatches.observe(viewLifecycleOwner, Observer { matches ->
-            // You can add another RecyclerView or section to show selected day matches
-            // For now, we'll update the live matches section to show selected day matches
-            if (matches.isNotEmpty()) {
+            // Only show live matches when today is selected
+            if (viewModel.isSelectedDateToday()) {
                 liveMatchesAdapter.submitList(matches)
             }
+        })
+
+        viewModel.todayMatches.observe(viewLifecycleOwner, Observer { matches ->
+            // Show selected date matches (includes past, present, future)
+            liveMatchesAdapter.submitList(matches)
         })
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
@@ -211,16 +231,21 @@ class MainMenuFragment : Fragment() {
         }
 
         view.findViewById<View>(R.id.search_id).setOnClickListener {
-
+            // Handle search click
         }
 
         view.findViewById<View>(R.id.notification_id).setOnClickListener {
-
+            // Handle notification click
         }
     }
 
     private fun onMatchClick(match: LiveMatch) {
-        Toast.makeText(context, "Match clicked: ${match.homeTeam.name} vs ${match.awayTeam.name}", Toast.LENGTH_SHORT).show()
+        val matchInfo = when {
+            match.isFinished -> "${match.homeTeam.name} ${match.homeScore} - ${match.awayScore} ${match.awayTeam.name} (Final)"
+            match.isLive -> "${match.homeTeam.name} vs ${match.awayTeam.name} (Live)"
+            else -> "${match.homeTeam.name} vs ${match.awayTeam.name}"
+        }
+        Toast.makeText(context, matchInfo, Toast.LENGTH_SHORT).show()
     }
 
     override fun onResume() {
