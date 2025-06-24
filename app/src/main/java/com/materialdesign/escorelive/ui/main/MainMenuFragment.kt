@@ -5,15 +5,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.materialdesign.escorelive.LiveMatch
 import com.materialdesign.escorelive.adapter.LiveMatchAdapter
 import com.materialdesign.escorelive.R
+import com.materialdesign.escorelive.databinding.FragmentMainMenuBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
@@ -21,11 +20,11 @@ import java.util.*
 @AndroidEntryPoint
 class MainMenuFragment : Fragment() {
 
+    private var _binding: FragmentMainMenuBinding? = null
+    private val binding get() = _binding!!
+
     private val viewModel: MainMenuViewModel by viewModels()
     private lateinit var liveMatchesAdapter: LiveMatchAdapter
-    private lateinit var liveMatchesRecycler: RecyclerView
-    private lateinit var weekRangeText: TextView
-    private lateinit var liveHeaderText: TextView
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private val displayDateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
@@ -36,57 +35,54 @@ class MainMenuFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_main_menu, container, false)
+    ): View {
+        _binding = FragmentMainMenuBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupRecyclerView(view)
-        setupCalendar(view)
+        setupRecyclerView()
+        setupCalendar()
         observeViewModel()
-        setupClickListeners(view)
-
-        liveHeaderText = view.findViewById(R.id.live_header_text)
+        setupClickListeners()
     }
 
-    private fun setupRecyclerView(view: View) {
-        liveMatchesRecycler = view.findViewById(R.id.live_matches_recycler)
+    private fun setupRecyclerView() {
         liveMatchesAdapter = LiveMatchAdapter { match ->
             onMatchClick(match)
         }
 
-        liveMatchesRecycler.apply {
+        binding.liveMatchesRecycler.apply {
             adapter = liveMatchesAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             setHasFixedSize(true)
         }
     }
 
-    private fun setupCalendar(view: View) {
-        weekRangeText = view.findViewById(R.id.week_range_text)
+    private fun setupCalendar() {
         updateWeekCalendar()
-        setupDayClickListeners(view)
+        setupDayClickListeners()
 
-        view.findViewById<View>(R.id.prev_week_btn).setOnClickListener {
+        binding.prevWeekBtn.setOnClickListener {
             navigateWeek(-7)
         }
 
-        view.findViewById<View>(R.id.next_week_btn).setOnClickListener {
+        binding.nextWeekBtn.setOnClickListener {
             navigateWeek(7)
         }
     }
 
-    private fun setupDayClickListeners(view: View) {
+    private fun setupDayClickListeners() {
         val dayLayouts = listOf(
-            view.findViewById<View>(R.id.day_1),
-            view.findViewById<View>(R.id.day_2),
-            view.findViewById<View>(R.id.day_3),
-            view.findViewById<View>(R.id.day_4),
-            view.findViewById<View>(R.id.day_5),
-            view.findViewById<View>(R.id.day_6),
-            view.findViewById<View>(R.id.day_7)
+            binding.day1,
+            binding.day2,
+            binding.day3,
+            binding.day4,
+            binding.day5,
+            binding.day6,
+            binding.day7
         )
 
         dayLayouts.forEachIndexed { index, dayLayout ->
@@ -112,23 +108,29 @@ class MainMenuFragment : Fragment() {
         sundayCalendar.add(Calendar.DAY_OF_MONTH, 6)
         val sundayDate = sundayCalendar.time
 
-        weekRangeText.text = "${weekRangeFormat.format(mondayDate)} - ${weekRangeFormat.format(sundayDate)}"
+        binding.weekRangeText.text = "${weekRangeFormat.format(mondayDate)} - ${weekRangeFormat.format(sundayDate)}"
 
         val dayNames = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+        val dayNameViews = listOf(
+            binding.day1Name, binding.day2Name, binding.day3Name, binding.day4Name,
+            binding.day5Name, binding.day6Name, binding.day7Name
+        )
+        val dayDateViews = listOf(
+            binding.day1Date, binding.day2Date, binding.day3Date, binding.day4Date,
+            binding.day5Date, binding.day6Date, binding.day7Date
+        )
+
         val today = Calendar.getInstance()
         var todayIndex = -1
 
-        for (i in 1..7) {
-            val dayNameTextView = view?.findViewById<TextView>(resources.getIdentifier("day_${i}_name", "id", requireContext().packageName))
-            val dayDateTextView = view?.findViewById<TextView>(resources.getIdentifier("day_${i}_date", "id", requireContext().packageName))
-
-            dayNameTextView?.text = dayNames[i - 1]
-            dayDateTextView?.text = calendar.get(Calendar.DAY_OF_MONTH).toString()
+        for (i in 0..6) {
+            dayNameViews[i].text = dayNames[i]
+            dayDateViews[i].text = calendar.get(Calendar.DAY_OF_MONTH).toString()
 
             if (calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                 calendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)) {
-                dayNameTextView?.text = "Today"
-                todayIndex = i - 1
+                dayNameViews[i].text = "Today"
+                todayIndex = i
             }
 
             calendar.add(Calendar.DAY_OF_MONTH, 1)
@@ -159,12 +161,16 @@ class MainMenuFragment : Fragment() {
     }
 
     private fun updateSelectedDay(selectedIndex: Int) {
-        for (i in 1..7) {
-            val dayLayout = view?.findViewById<View>(resources.getIdentifier("day_$i", "id", requireContext().packageName))
-            if (i - 1 == selectedIndex) {
-                dayLayout?.setBackgroundResource(R.drawable.selected_day)
+        val dayLayouts = listOf(
+            binding.day1, binding.day2, binding.day3, binding.day4,
+            binding.day5, binding.day6, binding.day7
+        )
+
+        dayLayouts.forEachIndexed { index, dayLayout ->
+            if (index == selectedIndex) {
+                dayLayout.setBackgroundResource(R.drawable.selected_day)
             } else {
-                dayLayout?.background = null
+                dayLayout.background = null
             }
         }
     }
@@ -179,19 +185,19 @@ class MainMenuFragment : Fragment() {
 
             when {
                 selectedDate == today -> {
-                    liveHeaderText.text = "Live Now"
+                    binding.liveHeaderText.text = "Live Now"
                 }
                 selectedCalendar.before(todayCalendar) -> {
                     val displayDate = displayDateFormat.format(selectedCalendar.time)
-                    liveHeaderText.text = "Results - $displayDate"
+                    binding.liveHeaderText.text = "Results - $displayDate"
                 }
                 selectedCalendar.after(todayCalendar) -> {
                     val displayDate = displayDateFormat.format(selectedCalendar.time)
-                    liveHeaderText.text = "Fixtures - $displayDate"
+                    binding.liveHeaderText.text = "Fixtures - $displayDate"
                 }
             }
         } catch (e: Exception) {
-            liveHeaderText.text = "Matches"
+            binding.liveHeaderText.text = "Matches"
         }
     }
 
@@ -202,14 +208,12 @@ class MainMenuFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.liveMatches.observe(viewLifecycleOwner, Observer { matches ->
-            // Only show live matches when today is selected
             if (viewModel.isSelectedDateToday()) {
                 liveMatchesAdapter.submitList(matches)
             }
         })
 
         viewModel.todayMatches.observe(viewLifecycleOwner, Observer { matches ->
-            // Show selected date matches (includes past, present, future)
             liveMatchesAdapter.submitList(matches)
         })
 
@@ -225,16 +229,16 @@ class MainMenuFragment : Fragment() {
         })
     }
 
-    private fun setupClickListeners(view: View) {
-        view.findViewById<View>(R.id.see_more_btn).setOnClickListener {
+    private fun setupClickListeners() {
+        binding.seeMoreBtn.setOnClickListener {
             // Handle see more button click
         }
 
-        view.findViewById<View>(R.id.search_id).setOnClickListener {
+        binding.searchId.setOnClickListener {
             // Handle search click
         }
 
-        view.findViewById<View>(R.id.notification_id).setOnClickListener {
+        binding.notificationId.setOnClickListener {
             // Handle notification click
         }
     }
@@ -251,5 +255,10 @@ class MainMenuFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         viewModel.refreshData()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
