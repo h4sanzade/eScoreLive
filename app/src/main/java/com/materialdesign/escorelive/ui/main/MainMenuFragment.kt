@@ -195,6 +195,7 @@ class MainMenuFragment : Fragment() {
                     val displayDate = displayDateFormat.format(selectedCalendar.time)
                     binding.liveHeaderText.text = "Fixtures - $displayDate"
                 }
+
             }
         } catch (e: Exception) {
             binding.liveHeaderText.text = "Matches"
