@@ -1,5 +1,6 @@
-package com.materialdesign.escorelive
+package com.materialdesign.escorelive.data.remote
 
+import com.materialdesign.escorelive.FixturesResponse
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Query

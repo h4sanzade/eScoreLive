@@ -1,5 +1,6 @@
-package com.materialdesign.escorelive
+package com.materialdesign.escorelive.di
 
+import com.materialdesign.escorelive.data.remote.FootballApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

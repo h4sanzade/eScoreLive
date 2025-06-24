@@ -1,6 +1,9 @@
-package com.materialdesign.escorelive
+package com.materialdesign.escorelive.repository
 
 
+import com.materialdesign.escorelive.LiveMatch
+import com.materialdesign.escorelive.data.remote.FootballApiService
+import com.materialdesign.escorelive.toLiveMatch
 import javax.inject.Inject
 import javax.inject.Singleton
 

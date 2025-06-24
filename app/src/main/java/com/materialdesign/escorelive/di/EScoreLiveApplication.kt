@@ -1,4 +1,4 @@
-package com.materialdesign.escorelive
+package com.materialdesign.escorelive.di
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

@@ -1,9 +1,11 @@
-package com.materialdesign.escorelive
+package com.materialdesign.escorelive.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.materialdesign.escorelive.LiveMatch
+import com.materialdesign.escorelive.repository.FootballRepository
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
