@@ -190,7 +190,7 @@ class MatchDetailFragment : Fragment() {
         binding.statisticsSection.visibility = View.GONE
 
         // Update tab appearance
-        binding.eventsTab.setBackgroundResource(R.drawable.selected_tab)
+        binding.eventsTab.setBackgroundResource(R.drawable.selected_day)
         binding.lineupTab.background = null
         binding.statisticsTab.background = null
     }
@@ -202,7 +202,7 @@ class MatchDetailFragment : Fragment() {
 
         // Update tab appearance
         binding.eventsTab.background = null
-        binding.lineupTab.setBackgroundResource(R.drawable.selected_tab)
+        binding.lineupTab.setBackgroundResource(R.drawable.selected_day)
         binding.statisticsTab.background = null
     }
 
@@ -214,7 +214,7 @@ class MatchDetailFragment : Fragment() {
         // Update tab appearance
         binding.eventsTab.background = null
         binding.lineupTab.background = null
-        binding.statisticsTab.setBackgroundResource(R.drawable.selected_tab)
+        binding.statisticsTab.setBackgroundResource(R.drawable.selected_day)
     }
 
     override fun onDestroyView() {

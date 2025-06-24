@@ -5,4 +5,33 @@
     <color name="background_color">#161616</color>
     <color name="button_color">#F63D68</color>
     <color name="card_background">#1E1E1E</color>
+
+    <color name="accent_color">#0F3460</color>
+
+    <color name="home_team_color">#4CAF50</color>
+    <color name="away_team_color">#FF5722</color>
+
+    <color name="starting_player_bg">#16213E</color>
+    <color name="substitute_player_bg">#1A1A2E</color>
+
+    <color name="border_color">#3A3A5C</color>
+    <color name="rating_background">#2C2C54</color>
+    <color name="assist_text_color">#9E9E9E</color>
+
+    <color name="goal_color">#4CAF50</color>
+    <color name="yellow_card_color">#FFC107</color>
+    <color name="red_card_color">#F44336</color>
+    <color name="substitution_color">#2196F3</color>
+
+    <color name="rating_excellent">#4CAF50</color>
+    <color name="rating_good">#8BC34A</color>
+    <color name="rating_average">#FF9800</color>
+    <color name="rating_poor">#F44336</color>
+
+    <color name="live_match_color">#FF4444</color>
+    <color name="finished_match_color">#9E9E9E</color>
+    <color name="upcoming_match_color">#2196F3</color>
+
+
 </resources>
+

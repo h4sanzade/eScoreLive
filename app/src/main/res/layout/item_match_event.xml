@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/card_background">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <!-- Team Color Indicator -->
+        <View
+            android:id="@+id/team_indicator"
+            android:layout_width="4dp"
+            android:layout_height="0dp"
+            android:background="@color/home_team_color"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Event Icon -->
+        <ImageView
+            android:id="@+id/event_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="12dp"
+            android:src="@drawable/ic_goal"
+            android:tint="@android:color/holo_green_dark"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/team_indicator"
+            app:layout_constraintBottom_toBottomOf="@id/player_name" />
+
+        <!-- Event Minute -->
+        <TextView
+            android:id="@+id/event_minute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="45'"
+            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:fontFamily="@font/mulish_bold"
+            android:background="@drawable/minute_background"
+            android:padding="4dp"
+            android:minWidth="32dp"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/event_icon" />
+
+        <!-- Player Name -->
+        <TextView
+            android:id="@+id/player_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:text="Bukayo Saka"
+            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:fontFamily="@font/mulish_bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/event_minute"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Event Detail -->
+        <TextView
+            android:id="@+id/event_detail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="8dp"
+            android:text="Normal Goal"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            android:fontFamily="@font/mulish_regular"
+            app:layout_constraintTop_toBottomOf="@id/player_name"
+            app:layout_constraintStart_toEndOf="@id/event_minute"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/assist_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="8dp"
+            android:text="Assist: Martin Ødegaard"
+            android:textSize="11sp"
+            android:textColor="@color/assist_text_color"
+            android:fontFamily="@font/mulish_regular"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/event_detail"
+            app:layout_constraintStart_toEndOf="@id/event_minute"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:visibility="visible" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
