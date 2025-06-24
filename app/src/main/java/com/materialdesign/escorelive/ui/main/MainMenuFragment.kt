@@ -13,6 +13,7 @@ import com.materialdesign.escorelive.LiveMatch
 import com.materialdesign.escorelive.adapter.LiveMatchAdapter
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.FragmentMainMenuBinding
+import com.materialdesign.escorelive.ui.matchdetail.MatchDetailFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
@@ -270,12 +271,13 @@ class MainMenuFragment : Fragment() {
     }
 
     private fun onMatchClick(match: LiveMatch) {
-        val matchInfo = when {
-            match.isFinished -> "${match.homeTeam.name} ${match.homeScore} - ${match.awayScore} ${match.awayTeam.name} (Final)"
-            match.isLive -> "${match.homeTeam.name} vs ${match.awayTeam.name} (Live)"
-            else -> "${match.homeTeam.name} vs ${match.awayTeam.name}"
-        }
-        Toast.makeText(context, matchInfo, Toast.LENGTH_SHORT).show()
+        // Navigate to match detail fragment
+        val matchDetailFragment = MatchDetailFragment.newInstance(match.id)
+
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, matchDetailFragment)
+            .addToBackStack("match_detail")
+            .commit()
     }
 
     override fun onResume() {
