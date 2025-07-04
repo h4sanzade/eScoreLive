@@ -31,19 +31,15 @@ class LiveMatchAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(match: LiveMatch) = with(binding) {
-            // League info
             leagueName.text = match.league.name
             loadImage(leagueLogo, match.league.logo)
 
-            // Team names
             homeTeamName.text = match.homeTeam.name
             awayTeamName.text = match.awayTeam.name
 
-            // Team logos
             loadImage(homeTeamLogo, match.homeTeam.logo)
             loadImage(awayTeamLogo, match.awayTeam.logo)
 
-            // Match minute and status indicator
             matchMinute.text = match.matchMinute
 
             when {
@@ -62,7 +58,6 @@ class LiveMatchAdapter(
                     matchMinute.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
                     homeScore.visibility = android.view.View.VISIBLE
                     awayScore.visibility = android.view.View.VISIBLE
-                    // Show final scores for finished matches from API
                     homeScore.text = match.homeScore.toString()
                     awayScore.text = match.awayScore.toString()
                     detailsBtn.text = "Match Report"
@@ -83,7 +78,6 @@ class LiveMatchAdapter(
                     matchMinute.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
                     homeScore.visibility = android.view.View.VISIBLE
                     awayScore.visibility = android.view.View.VISIBLE
-                    // For any other state, show scores if available from API
                     if (match.homeScore > 0 || match.awayScore > 0) {
                         homeScore.text = match.homeScore.toString()
                         awayScore.text = match.awayScore.toString()

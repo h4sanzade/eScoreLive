@@ -48,6 +48,7 @@ class MainMenuViewModel @Inject constructor(
 
             repository.getLiveMatches()
                 .onSuccess { matches ->
+                    // Filter for actually live matches
                     val actuallyLive = matches.filter { it.isLive }
                     _liveMatches.value = actuallyLive
                 }
@@ -66,7 +67,6 @@ class MainMenuViewModel @Inject constructor(
 
             repository.getMatchesByDate(date)
                 .onSuccess { matches ->
-                    // Show all matches for the selected date (past, present, future)
                     val sortedMatches = sortMatchesByStatus(matches)
                     _todayMatches.value = sortedMatches
                 }
@@ -100,6 +100,7 @@ class MainMenuViewModel @Inject constructor(
         _selectedDate.value = date
         loadMatchesByDate(date)
 
+        // If today is selected, also load live matches
         val today = dateFormat.format(Date())
         if (date == today) {
             loadLiveMatches()
@@ -107,9 +108,14 @@ class MainMenuViewModel @Inject constructor(
     }
 
     fun refreshData() {
-        loadLiveMatches()
-        _selectedDate.value?.let { date ->
-            loadMatchesByDate(date)
+        _selectedDate.value?.let { selectedDate ->
+            loadMatchesByDate(selectedDate)
+
+            // If today is selected, also refresh live matches
+            val today = dateFormat.format(Date())
+            if (selectedDate == today) {
+                loadLiveMatches()
+            }
         }
     }
 
@@ -123,52 +129,56 @@ class MainMenuViewModel @Inject constructor(
     }
 
     fun isSelectedDateInPast(): Boolean {
-        val today = Calendar.getInstance()
         val selectedDateStr = _selectedDate.value ?: return false
+        val today = dateFormat.format(Date())
 
         return try {
-            val selectedDate = dateFormat.parse(selectedDateStr)
-            val selectedCalendar = Calendar.getInstance().apply {
-                time = selectedDate ?: Date()
-            }
+            val selectedCalendar = Calendar.getInstance()
+            val todayCalendar = Calendar.getInstance()
 
+            selectedCalendar.time = dateFormat.parse(selectedDateStr) ?: Date()
+            todayCalendar.time = dateFormat.parse(today) ?: Date()
+
+            // Compare dates only (ignore time)
             selectedCalendar.set(Calendar.HOUR_OF_DAY, 0)
             selectedCalendar.set(Calendar.MINUTE, 0)
             selectedCalendar.set(Calendar.SECOND, 0)
             selectedCalendar.set(Calendar.MILLISECOND, 0)
 
-            today.set(Calendar.HOUR_OF_DAY, 0)
-            today.set(Calendar.MINUTE, 0)
-            today.set(Calendar.SECOND, 0)
-            today.set(Calendar.MILLISECOND, 0)
+            todayCalendar.set(Calendar.HOUR_OF_DAY, 0)
+            todayCalendar.set(Calendar.MINUTE, 0)
+            todayCalendar.set(Calendar.SECOND, 0)
+            todayCalendar.set(Calendar.MILLISECOND, 0)
 
-            selectedCalendar.before(today)
+            selectedCalendar.before(todayCalendar)
         } catch (e: Exception) {
             false
         }
     }
 
     fun isSelectedDateInFuture(): Boolean {
-        val today = Calendar.getInstance()
         val selectedDateStr = _selectedDate.value ?: return false
+        val today = dateFormat.format(Date())
 
         return try {
-            val selectedDate = dateFormat.parse(selectedDateStr)
-            val selectedCalendar = Calendar.getInstance().apply {
-                time = selectedDate ?: Date()
-            }
+            val selectedCalendar = Calendar.getInstance()
+            val todayCalendar = Calendar.getInstance()
 
+            selectedCalendar.time = dateFormat.parse(selectedDateStr) ?: Date()
+            todayCalendar.time = dateFormat.parse(today) ?: Date()
+
+            // Compare dates only (ignore time)
             selectedCalendar.set(Calendar.HOUR_OF_DAY, 0)
             selectedCalendar.set(Calendar.MINUTE, 0)
             selectedCalendar.set(Calendar.SECOND, 0)
             selectedCalendar.set(Calendar.MILLISECOND, 0)
 
-            today.set(Calendar.HOUR_OF_DAY, 0)
-            today.set(Calendar.MINUTE, 0)
-            today.set(Calendar.SECOND, 0)
-            today.set(Calendar.MILLISECOND, 0)
+            todayCalendar.set(Calendar.HOUR_OF_DAY, 0)
+            todayCalendar.set(Calendar.MINUTE, 0)
+            todayCalendar.set(Calendar.SECOND, 0)
+            todayCalendar.set(Calendar.MILLISECOND, 0)
 
-            selectedCalendar.after(today)
+            selectedCalendar.after(todayCalendar)
         } catch (e: Exception) {
             false
         }
