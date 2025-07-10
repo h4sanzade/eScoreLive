@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mainMenuFragment">
+
+    <fragment
+        android:id="@+id/mainMenuFragment"
+        android:name="com.materialdesign.escorelive.ui.main.MainMenuFragment"
+        android:label="Main Menu"
+        tools:layout="@layout/fragment_main_menu">
+
+        <action
+            android:id="@+id/action_mainMenu_to_allMatches"
+            app:destination="@id/allMatchesFragment" />
+
+        <action
+            android:id="@+id/action_mainMenu_to_matchDetail"
+            app:destination="@id/matchDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/allMatchesFragment"
+        android:name="com.materialdesign.escorelive.ui.allmatchs.AllMatchesFragment"
+        android:label="All Matches"
+        tools:layout="@layout/fragment_all_matches">
+
+        <action
+            android:id="@+id/action_allMatches_to_matchDetail"
+            app:destination="@id/matchDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/matchDetailFragment"
+        android:name="com.materialdesign.escorelive.ui.matchdetail.MatchDetailFragment"
+        android:label="Match Detail"
+        tools:layout="@layout/fragment_match_detail">
+
+        <argument
+            android:name="matchId"
+            app:argType="long" />
+    </fragment>
+
+</navigation>

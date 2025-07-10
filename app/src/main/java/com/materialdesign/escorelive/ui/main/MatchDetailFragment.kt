@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.materialdesign.escorelive.LiveMatch
@@ -25,14 +27,8 @@ class MatchDetailFragment : Fragment() {
     private lateinit var eventsAdapter: MatchEventsAdapter
     private lateinit var lineupAdapter: LineupAdapter
 
-    private var matchId: Long = -1
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            matchId = it.getLong(ARG_MATCH_ID)
-        }
-    }
+    // Navigation Component safe args
+    private val args: MatchDetailFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,8 +45,8 @@ class MatchDetailFragment : Fragment() {
         observeViewModel()
         setupClickListeners()
 
-        // Load match details
-        viewModel.loadMatchDetails(matchId)
+        // Load match details using safe args
+        viewModel.loadMatchDetails(args.matchId)
     }
 
     private fun setupRecyclerViews() {
@@ -168,7 +164,8 @@ class MatchDetailFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.backButton.setOnClickListener {
-            parentFragmentManager.popBackStack()
+            // Navigation Component ile geri git
+            findNavController().popBackStack()
         }
 
         binding.eventsTab.setOnClickListener {
@@ -220,15 +217,5 @@ class MatchDetailFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        private const val ARG_MATCH_ID = "match_id"
-
-        fun newInstance(matchId: Long) = MatchDetailFragment().apply {
-            arguments = Bundle().apply {
-                putLong(ARG_MATCH_ID, matchId)
-            }
-        }
     }
 }

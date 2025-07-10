@@ -32,6 +32,16 @@
     <color name="finished_match_color">#9E9E9E</color>
     <color name="upcoming_match_color">#2196F3</color>
 
+    <color name="live_match_bg">#1B4332</color>
+    <color name="finished_match_bg">#2D2D2D</color>
+    <color name="upcoming_match_bg">#1E3A8A</color>
+
+
+
+    <!-- Filter colors -->
+    <color name="filter_selected_bg">#F63D68</color>
+    <color name="filter_unselected_bg">#374151</color>
+
 
 </resources>
 

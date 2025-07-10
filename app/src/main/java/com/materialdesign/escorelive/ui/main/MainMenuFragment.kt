@@ -8,12 +8,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.materialdesign.escorelive.LiveMatch
 import com.materialdesign.escorelive.adapter.LiveMatchAdapter
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.FragmentMainMenuBinding
-import com.materialdesign.escorelive.ui.matchdetail.MatchDetailFragment
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
@@ -269,7 +269,8 @@ class MainMenuFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.seeMoreBtn.setOnClickListener {
-            // Handle see more button click
+            // Navigation Component ile All Matches Fragment'e git
+            findNavController().navigate(R.id.action_mainMenu_to_allMatches)
         }
 
         binding.searchId.setOnClickListener {
@@ -282,13 +283,8 @@ class MainMenuFragment : Fragment() {
     }
 
     private fun onMatchClick(match: LiveMatch) {
-        // Navigate to match detail fragment
-        val matchDetailFragment = MatchDetailFragment.newInstance(match.id)
-
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, matchDetailFragment)
-            .addToBackStack("match_detail")
-            .commit()
+        val action = MainMenuFragmentDirections.actionMainMenuToMatchDetail(match.id)
+        findNavController().navigate(action)
     }
 
     override fun onResume() {
