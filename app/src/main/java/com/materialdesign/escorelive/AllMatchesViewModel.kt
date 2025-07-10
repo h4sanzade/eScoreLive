@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import android.util.Log
 
 @HiltViewModel
 class AllMatchesViewModel @Inject constructor(
@@ -33,34 +34,50 @@ class AllMatchesViewModel @Inject constructor(
     private var allMatchesList: List<LiveMatch> = emptyList()
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-    // Popular leagues to filter
+    // Expanded leagues list - including all European competitions
     private val popularLeagues = setOf(
-        // Premier League
-        39,
-        // La Liga
-        140,
-        // Bundesliga
-        78,
-        // Serie A
-        135,
-        // Ligue 1
-        61,
-        // Champions League
-        2,
-        // Europa League
-        3,
-        // Turkish Super League
-        203,
-        // Turkish 1. Lig
-        204,
-        // Azerbaijan Premier League
-        342,
-        // World Cup
-        1,
-        // European Championship
-        4,
-        // Nations League
-        5
+        // Major European Leagues
+        39,  // Premier League
+        140, // La Liga
+        78,  // Bundesliga
+        135, // Serie A
+        61,  // Ligue 1
+        94,  // Primeira Liga
+        88,  // Eredivisie
+
+        // European Competitions
+        2,   // Champions League
+        3,   // Europa League
+        848, // Europa League Play-offs
+        4,   // Euro Championship
+        5,   // Nations League
+
+        // Other Popular Leagues
+        203, // Turkish Super League
+        204, // Turkish 1. Lig
+        342, // Azerbaijan Premier League
+        235, // Russian Premier League
+
+        // World Competitions
+        1,   // World Cup
+        17,  // Africa Cup of Nations
+        9,   // Copa America
+
+        // Additional European Leagues
+        179, // Scottish Premiership
+        144, // Belgian Pro League
+        103, // Eliteserien (Norway)
+        113, // Allsvenskan (Sweden)
+        119, // Superligaen (Denmark)
+
+        // Conference League
+        848, // Conference League Play-offs
+
+        // Additional Competitions
+        81,  // DFB Pokal
+        137, // Coppa Italia
+        48,  // FA Cup
+        143  // Copa del Rey
     )
 
     init {
@@ -73,48 +90,79 @@ class AllMatchesViewModel @Inject constructor(
             _error.value = null
 
             try {
-                // Load live matches
-                val liveMatches = repository.getLiveMatches().getOrNull() ?: emptyList()
+                val allMatchesSet = mutableSetOf<LiveMatch>()
 
-                // Load today's matches
+                // 1. Load live matches first
+                try {
+                    val liveMatches = repository.getLiveMatches().getOrNull() ?: emptyList()
+                    allMatchesSet.addAll(liveMatches)
+                    Log.d("AllMatchesViewModel", "Loaded ${liveMatches.size} live matches")
+                } catch (e: Exception) {
+                    Log.e("AllMatchesViewModel", "Failed to load live matches", e)
+                }
+
+                // 2. Load today's matches
                 val today = dateFormat.format(Date())
-                val todayMatches = repository.getMatchesByDate(today).getOrNull() ?: emptyList()
+                try {
+                    val todayMatches = repository.getMatchesByDate(today).getOrNull() ?: emptyList()
+                    allMatchesSet.addAll(todayMatches)
+                    Log.d("AllMatchesViewModel", "Loaded ${todayMatches.size} matches for today")
 
-                // Load matches for the next few days from popular leagues
-                val upcomingMatches = mutableListOf<LiveMatch>()
-                for (i in 1..3) {
-                    val calendar = Calendar.getInstance()
-                    calendar.add(Calendar.DAY_OF_MONTH, i)
-                    val futureDate = dateFormat.format(calendar.time)
-
-                    val dayMatches = repository.getMatchesByDate(futureDate).getOrNull() ?: emptyList()
-                    upcomingMatches.addAll(dayMatches)
+                    // Debug: Log today's matches
+                    todayMatches.forEach { match ->
+                        Log.d("AllMatchesViewModel", "Today: ${match.homeTeam.name} vs ${match.awayTeam.name} - League: ${match.league.name} (ID: ${match.league.id})")
+                    }
+                } catch (e: Exception) {
+                    Log.e("AllMatchesViewModel", "Failed to load today's matches", e)
                 }
 
-                // Load matches from popular leagues
-                val leagueMatches = mutableListOf<LiveMatch>()
-                for (leagueId in popularLeagues.take(5)) { // Limit API calls
+                // 3. Load upcoming matches (next 7 days)
+                for (i in 1..7) {
                     try {
-                        val matches = repository.getMatchesByLeague(leagueId, 2024).getOrNull() ?: emptyList()
-                        leagueMatches.addAll(matches)
-                        delay(100) // Small delay to avoid hitting API rate limits
+                        val calendar = Calendar.getInstance()
+                        calendar.add(Calendar.DAY_OF_MONTH, i)
+                        val futureDate = dateFormat.format(calendar.time)
+
+                        val dayMatches = repository.getMatchesByDate(futureDate).getOrNull() ?: emptyList()
+                        allMatchesSet.addAll(dayMatches)
+
+                        if (dayMatches.isNotEmpty()) {
+                            Log.d("AllMatchesViewModel", "Loaded ${dayMatches.size} matches for $futureDate")
+                        }
+
+                        delay(50) // Small delay to avoid API rate limits
                     } catch (e: Exception) {
-                        // Continue if one league fails
+                        Log.e("AllMatchesViewModel", "Failed to load matches for day $i", e)
                     }
                 }
 
-                // Combine all matches and remove duplicates
-                val combinedMatches = (liveMatches + todayMatches + upcomingMatches + leagueMatches)
-                    .distinctBy { it.id }
-                    .filter { match ->
-                        // Filter only popular leagues
-                        popularLeagues.contains(match.league.id.toInt())
-                    }
+                // 4. Load matches from popular leagues (current season)
+                val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+                for (leagueId in popularLeagues.take(15)) { // Increased to 15 leagues
+                    try {
+                        val matches = repository.getMatchesByLeague(leagueId, currentYear).getOrNull() ?: emptyList()
+                        allMatchesSet.addAll(matches)
 
-                allMatchesList = sortMatchesByPriority(combinedMatches)
+                        if (matches.isNotEmpty()) {
+                            Log.d("AllMatchesViewModel", "Loaded ${matches.size} matches for league ID: $leagueId")
+                        }
+
+                        delay(100) // Delay to avoid hitting API rate limits
+                    } catch (e: Exception) {
+                        Log.e("AllMatchesViewModel", "Failed to load matches for league $leagueId", e)
+                    }
+                }
+
+                // 5. Convert set to list and sort
+                allMatchesList = allMatchesSet.toList()
+                allMatchesList = sortMatchesByPriority(allMatchesList)
+
+                Log.d("AllMatchesViewModel", "Total unique matches loaded: ${allMatchesList.size}")
+
                 applyCurrentFilter()
 
             } catch (e: Exception) {
+                Log.e("AllMatchesViewModel", "Failed to load matches", e)
                 _error.value = "Failed to load matches: ${e.message}"
             } finally {
                 _isLoading.value = false
@@ -133,11 +181,12 @@ class AllMatchesViewModel @Inject constructor(
 
     private fun applyCurrentFilter() {
         val filter = _selectedFilter.value ?: MatchFilter.ALL
+        val today = dateFormat.format(Date())
+
         val filteredMatches = when (filter) {
             MatchFilter.ALL -> allMatchesList
             MatchFilter.LIVE -> allMatchesList.filter { it.isLive }
             MatchFilter.TODAY -> {
-                val today = dateFormat.format(Date())
                 allMatchesList.filter { match ->
                     match.kickoffTime?.startsWith(today) == true
                 }
@@ -146,6 +195,7 @@ class AllMatchesViewModel @Inject constructor(
             MatchFilter.UPCOMING -> allMatchesList.filter { it.isUpcoming }
         }
 
+        Log.d("AllMatchesViewModel", "Applied filter: $filter, showing ${filteredMatches.size} matches")
         _allMatches.value = filteredMatches
     }
 
@@ -166,16 +216,19 @@ class AllMatchesViewModel @Inject constructor(
                 Long.MAX_VALUE
             }
         }.thenBy { match ->
-            // Sort by league popularity (Champions League, Premier League, etc.)
+            // Sort by league importance
             when (match.league.id.toInt()) {
-                2 -> 0 // Champions League
-                39 -> 1 // Premier League
-                140 -> 2 // La Liga
-                78 -> 3 // Bundesliga
-                135 -> 4 // Serie A
-                61 -> 5 // Ligue 1
-                203 -> 6 // Turkish Super League
-                else -> 7
+                2 -> 0   // Champions League
+                3 -> 1   // Europa League
+                848 -> 2 // Europa League Play-offs
+                39 -> 3  // Premier League
+                140 -> 4 // La Liga
+                78 -> 5  // Bundesliga
+                135 -> 6 // Serie A
+                61 -> 7  // Ligue 1
+                342 -> 8 // Azerbaijan Premier League
+                203 -> 9 // Turkish Super League
+                else -> 10
             }
         })
     }

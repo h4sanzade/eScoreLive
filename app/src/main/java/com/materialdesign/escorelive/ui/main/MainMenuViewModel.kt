@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import android.util.Log
 
 @HiltViewModel
 class MainMenuViewModel @Inject constructor(
@@ -46,15 +47,22 @@ class MainMenuViewModel @Inject constructor(
             _isLoading.value = true
             _error.value = null
 
-            repository.getLiveMatches()
-                .onSuccess { matches ->
-                    // Filter for actually live matches
-                    val actuallyLive = matches.filter { it.isLive }
-                    _liveMatches.value = actuallyLive
-                }
-                .onFailure { exception ->
-                    _error.value = exception.message
-                }
+            try {
+                repository.getLiveMatches()
+                    .onSuccess { matches ->
+                        // Filter for actually live matches
+                        val actuallyLive = matches.filter { it.isLive }
+                        _liveMatches.value = actuallyLive
+                        Log.d("MainMenuViewModel", "Loaded ${actuallyLive.size} live matches")
+                    }
+                    .onFailure { exception ->
+                        Log.e("MainMenuViewModel", "Failed to load live matches", exception)
+                        _error.value = exception.message
+                    }
+            } catch (e: Exception) {
+                Log.e("MainMenuViewModel", "Exception loading live matches", e)
+                _error.value = e.message
+            }
 
             _isLoading.value = false
         }
@@ -65,14 +73,26 @@ class MainMenuViewModel @Inject constructor(
             _isLoading.value = true
             _error.value = null
 
-            repository.getMatchesByDate(date)
-                .onSuccess { matches ->
-                    val sortedMatches = sortMatchesByStatus(matches)
-                    _todayMatches.value = sortedMatches
-                }
-                .onFailure { exception ->
-                    _error.value = exception.message
-                }
+            try {
+                repository.getMatchesByDate(date)
+                    .onSuccess { matches ->
+                        // DEBUG: Log all matches for the selected date
+                        Log.d("MainMenuViewModel", "Loaded ${matches.size} matches for date: $date")
+                        matches.forEach { match ->
+                            Log.d("MainMenuViewModel", "Match: ${match.homeTeam.name} vs ${match.awayTeam.name} - League: ${match.league.name} (ID: ${match.league.id}) - Status: ${match.matchStatus}")
+                        }
+
+                        val sortedMatches = sortMatchesByStatus(matches)
+                        _todayMatches.value = sortedMatches
+                    }
+                    .onFailure { exception ->
+                        Log.e("MainMenuViewModel", "Failed to load matches for date: $date", exception)
+                        _error.value = exception.message
+                    }
+            } catch (e: Exception) {
+                Log.e("MainMenuViewModel", "Exception loading matches for date: $date", e)
+                _error.value = e.message
+            }
 
             _isLoading.value = false
         }
@@ -93,10 +113,26 @@ class MainMenuViewModel @Inject constructor(
             } catch (e: Exception) {
                 Long.MAX_VALUE
             }
+        }.thenBy { match ->
+            // Prioritize important leagues
+            when (match.league.id.toInt()) {
+                2 -> 0   // Champions League
+                3 -> 1   // Europa League
+                848 -> 2 // Europa League Play-offs
+                39 -> 3  // Premier League
+                140 -> 4 // La Liga
+                78 -> 5  // Bundesliga
+                135 -> 6 // Serie A
+                61 -> 7  // Ligue 1
+                342 -> 8 // Azerbaijan Premier League
+                203 -> 9 // Turkish Super League
+                else -> 10
+            }
         })
     }
 
     fun selectDate(date: String) {
+        Log.d("MainMenuViewModel", "Selected date: $date")
         _selectedDate.value = date
         loadMatchesByDate(date)
 
@@ -109,6 +145,7 @@ class MainMenuViewModel @Inject constructor(
 
     fun refreshData() {
         _selectedDate.value?.let { selectedDate ->
+            Log.d("MainMenuViewModel", "Refreshing data for date: $selectedDate")
             loadMatchesByDate(selectedDate)
 
             // If today is selected, also refresh live matches
