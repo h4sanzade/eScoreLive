@@ -27,7 +27,6 @@ class MatchDetailFragment : Fragment() {
     private lateinit var eventsAdapter: MatchEventsAdapter
     private lateinit var lineupAdapter: LineupAdapter
 
-    // Navigation Component safe args
     private val args: MatchDetailFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -45,7 +44,6 @@ class MatchDetailFragment : Fragment() {
         observeViewModel()
         setupClickListeners()
 
-        // Load match details using safe args
         viewModel.loadMatchDetails(args.matchId)
     }
 
@@ -111,50 +109,40 @@ class MatchDetailFragment : Fragment() {
                 .placeholder(R.drawable.ic_placeholder)
                 .into(awayTeamLogo)
 
-            // Score
             homeScore.text = match.homeScore.toString()
             awayScore.text = match.awayScore.toString()
 
-            // Match status
             matchStatus.text = match.matchStatus
             matchMinute.text = match.matchMinute
 
-            // League
             leagueName.text = match.league.name
             Glide.with(this@MatchDetailFragment)
                 .load(match.league.logo)
                 .placeholder(R.drawable.ic_placeholder)
                 .into(leagueLogo)
 
-            // Date and time
             kickoffTime.text = match.kickoffTimeFormatted ?: "TBD"
         }
     }
 
     private fun updateStatistics(stats: MatchStatistics) {
         with(binding) {
-            // Ball possession
             homePossession.text = "${stats.homePossession}%"
             awayPossession.text = "${stats.awayPossession}%"
             possessionProgressBar.progress = stats.homePossession
 
-            // Shots
             homeShots.text = stats.homeShots.toString()
             awayShots.text = stats.awayShots.toString()
 
-            // Shots on target
             homeShotsOnTarget.text = stats.homeShotsOnTarget.toString()
             awayShotsOnTarget.text = stats.awayShotsOnTarget.toString()
 
-            // Corners
             homeCorners.text = stats.homeCorners.toString()
             awayCorners.text = stats.awayCorners.toString()
 
-            // Yellow cards
             homeYellowCards.text = stats.homeYellowCards.toString()
             awayYellowCards.text = stats.awayYellowCards.toString()
 
-            // Red cards
             homeRedCards.text = stats.homeRedCards.toString()
             awayRedCards.text = stats.awayRedCards.toString()
 
@@ -164,7 +152,6 @@ class MatchDetailFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.backButton.setOnClickListener {
-            // Navigation Component ile geri git
             findNavController().popBackStack()
         }
 
@@ -186,7 +173,6 @@ class MatchDetailFragment : Fragment() {
         binding.lineupSection.visibility = View.GONE
         binding.statisticsSection.visibility = View.GONE
 
-        // Update tab appearance
         binding.eventsTab.setBackgroundResource(R.drawable.selected_day)
         binding.lineupTab.background = null
         binding.statisticsTab.background = null
@@ -197,7 +183,6 @@ class MatchDetailFragment : Fragment() {
         binding.lineupSection.visibility = View.VISIBLE
         binding.statisticsSection.visibility = View.GONE
 
-        // Update tab appearance
         binding.eventsTab.background = null
         binding.lineupTab.setBackgroundResource(R.drawable.selected_day)
         binding.statisticsTab.background = null
@@ -208,7 +193,6 @@ class MatchDetailFragment : Fragment() {
         binding.lineupSection.visibility = View.GONE
         binding.statisticsSection.visibility = View.VISIBLE
 
-        // Update tab appearance
         binding.eventsTab.background = null
         binding.lineupTab.background = null
         binding.statisticsTab.setBackgroundResource(R.drawable.selected_day)

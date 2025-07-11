@@ -31,17 +31,14 @@ class AllMatchesAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(match: LiveMatch) = with(binding) {
-            // League info
             leagueName.text = match.league.name
             loadImage(leagueLogo, match.league.logo)
 
-            // Teams
             homeTeamName.text = match.homeTeam.name
             awayTeamName.text = match.awayTeam.name
             loadImage(homeTeamLogo, match.homeTeam.logo)
             loadImage(awayTeamLogo, match.awayTeam.logo)
 
-            // Match time and status
             matchTime.text = match.matchMinute
 
             when {
@@ -103,7 +100,6 @@ class AllMatchesAdapter(
                 }
             }
 
-            // Format and display match date
             displayMatchDate(match)
 
             root.setOnClickListener { onMatchClick(match) }

@@ -27,7 +27,6 @@ class AllMatchesFragment : Fragment() {
     private val viewModel: AllMatchesViewModel by viewModels()
     private lateinit var allMatchesAdapter: AllMatchesAdapter
 
-    // Navigation args
     private val args: AllMatchesFragmentArgs by navArgs()
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -49,14 +48,11 @@ class AllMatchesFragment : Fragment() {
         setupClickListeners()
         setupSwipeRefresh()
 
-        // Determine display type based on selected date
         val selectedDate = args.selectedDate.ifEmpty { dateFormat.format(Date()) }
         val displayType = determineDisplayType(selectedDate)
 
-        // Update UI based on display type
         updateUIForDisplayType(displayType, selectedDate)
 
-        // Load data based on display type
         viewModel.loadMatchesForDate(selectedDate, displayType)
     }
 
@@ -70,7 +66,6 @@ class AllMatchesFragment : Fragment() {
             selectedCalendar.time = dateFormat.parse(selectedDate) ?: Date()
             todayCalendar.time = dateFormat.parse(today) ?: Date()
 
-            // Compare dates only (ignore time)
             selectedCalendar.set(Calendar.HOUR_OF_DAY, 0)
             selectedCalendar.set(Calendar.MINUTE, 0)
             selectedCalendar.set(Calendar.SECOND, 0)
@@ -106,14 +101,11 @@ class AllMatchesFragment : Fragment() {
             DisplayType.FUTURE -> "Fixtures - $formattedDate"
         }
 
-        // Show/hide filter buttons based on display type
         when (displayType) {
             DisplayType.PAST -> {
-                // Hide filter buttons for past matches
                 binding.filterScrollView.visibility = View.GONE
             }
             DisplayType.TODAY -> {
-                // Show all filters for today
                 binding.filterScrollView.visibility = View.VISIBLE
                 binding.filterAll.visibility = View.VISIBLE
                 binding.filterLive.visibility = View.VISIBLE
@@ -121,7 +113,6 @@ class AllMatchesFragment : Fragment() {
                 binding.filterUpcoming.visibility = View.VISIBLE
             }
             DisplayType.FUTURE -> {
-                // Hide filter buttons for future matches
                 binding.filterScrollView.visibility = View.GONE
             }
         }
@@ -198,18 +189,16 @@ class AllMatchesFragment : Fragment() {
     }
 
     private fun updateFilterButtons(selectedFilter: MatchFilter) {
-        // Reset all buttons
         binding.filterAll.setBackgroundResource(R.drawable.filter_unselected_bg)
         binding.filterLive.setBackgroundResource(R.drawable.filter_unselected_bg)
         binding.filterFinished.setBackgroundResource(R.drawable.filter_unselected_bg)
         binding.filterUpcoming.setBackgroundResource(R.drawable.filter_unselected_bg)
 
-        // Set selected button
         when (selectedFilter) {
-            MatchFilter.ALL -> binding.filterAll.setBackgroundResource(R.drawable.filter_selected_bg)
-            MatchFilter.LIVE -> binding.filterLive.setBackgroundResource(R.drawable.filter_selected_bg)
-            MatchFilter.FINISHED -> binding.filterFinished.setBackgroundResource(R.drawable.filter_selected_bg)
-            MatchFilter.UPCOMING -> binding.filterUpcoming.setBackgroundResource(R.drawable.filter_selected_bg)
+            MatchFilter.ALL -> binding.filterAll.setBackgroundResource(R.drawable.bottom_line_selected)
+            MatchFilter.LIVE -> binding.filterLive.setBackgroundResource(R.drawable.bottom_line_selected)
+            MatchFilter.FINISHED -> binding.filterFinished.setBackgroundResource(R.drawable.bottom_line_selected)
+            MatchFilter.UPCOMING -> binding.filterUpcoming.setBackgroundResource(R.drawable.bottom_line_selected)
         }
     }
 

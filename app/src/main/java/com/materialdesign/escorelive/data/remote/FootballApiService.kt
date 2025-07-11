@@ -69,7 +69,7 @@ interface FootballApiService {
     suspend fun getH2HMatches(
         @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
         @Header("X-RapidAPI-Host") host: String = API_HOST,
-        @Query("h2h") h2h: String, // Format: "teamId1-teamId2"
+        @Query("h2h") h2h: String,
         @Query("last") last: Int = 10
     ): Response<FixturesResponse>
 

@@ -9,35 +9,38 @@
 
 
     <!-- Header -->
+
+    <!-- Filter Buttons -->
     <LinearLayout
         android:id="@+id/header_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:padding="16dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/back_button"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/vector_left"
             android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:padding="4dp" />
+            android:padding="4dp"
+            android:src="@drawable/vector_left" />
 
         <TextView
             android:id="@+id/header_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="All Matches"
-            android:textSize="18sp"
-            android:textColor="@color/white"
             android:fontFamily="@font/mulish_bold"
-            android:textAlignment="center" />
+            android:text="All Matches"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
 
         <View
             android:layout_width="24dp"
@@ -45,7 +48,6 @@
 
     </LinearLayout>
 
-    <!-- Filter Buttons -->
     <HorizontalScrollView
         android:id="@+id/filter_scroll_view"
         android:layout_width="match_parent"
@@ -64,19 +66,21 @@
             android:orientation="horizontal"
             android:paddingEnd="16dp">
 
-            <TextView
-                android:id="@+id/filter_all"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="All"
-                android:textSize="14sp"
-                android:textColor="@color/white"
-                android:fontFamily="@font/mulish_bold"
-                android:background="@drawable/filter_selected_bg"
-                android:padding="12dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/filter_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All"
+                    android:textSize="14sp"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/mulish_bold"
+                    android:padding="12dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:background="@drawable/bottom_line_selected" />
+
+
 
             <TextView
                 android:id="@+id/filter_live"
@@ -84,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:text="Live"
                 android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/white"
                 android:fontFamily="@font/mulish_bold"
                 android:background="@drawable/filter_unselected_bg"
                 android:padding="12dp"
@@ -98,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:text="Today"
                 android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/white"
                 android:fontFamily="@font/mulish_bold"
                 android:background="@drawable/filter_unselected_bg"
                 android:padding="12dp"
@@ -112,7 +116,7 @@
                 android:layout_height="wrap_content"
                 android:text="Finished"
                 android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/white"
                 android:fontFamily="@font/mulish_bold"
                 android:background="@drawable/filter_unselected_bg"
                 android:padding="12dp"
@@ -126,7 +130,7 @@
                 android:layout_height="wrap_content"
                 android:text="Upcoming"
                 android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/white"
                 android:fontFamily="@font/mulish_bold"
                 android:background="@drawable/filter_unselected_bg"
                 android:padding="12dp"

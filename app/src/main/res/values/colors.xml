@@ -6,7 +6,7 @@
     <color name="button_color">#F63D68</color>
     <color name="card_background">#1E1E1E</color>
 
-    <color name="accent_color">#0F3460</color>
+    <color name="accent_color">#F63D68</color>
 
 
 
@@ -33,7 +33,7 @@
 
     <!-- Filter colors -->
     <color name="filter_selected_bg">#F63D68</color>
-    <color name="filter_unselected_bg">#374151</color>
+    <color name="filter_unselected_bg">#161616</color>
 
 
     <!-- Match status colors -->

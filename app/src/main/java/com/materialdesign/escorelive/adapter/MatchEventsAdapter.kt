@@ -36,7 +36,6 @@ class MatchEventsAdapter : ListAdapter<MatchEvent, MatchEventsAdapter.EventViewH
                 assistText.visibility = android.view.View.GONE
             }
 
-            // Set event icon and color based on type
             when (event.type.lowercase()) {
                 "goal" -> {
                     eventIcon.setImageResource(R.drawable.ic_goal)
@@ -61,7 +60,6 @@ class MatchEventsAdapter : ListAdapter<MatchEvent, MatchEventsAdapter.EventViewH
                 }
             }
 
-            // Align event based on team (home team on left, away team on right)
             if (event.isHomeTeam) {
                 // Home team events on the left
                 root.layoutDirection = android.view.View.LAYOUT_DIRECTION_LTR

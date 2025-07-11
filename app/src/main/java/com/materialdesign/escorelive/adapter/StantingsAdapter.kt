@@ -26,10 +26,8 @@ class StandingsAdapter : ListAdapter<TeamStanding, StandingsAdapter.StandingView
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(standing: TeamStanding) = with(binding) {
-            // Position
             positionText.text = standing.rank.toString()
 
-            // Position background color based on rank
             when (standing.rank) {
                 in 1..4 -> positionText.setBackgroundResource(R.drawable.position_champions_bg)
                 in 5..6 -> positionText.setBackgroundResource(R.drawable.position_europa_bg)
@@ -37,7 +35,6 @@ class StandingsAdapter : ListAdapter<TeamStanding, StandingsAdapter.StandingView
                 else -> positionText.setBackgroundResource(R.drawable.position_normal_bg)
             }
 
-            // Team logo and name
             Glide.with(root.context)
                 .load(standing.team.logo)
                 .placeholder(R.drawable.ic_placeholder)
@@ -55,7 +52,6 @@ class StandingsAdapter : ListAdapter<TeamStanding, StandingsAdapter.StandingView
             gdText.text = standing.goalsDiff.toString()
             pointsText.text = standing.points.toString()
 
-            // Goal difference color
             when {
                 standing.goalsDiff > 0 -> gdText.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_green_dark))
                 standing.goalsDiff < 0 -> gdText.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_red_light))

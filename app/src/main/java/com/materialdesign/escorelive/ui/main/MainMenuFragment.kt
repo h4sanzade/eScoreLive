@@ -102,10 +102,8 @@ class MainMenuFragment : Fragment() {
         val today = Calendar.getInstance()
         val calendar = Calendar.getInstance()
 
-        // Navigate to the desired week
         calendar.add(Calendar.WEEK_OF_YEAR, currentWeekOffset)
 
-        // Find Monday of the current week
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
         val daysFromMonday = when (dayOfWeek) {
             Calendar.SUNDAY -> -6
@@ -126,7 +124,6 @@ class MainMenuFragment : Fragment() {
 
         binding.weekRangeText.text = "${weekRangeFormat.format(mondayDate)} - ${weekRangeFormat.format(sundayDate)}"
 
-        // Day names in correct order: Monday to Sunday
         val dayNames = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
         val dayNameViews = listOf(
             binding.day1Name, binding.day2Name, binding.day3Name, binding.day4Name,
@@ -139,14 +136,12 @@ class MainMenuFragment : Fragment() {
 
         var todayIndex = -1
 
-        // Reset calendar to Monday
         calendar.time = mondayDate
 
         for (i in 0..6) {
             dayNameViews[i].text = dayNames[i]
             dayDateViews[i].text = calendar.get(Calendar.DAY_OF_MONTH).toString()
 
-            // Check if this day is today
             if (calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                 calendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)) {
                 dayNameViews[i].text = "Today"
@@ -156,7 +151,6 @@ class MainMenuFragment : Fragment() {
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
 
-        // Auto-select today if it's in the current week, otherwise keep previous selection or select first day
         if (todayIndex != -1 && selectedDayIndex == -1) {
             selectedDayIndex = todayIndex
         } else if (selectedDayIndex == -1) {
@@ -172,10 +166,8 @@ class MainMenuFragment : Fragment() {
     private fun getDateForDayIndex(dayIndex: Int): String {
         val calendar = Calendar.getInstance()
 
-        // Navigate to the desired week
         calendar.add(Calendar.WEEK_OF_YEAR, currentWeekOffset)
 
-        // Find Monday of the current week
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
         val daysFromMonday = when (dayOfWeek) {
             Calendar.SUNDAY -> -6
@@ -237,26 +229,22 @@ class MainMenuFragment : Fragment() {
 
     private fun navigateWeek(weekOffset: Int) {
         currentWeekOffset += weekOffset
-        // Reset selected day when navigating weeks
         selectedDayIndex = -1
         updateWeekCalendar()
     }
 
     private fun observeViewModel() {
         viewModel.liveMatches.observe(viewLifecycleOwner, Observer { matches ->
-            // Only show live matches when today is selected
             if (viewModel.isSelectedDateToday()) {
                 liveMatchesAdapter.submitList(matches)
             }
         })
 
         viewModel.todayMatches.observe(viewLifecycleOwner, Observer { matches ->
-            // Show all matches for the selected date
             liveMatchesAdapter.submitList(matches)
         })
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
-            // Handle loading state if needed
         })
 
         viewModel.error.observe(viewLifecycleOwner, Observer { error ->
@@ -275,11 +263,9 @@ class MainMenuFragment : Fragment() {
         }
 
         binding.searchId.setOnClickListener {
-            // Handle search click
         }
 
         binding.notificationId.setOnClickListener {
-            // Handle notification click
         }
     }
 

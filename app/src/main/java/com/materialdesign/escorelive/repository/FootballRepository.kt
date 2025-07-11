@@ -30,11 +30,10 @@ class FootballRepository @Inject constructor(
                 val body = response.body()
                 Log.d("FootballRepository", "Response body is null: ${body == null}")
 
-                // API yanıtını detaylı logla
                 if (body != null) {
                     val gson = Gson()
                     val jsonString = gson.toJson(body)
-                    Log.d("FootballRepository", "Full API Response: ${jsonString.take(500)}...") // İlk 500 karakter
+                    Log.d("FootballRepository", "Full API Response: ${jsonString.take(500)}...")
                 }
 
                 val fixtures = body?.response ?: emptyList()
@@ -142,7 +141,6 @@ class FootballRepository @Inject constructor(
                 val matches = fixtures.mapNotNull { fixture ->
                     try {
                         val match = fixture.toLiveMatch()
-                        // Only log first few matches to avoid spam
                         if (fixtures.indexOf(fixture) < 3) {
                             Log.d("FootballRepository", "League $leagueId match: ${match.homeTeam.name} vs ${match.awayTeam.name} - ${match.matchStatus}")
                         }
@@ -211,7 +209,7 @@ class FootballRepository @Inject constructor(
                             player = eventData.player.name,
                             assistPlayer = eventData.assist?.name,
                             team = eventData.team.name,
-                            isHomeTeam = true // This should be determined from fixture data
+                            isHomeTeam = true
                         )
                     } catch (e: Exception) {
                         Log.e("FootballRepository", "Error converting event for match $matchId", e)

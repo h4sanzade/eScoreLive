@@ -33,7 +33,6 @@ class LineupAdapter : ListAdapter<LineupPlayer, LineupAdapter.LineupViewHolder>(
                 playerRating.text = String.format("%.1f", player.rating)
                 playerRating.visibility = android.view.View.VISIBLE
 
-                // Color rating based on value
                 val ratingColor = when {
                     player.rating >= 8.0f -> ContextCompat.getColor(root.context, android.R.color.holo_green_dark)
                     player.rating >= 7.0f -> ContextCompat.getColor(root.context, android.R.color.holo_orange_light)
@@ -45,7 +44,6 @@ class LineupAdapter : ListAdapter<LineupPlayer, LineupAdapter.LineupViewHolder>(
                 playerRating.visibility = android.view.View.GONE
             }
 
-            // Style based on starting/substitute
             if (player.isStarting) {
                 playerCard.setCardBackgroundColor(ContextCompat.getColor(root.context, R.color.starting_player_bg))
                 startingIndicator.visibility = android.view.View.VISIBLE
@@ -56,14 +54,12 @@ class LineupAdapter : ListAdapter<LineupPlayer, LineupAdapter.LineupViewHolder>(
                 startingIndicator.text = "Substitute"
             }
 
-            // Team color indicator
             if (player.isHomeTeam) {
                 teamIndicator.setBackgroundColor(ContextCompat.getColor(root.context, R.color.home_team_color))
             } else {
                 teamIndicator.setBackgroundColor(ContextCompat.getColor(root.context, R.color.away_team_color))
             }
 
-            // Jersey number styling
             playerNumber.setBackgroundResource(R.drawable.jersey_number_bg)
         }
     }

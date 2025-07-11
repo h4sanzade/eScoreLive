@@ -117,7 +117,6 @@ class MainMenuViewModel @Inject constructor(
                 Long.MAX_VALUE
             }
         }.thenBy { match ->
-            // Prioritize important leagues
             when (match.league.id.toInt()) {
                 2 -> 0   // Champions League
                 3 -> 1   // Europa League
@@ -139,7 +138,6 @@ class MainMenuViewModel @Inject constructor(
         _selectedDate.value = date
         loadMatchesByDate(date)
 
-        // If today is selected, also load live matches
         val today = dateFormat.format(Date())
         if (date == today) {
             loadLiveMatches()
@@ -151,7 +149,6 @@ class MainMenuViewModel @Inject constructor(
             Log.d("MainMenuViewModel", "Refreshing data for date: $selectedDate")
             loadMatchesByDate(selectedDate)
 
-            // If today is selected, also refresh live matches
             val today = dateFormat.format(Date())
             if (selectedDate == today) {
                 loadLiveMatches()
@@ -207,7 +204,6 @@ class MainMenuViewModel @Inject constructor(
             selectedCalendar.time = dateFormat.parse(selectedDateStr) ?: Date()
             todayCalendar.time = dateFormat.parse(today) ?: Date()
 
-            // Compare dates only (ignore time)
             selectedCalendar.set(Calendar.HOUR_OF_DAY, 0)
             selectedCalendar.set(Calendar.MINUTE, 0)
             selectedCalendar.set(Calendar.SECOND, 0)

@@ -28,7 +28,6 @@ class H2HAdapter : ListAdapter<LiveMatch, H2HAdapter.H2HViewHolder>(H2HDiffCallb
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(match: LiveMatch) = with(binding) {
-            // Date formatting
             val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
             val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
 
@@ -43,15 +42,12 @@ class H2HAdapter : ListAdapter<LiveMatch, H2HAdapter.H2HViewHolder>(H2HDiffCallb
                 matchDate.text = "Date N/A"
             }
 
-            // Teams
             homeTeamName.text = match.homeTeam.name
             awayTeamName.text = match.awayTeam.name
 
-            // Score
             homeScore.text = match.homeScore.toString()
             awayScore.text = match.awayScore.toString()
 
-            // League
             leagueName.text = match.league.name
 
             // Load logos
