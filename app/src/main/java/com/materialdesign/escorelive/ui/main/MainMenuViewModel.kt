@@ -52,6 +52,7 @@ class MainMenuViewModel @Inject constructor(
             try {
                 repository.getLiveMatches()
                     .onSuccess { matches ->
+
                         // Filter for actually live matches
                         val actuallyLive = matches.filter { it.isLive }
                         _liveMatches.value = actuallyLive

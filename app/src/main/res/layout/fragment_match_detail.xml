@@ -245,168 +245,253 @@
         </androidx.cardview.widget.CardView>
 
         <!-- Tab Layout -->
-        <LinearLayout
-            android:id="@+id/tab_layout"
+        <HorizontalScrollView
+            android:id="@+id/tab_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginTop="24dp"
+            android:scrollbars="none"
             app:layout_constraintTop_toBottomOf="@id/match_info_card"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <TextView
-                android:id="@+id/events_tab"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Summary"
-                android:textSize="14sp"
-                android:textColor="@color/white"
-                android:fontFamily="@font/mulish_bold"
-                android:textAlignment="center"
-                android:padding="12dp"
-                android:background="@drawable/selected_day" />
-
-            <TextView
-                android:id="@+id/lineup_tab"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Lineup"
-                android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"
-                android:fontFamily="@font/mulish_bold"
-                android:textAlignment="center"
-                android:padding="12dp"
-                android:background="?android:attr/selectableItemBackground" />
-
-            <TextView
-                android:id="@+id/statistics_tab"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Statistics"
-                android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"
-                android:fontFamily="@font/mulish_bold"
-                android:textAlignment="center"
-                android:padding="12dp"
-                android:background="?android:attr/selectableItemBackground" />
-
-        </LinearLayout>
-
-        <!-- Events Section -->
-        <LinearLayout
-            android:id="@+id/events_section"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="16dp"
-            android:visibility="visible"
-            app:layout_constraintTop_toBottomOf="@id/tab_layout"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginBottom="8dp"
-                android:text="Match Events"
-                android:textSize="16sp"
-                android:textColor="@color/white"
-                android:fontFamily="@font/mulish_bold" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/events_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_match_event" />
-
-        </LinearLayout>
-
-        <!-- Lineup Section -->
-        <LinearLayout
-            android:id="@+id/lineup_section"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="16dp"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/tab_layout"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginBottom="8dp"
-                android:text="Team Lineups"
-                android:textSize="16sp"
-                android:textColor="@color/white"
-                android:fontFamily="@font/mulish_bold" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/lineup_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:nestedScrollingEnabled="false"
-                tools:listitem="@layout/item_lineup_player" />
-
-        </LinearLayout>
-
-        <!-- Statistics Section -->
-        <LinearLayout
-            android:id="@+id/statistics_section"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/tab_layout"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="Match Statistics"
-                android:textSize="16sp"
-                android:textColor="@color/white"
-                android:fontFamily="@font/mulish_bold" />
-
-            <!-- Ball Possession -->
             <LinearLayout
+                android:id="@+id/tab_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp">
+
+                <TextView
+                    android:id="@+id/events_tab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Summary"
+                    android:textSize="14sp"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/mulish_bold"
+                    android:textAlignment="center"
+                    android:padding="12dp"
+                    android:background="@drawable/selected_day"
+                    android:minWidth="80dp" />
+
+                <TextView
+                    android:id="@+id/lineup_tab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lineup"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:fontFamily="@font/mulish_bold"
+                    android:textAlignment="center"
+                    android:padding="12dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:minWidth="80dp" />
+
+                <TextView
+                    android:id="@+id/statistics_tab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Statistics"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:fontFamily="@font/mulish_bold"
+                    android:textAlignment="center"
+                    android:padding="12dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:minWidth="80dp" />
+
+                <TextView
+                    android:id="@+id/h2h_tab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="H2H"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:fontFamily="@font/mulish_bold"
+                    android:textAlignment="center"
+                    android:padding="12dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:minWidth="80dp" />
+
+                <TextView
+                    android:id="@+id/standings_tab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Standings"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:fontFamily="@font/mulish_bold"
+                    android:textAlignment="center"
+                    android:padding="12dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:minWidth="80dp" />
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
+        <!-- Content Container -->
+        <FrameLayout
+            android:id="@+id/content_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/tab_scroll_view"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <!-- Events Section -->
+            <LinearLayout
+                android:id="@+id/events_section"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@drawable/stat_item_background"
-                android:padding="16dp"
-                android:layout_marginBottom="8dp">
+                android:visibility="visible">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="Match Events"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/mulish_bold" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/events_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_match_event" />
+
+            </LinearLayout>
+
+            <!-- Lineup Section -->
+            <LinearLayout
+                android:id="@+id/lineup_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="Team Lineups"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/mulish_bold" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/lineup_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_lineup_player" />
+
+            </LinearLayout>
+
+            <!-- Statistics Section -->
+            <LinearLayout
+                android:id="@+id/statistics_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="Match Statistics"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/mulish_bold" />
+
+                <!-- Ball Possession -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/stat_item_background"
+                    android:padding="16dp"
+                    android:layout_marginBottom="8dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/home_possession"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="65%"
+                            android:textSize="14sp"
+                            android:textColor="@color/white"
+                            android:fontFamily="@font/mulish_bold" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Ball Possession"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/darker_gray"
+                            android:fontFamily="@font/mulish_bold"
+                            android:textAlignment="center" />
+
+                        <TextView
+                            android:id="@+id/away_possession"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="35%"
+                            android:textSize="14sp"
+                            android:textColor="@color/white"
+                            android:fontFamily="@font/mulish_bold" />
+
+                    </LinearLayout>
+
+                    <ProgressBar
+                        android:id="@+id/possession_progress_bar"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:layout_marginTop="8dp"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:progress="65"
+                        android:progressTint="@color/home_team_color"
+                        android:progressBackgroundTint="@color/away_team_color" />
+
+                </LinearLayout>
+
+                <!-- Shots -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:background="@drawable/stat_item_background"
+                    android:padding="16dp"
+                    android:layout_marginBottom="8dp">
 
                     <TextView
-                        android:id="@+id/home_possession"
+                        android:id="@+id/home_shots"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="65%"
+                        android:text="12"
                         android:textSize="14sp"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_bold" />
@@ -415,236 +500,384 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Ball Possession"
+                        android:text="Total Shots"
                         android:textSize="14sp"
                         android:textColor="@android:color/darker_gray"
                         android:fontFamily="@font/mulish_bold"
                         android:textAlignment="center" />
 
                     <TextView
-                        android:id="@+id/away_possession"
+                        android:id="@+id/away_shots"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="35%"
+                        android:text="8"
                         android:textSize="14sp"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_bold" />
 
                 </LinearLayout>
 
-                <ProgressBar
-                    android:id="@+id/possession_progress_bar"
+                <!-- Shots on Target -->
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="8dp"
-                    android:layout_marginTop="8dp"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:progress="65"
-                    android:progressTint="@color/home_team_color"
-                    android:progressBackgroundTint="@color/away_team_color" />
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/stat_item_background"
+                    android:padding="16dp"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/home_shots_on_target"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="6"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/mulish_bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Shots on Target"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/darker_gray"
+                        android:fontFamily="@font/mulish_bold"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:id="@+id/away_shots_on_target"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="3"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/mulish_bold" />
+
+                </LinearLayout>
+
+                <!-- Corners -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/stat_item_background"
+                    android:padding="16dp"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/home_corners"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="7"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/mulish_bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Corner Kicks"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/darker_gray"
+                        android:fontFamily="@font/mulish_bold"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:id="@+id/away_corners"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="4"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/mulish_bold" />
+
+                </LinearLayout>
+
+                <!-- Yellow Cards -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/stat_item_background"
+                    android:padding="16dp"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/home_yellow_cards"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/mulish_bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Yellow Cards"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/darker_gray"
+                        android:fontFamily="@font/mulish_bold"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:id="@+id/away_yellow_cards"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="3"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/mulish_bold" />
+
+                </LinearLayout>
+
+                <!-- Red Cards -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/stat_item_background"
+                    android:padding="16dp"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/home_red_cards"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/mulish_bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Red Cards"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/darker_gray"
+                        android:fontFamily="@font/mulish_bold"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:id="@+id/away_red_cards"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/mulish_bold" />
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <!-- Shots -->
+            <!-- H2H Section -->
             <LinearLayout
+                android:id="@+id/h2h_section"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/stat_item_background"
-                android:padding="16dp"
-                android:layout_marginBottom="8dp">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
-                    android:id="@+id/home_shots"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="12"
-                    android:textSize="14sp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="Head to Head"
+                    android:textSize="16sp"
                     android:textColor="@color/white"
                     android:fontFamily="@font/mulish_bold" />
 
-                <TextView
-                    android:layout_width="0dp"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/h2h_recycler_view"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Total Shots"
-                    android:textSize="14sp"
-                    android:textColor="@android:color/darker_gray"
-                    android:fontFamily="@font/mulish_bold"
-                    android:textAlignment="center" />
-
-                <TextView
-                    android:id="@+id/away_shots"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="8"
-                    android:textSize="14sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="@font/mulish_bold" />
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_h2h_match" />
 
             </LinearLayout>
 
-            <!-- Shots on Target -->
+            <!-- H2H Empty State -->
             <LinearLayout
+                android:id="@+id/h2h_empty_state"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/stat_item_background"
-                android:padding="16dp"
-                android:layout_marginBottom="8dp">
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="48dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/ic_no_matches"
+                    android:layout_marginBottom="16dp"
+                    android:alpha="0.5" />
 
                 <TextView
-                    android:id="@+id/home_shots_on_target"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="6"
-                    android:textSize="14sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="@font/mulish_bold" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Shots on Target"
-                    android:textSize="14sp"
+                    android:text="No H2H data available"
+                    android:textSize="16sp"
                     android:textColor="@android:color/darker_gray"
-                    android:fontFamily="@font/mulish_bold"
-                    android:textAlignment="center" />
-
-                <TextView
-                    android:id="@+id/away_shots_on_target"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="3"
-                    android:textSize="14sp"
-                    android:textColor="@color/white"
                     android:fontFamily="@font/mulish_bold" />
 
             </LinearLayout>
 
-            <!-- Corners -->
+            <!-- Standings Section -->
             <LinearLayout
+                android:id="@+id/standings_section"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/stat_item_background"
-                android:padding="16dp"
-                android:layout_marginBottom="8dp">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
-                    android:id="@+id/home_corners"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="7"
-                    android:textSize="14sp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:text="League Standings"
+                    android:textSize="16sp"
                     android:textColor="@color/white"
                     android:fontFamily="@font/mulish_bold" />
 
-                <TextView
-                    android:layout_width="0dp"
+                <!-- Table Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Corner Kicks"
-                    android:textSize="14sp"
-                    android:textColor="@android:color/darker_gray"
-                    android:fontFamily="@font/mulish_bold"
-                    android:textAlignment="center" />
+                    android:orientation="horizontal"
+                    android:background="@color/card_background"
+                    android:padding="8dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="4dp">
 
-                <TextView
-                    android:id="@+id/away_corners"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:layout_width="24dp"
+                        android:layout_height="wrap_content"
+                        android:text="#"
+                        android:textSize="11sp"
+                        android:textColor="@android:color/darker_gray"
+                        android:fontFamily="@font/mulish_bold"
+                        android:gravity="center" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:layout_marginStart="8dp"
+                        android:text="Team"
+                        android:textSize="11sp"
+                        android:textColor="@android:color/darker_gray"
+                        android:fontFamily="@font/mulish_bold" />
+
+                    <TextView
+                        android:layout_width="24dp"
+                        android:layout_height="wrap_content"
+                        android:text="P"
+                        android:textSize="11sp"
+                        android:textColor="@android:color/darker_gray"
+                        android:fontFamily="@font/mulish_bold"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:layout_width="24dp"
+                        android:layout_height="wrap_content"
+                        android:text="W"
+                        android:textSize="11sp"
+                        android:textColor="@android:color/darker_gray"
+                        android:fontFamily="@font/mulish_bold"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:layout_width="24dp"
+                        android:layout_height="wrap_content"
+                        android:text="D"
+                        android:textSize="11sp"
+                        android:textColor="@android:color/darker_gray"
+                        android:fontFamily="@font/mulish_bold"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:layout_width="24dp"
+                        android:layout_height="wrap_content"
+                        android:text="L"
+                        android:textSize="11sp"
+                        android:textColor="@android:color/darker_gray"
+                        android:fontFamily="@font/mulish_bold"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:layout_width="32dp"
+                        android:layout_height="wrap_content"
+                        android:text="GD"
+                        android:textSize="11sp"
+                        android:textColor="@android:color/darker_gray"
+                        android:fontFamily="@font/mulish_bold"
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:layout_width="32dp"
+                        android:layout_height="wrap_content"
+                        android:text="Pts"
+                        android:textSize="11sp"
+                        android:textColor="@android:color/darker_gray"
+                        android:fontFamily="@font/mulish_bold"
+                        android:textAlignment="center" />
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/standings_recycler_view"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="4"
-                    android:textSize="14sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="@font/mulish_bold" />
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_standing" />
 
             </LinearLayout>
 
-            <!-- Yellow Cards -->
+            <!-- Standings Empty State -->
             <LinearLayout
+                android:id="@+id/standings_empty_state"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/stat_item_background"
-                android:padding="16dp"
-                android:layout_marginBottom="8dp">
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="48dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/ic_no_matches"
+                    android:layout_marginBottom="16dp"
+                    android:alpha="0.5" />
 
                 <TextView
-                    android:id="@+id/home_yellow_cards"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2"
-                    android:textSize="14sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="@font/mulish_bold" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Yellow Cards"
-                    android:textSize="14sp"
+                    android:text="No standings data available"
+                    android:textSize="16sp"
                     android:textColor="@android:color/darker_gray"
-                    android:fontFamily="@font/mulish_bold"
-                    android:textAlignment="center" />
-
-                <TextView
-                    android:id="@+id/away_yellow_cards"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="3"
-                    android:textSize="14sp"
-                    android:textColor="@color/white"
                     android:fontFamily="@font/mulish_bold" />
 
             </LinearLayout>
 
-            <!-- Red Cards -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/stat_item_background"
-                android:padding="16dp"
-                android:layout_marginBottom="8dp">
-
-                <TextView
-                    android:id="@+id/home_red_cards"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="14sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="@font/mulish_bold" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Red Cards"
-                    android:textSize="14sp"
-                    android:textColor="@android:color/darker_gray"
-                    android:fontFamily="@font/mulish_bold"
-                    android:textAlignment="center" />
-
-                <TextView
-                    android:id="@+id/away_red_cards"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="1"
-                    android:textSize="14sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="@font/mulish_bold" />
-
-            </LinearLayout>
-
-        </LinearLayout>
+        </FrameLayout>
 
         <!-- Loading Indicator -->
         <ProgressBar
@@ -662,13 +895,10 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="24dp"
-            app:layout_constraintTop_toBottomOf="@id/events_section"
+            app:layout_constraintTop_toBottomOf="@id/content_container"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 </ScrollView>
