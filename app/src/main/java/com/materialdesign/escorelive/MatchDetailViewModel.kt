@@ -5,10 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.materialdesign.escorelive.LiveMatch
+import com.materialdesign.escorelive.data.remote.TeamStanding
 import com.materialdesign.escorelive.repository.FootballRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.Calendar
 
 @HiltViewModel
 class MatchDetailViewModel @Inject constructor(
@@ -27,6 +29,12 @@ class MatchDetailViewModel @Inject constructor(
     private val _matchStatistics = MutableLiveData<MatchStatistics?>()
     val matchStatistics: LiveData<MatchStatistics?> = _matchStatistics
 
+    private val _h2hMatches = MutableLiveData<List<LiveMatch>>()
+    val h2hMatches: LiveData<List<LiveMatch>> = _h2hMatches
+
+    private val _standings = MutableLiveData<List<TeamStanding>>()
+    val standings: LiveData<List<TeamStanding>> = _standings
+
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -42,6 +50,10 @@ class MatchDetailViewModel @Inject constructor(
             repository.getMatchDetails(matchId)
                 .onSuccess { match ->
                     _matchDetails.value = match
+
+                    // After getting match details, load H2H and standings
+                    loadH2HMatches(match.homeTeam.id, match.awayTeam.id)
+                    loadStandings(match.league.id.toInt())
                 }
                 .onFailure { exception ->
                     _error.value = "Failed to load match details: ${exception.message}"
@@ -75,6 +87,35 @@ class MatchDetailViewModel @Inject constructor(
                 }
 
             _isLoading.value = false
+        }
+    }
+
+    private fun loadH2HMatches(homeTeamId: Long, awayTeamId: Long) {
+        viewModelScope.launch {
+            repository.getH2HMatches(homeTeamId, awayTeamId)
+                .onSuccess { matches ->
+                    _h2hMatches.value = matches
+                }
+                .onFailure { exception ->
+                    // H2H is optional, don't show error
+                }
+        }
+    }
+
+    private fun loadStandings(leagueId: Int) {
+        viewModelScope.launch {
+            val currentSeason = Calendar.getInstance().get(Calendar.YEAR)
+            repository.getStandings(leagueId, currentSeason)
+                .onSuccess { standings ->
+                    _standings.value = standings
+                }
+                .onFailure { exception ->
+                    // Try previous season if current season fails
+                    repository.getStandings(leagueId, currentSeason - 1)
+                        .onSuccess { standings ->
+                            _standings.value = standings
+                        }
+                }
         }
     }
 

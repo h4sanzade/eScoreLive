@@ -10,60 +10,124 @@ import retrofit2.Response
 
 interface FootballApiService {
 
+    companion object {
+        const val API_KEY = "8767b67b14200a87603b7211cf4239dd"
+        const val API_HOST = "v3.football.api-sports.io"
+    }
+
     @GET("fixtures")
     suspend fun getLiveFixtures(
-        @Header("X-RapidAPI-Key") apiKey: String = "acc13599400653ba46e1defb6d242255",
-        @Header("X-RapidAPI-Host") host: String = "v3.football.api-sports.io",
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST,
         @Query("live") live: String = "all"
     ): Response<FixturesResponse>
 
     @GET("fixtures")
     suspend fun getFixturesByDate(
-        @Header("X-RapidAPI-Key") apiKey: String = "acc13599400653ba46e1defb6d242255",
-        @Header("X-RapidAPI-Host") host: String = "v3.football.api-sports.io",
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST,
         @Query("date") date: String,
         @Query("timezone") timezone: String = "Europe/London"
     ): Response<FixturesResponse>
 
     @GET("fixtures")
     suspend fun getFixturesByLeague(
-        @Header("X-RapidAPI-Key") apiKey: String = "acc13599400653ba46e1defb6d242255",
-        @Header("X-RapidAPI-Host") host: String = "v3.football.api-sports.io",
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST,
         @Query("league") leagueId: Int,
-        @Query("season") season: Int,
-        @Query("live") live: String = "all"
+        @Query("season") season: Int
     ): Response<FixturesResponse>
 
     @GET("fixtures")
     suspend fun getFixtureById(
-        @Header("X-RapidAPI-Key") apiKey: String = "acc13599400653ba46e1defb6d242255",
-        @Header("X-RapidAPI-Host") host: String = "v3.football.api-sports.io",
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST,
         @Query("id") fixtureId: Long
     ): Response<FixturesResponse>
 
     @GET("fixtures/events")
     suspend fun getMatchEvents(
-        @Header("X-RapidAPI-Key") apiKey: String = "acc13599400653ba46e1defb6d242255",
-        @Header("X-RapidAPI-Host") host: String = "v3.football.api-sports.io",
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST,
         @Query("fixture") fixtureId: Long
     ): Response<MatchEventsResponse>
 
     @GET("fixtures/lineups")
     suspend fun getMatchLineups(
-        @Header("X-RapidAPI-Key") apiKey: String = "acc13599400653ba46e1defb6d242255",
-        @Header("X-RapidAPI-Host") host: String = "v3.football.api-sports.io",
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST,
         @Query("fixture") fixtureId: Long
     ): Response<MatchLineupsResponse>
 
     @GET("fixtures/statistics")
     suspend fun getMatchStatistics(
-        @Header("X-RapidAPI-Key") apiKey: String = "acc13599400653ba46e1defb6d242255",
-        @Header("X-RapidAPI-Host") host: String = "v3.football.api-sports.io",
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST,
         @Query("fixture") fixtureId: Long
     ): Response<MatchStatisticsResponse>
+    @GET("fixtures/headtohead")
+    suspend fun getH2HMatches(
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST,
+        @Query("h2h") h2h: String, // Format: "teamId1-teamId2"
+        @Query("last") last: Int = 10
+    ): Response<FixturesResponse>
+
+    @GET("standings")
+    suspend fun getStandings(
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST,
+        @Query("league") leagueId: Int,
+        @Query("season") season: Int
+    ): Response<StandingsResponse>
 }
 
 // Response data classes for API
+data class StandingsResponse(
+    val response: List<StandingsData>
+)
+
+data class StandingsData(
+    val league: StandingsLeague
+)
+
+data class StandingsLeague(
+    val id: Int,
+    val name: String,
+    val country: String,
+    val logo: String,
+    val season: Int,
+    val standings: List<List<TeamStanding>>
+)
+
+data class TeamStanding(
+    val rank: Int,
+    val team: TeamData,
+    val points: Int,
+    val goalsDiff: Int,
+    val group: String,
+    val form: String,
+    val status: String,
+    val description: String?,
+    val all: StandingStats,
+    val home: StandingStats,
+    val away: StandingStats,
+    val update: String
+)
+
+data class StandingStats(
+    val played: Int,
+    val win: Int,
+    val draw: Int,
+    val lose: Int,
+    val goals: GoalsStats
+)
+
+data class GoalsStats(
+    val `for`: Int,
+    val against: Int
+)
+
 data class MatchEventsResponse(
     val response: List<EventData>
 )

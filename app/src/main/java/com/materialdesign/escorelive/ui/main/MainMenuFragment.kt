@@ -269,8 +269,9 @@ class MainMenuFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.seeMoreBtn.setOnClickListener {
-            // Navigation Component ile All Matches Fragment'e git
-            findNavController().navigate(R.id.action_mainMenu_to_allMatches)
+            val selectedDate = viewModel.selectedDate.value ?: dateFormat.format(Date())
+            val action = MainMenuFragmentDirections.actionMainMenuToAllMatches(selectedDate)
+            findNavController().navigate(action)
         }
 
         binding.searchId.setOnClickListener {

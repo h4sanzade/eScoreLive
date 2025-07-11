@@ -26,6 +26,8 @@ class MatchDetailFragment : Fragment() {
     private val viewModel: MatchDetailViewModel by viewModels()
     private lateinit var eventsAdapter: MatchEventsAdapter
     private lateinit var lineupAdapter: LineupAdapter
+    private lateinit var h2hAdapter: H2HAdapter
+    private lateinit var standingsAdapter: StandingsAdapter
 
     // Navigation Component safe args
     private val args: MatchDetailFragmentArgs by navArgs()
@@ -50,17 +52,36 @@ class MatchDetailFragment : Fragment() {
     }
 
     private fun setupRecyclerViews() {
+        // Events/Summary RecyclerView
         eventsAdapter = MatchEventsAdapter()
-        lineupAdapter = LineupAdapter()
-
         binding.eventsRecyclerView.apply {
             adapter = eventsAdapter
             layoutManager = LinearLayoutManager(context)
+            setHasFixedSize(true)
         }
 
+        // Lineup RecyclerView
+        lineupAdapter = LineupAdapter()
         binding.lineupRecyclerView.apply {
             adapter = lineupAdapter
             layoutManager = LinearLayoutManager(context)
+            setHasFixedSize(true)
+        }
+
+        // H2H RecyclerView
+        h2hAdapter = H2HAdapter()
+        binding.h2hRecyclerView.apply {
+            adapter = h2hAdapter
+            layoutManager = LinearLayoutManager(context)
+            setHasFixedSize(true)
+        }
+
+        // Standings RecyclerView
+        standingsAdapter = StandingsAdapter()
+        binding.standingsRecyclerView.apply {
+            adapter = standingsAdapter
+            layoutManager = LinearLayoutManager(context)
+            setHasFixedSize(true)
         }
     }
 
@@ -81,6 +102,24 @@ class MatchDetailFragment : Fragment() {
 
         viewModel.matchStatistics.observe(viewLifecycleOwner, Observer { stats ->
             stats?.let { updateStatistics(it) }
+        })
+
+        viewModel.h2hMatches.observe(viewLifecycleOwner, Observer { matches ->
+            if (matches.isNotEmpty()) {
+                h2hAdapter.submitList(matches)
+                binding.h2hSection.visibility = View.VISIBLE
+            } else {
+                binding.h2hSection.visibility = View.GONE
+            }
+        })
+
+        viewModel.standings.observe(viewLifecycleOwner, Observer { standings ->
+            if (standings.isNotEmpty()) {
+                standingsAdapter.submitList(standings)
+                binding.standingsSection.visibility = View.VISIBLE
+            } else {
+                binding.standingsSection.visibility = View.GONE
+            }
         })
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
@@ -104,11 +143,13 @@ class MatchDetailFragment : Fragment() {
             Glide.with(this@MatchDetailFragment)
                 .load(match.homeTeam.logo)
                 .placeholder(R.drawable.ic_placeholder)
+                .error(R.drawable.ic_error)
                 .into(homeTeamLogo)
 
             Glide.with(this@MatchDetailFragment)
                 .load(match.awayTeam.logo)
                 .placeholder(R.drawable.ic_placeholder)
+                .error(R.drawable.ic_error)
                 .into(awayTeamLogo)
 
             // Score
@@ -124,6 +165,7 @@ class MatchDetailFragment : Fragment() {
             Glide.with(this@MatchDetailFragment)
                 .load(match.league.logo)
                 .placeholder(R.drawable.ic_placeholder)
+                .error(R.drawable.ic_error)
                 .into(leagueLogo)
 
             // Date and time
@@ -164,10 +206,10 @@ class MatchDetailFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.backButton.setOnClickListener {
-            // Navigation Component ile geri git
             findNavController().popBackStack()
         }
 
+        // Tab click listeners
         binding.eventsTab.setOnClickListener {
             showEventsSection()
         }
@@ -179,39 +221,100 @@ class MatchDetailFragment : Fragment() {
         binding.statisticsTab.setOnClickListener {
             showStatisticsSection()
         }
+
+        binding.h2hTab.setOnClickListener {
+            showH2HSection()
+        }
+
+        binding.standingsTab.setOnClickListener {
+            showStandingsSection()
+        }
     }
 
     private fun showEventsSection() {
+        // Hide all sections
+        hideAllSections()
+
+        // Show events section
         binding.eventsSection.visibility = View.VISIBLE
-        binding.lineupSection.visibility = View.GONE
-        binding.statisticsSection.visibility = View.GONE
 
         // Update tab appearance
+        resetAllTabs()
         binding.eventsTab.setBackgroundResource(R.drawable.selected_day)
-        binding.lineupTab.background = null
-        binding.statisticsTab.background = null
     }
 
     private fun showLineupSection() {
-        binding.eventsSection.visibility = View.GONE
+        // Hide all sections
+        hideAllSections()
+
+        // Show lineup section
         binding.lineupSection.visibility = View.VISIBLE
-        binding.statisticsSection.visibility = View.GONE
 
         // Update tab appearance
-        binding.eventsTab.background = null
+        resetAllTabs()
         binding.lineupTab.setBackgroundResource(R.drawable.selected_day)
-        binding.statisticsTab.background = null
     }
 
     private fun showStatisticsSection() {
-        binding.eventsSection.visibility = View.GONE
-        binding.lineupSection.visibility = View.GONE
+        // Hide all sections
+        hideAllSections()
+
+        // Show statistics section
         binding.statisticsSection.visibility = View.VISIBLE
 
         // Update tab appearance
+        resetAllTabs()
+        binding.statisticsTab.setBackgroundResource(R.drawable.selected_day)
+    }
+
+    private fun showH2HSection() {
+        // Hide all sections
+        hideAllSections()
+
+        // Show H2H section if data is available
+        if (viewModel.h2hMatches.value?.isNotEmpty() == true) {
+            binding.h2hSection.visibility = View.VISIBLE
+        } else {
+            binding.h2hEmptyState.visibility = View.VISIBLE
+        }
+
+        // Update tab appearance
+        resetAllTabs()
+        binding.h2hTab.setBackgroundResource(R.drawable.selected_day)
+    }
+
+    private fun showStandingsSection() {
+        // Hide all sections
+        hideAllSections()
+
+        // Show standings section if data is available
+        if (viewModel.standings.value?.isNotEmpty() == true) {
+            binding.standingsSection.visibility = View.VISIBLE
+        } else {
+            binding.standingsEmptyState.visibility = View.VISIBLE
+        }
+
+        // Update tab appearance
+        resetAllTabs()
+        binding.standingsTab.setBackgroundResource(R.drawable.selected_day)
+    }
+
+    private fun hideAllSections() {
+        binding.eventsSection.visibility = View.GONE
+        binding.lineupSection.visibility = View.GONE
+        binding.statisticsSection.visibility = View.GONE
+        binding.h2hSection.visibility = View.GONE
+        binding.standingsSection.visibility = View.GONE
+        binding.h2hEmptyState.visibility = View.GONE
+        binding.standingsEmptyState.visibility = View.GONE
+    }
+
+    private fun resetAllTabs() {
         binding.eventsTab.background = null
         binding.lineupTab.background = null
-        binding.statisticsTab.setBackgroundResource(R.drawable.selected_day)
+        binding.statisticsTab.background = null
+        binding.h2hTab.background = null
+        binding.standingsTab.background = null
     }
 
     override fun onDestroyView() {

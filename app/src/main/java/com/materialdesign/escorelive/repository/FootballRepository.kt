@@ -9,6 +9,8 @@ import com.materialdesign.escorelive.ui.matchdetail.MatchStatistics
 import javax.inject.Inject
 import javax.inject.Singleton
 import android.util.Log
+import com.google.gson.Gson
+import com.materialdesign.escorelive.data.remote.TeamStanding
 
 @Singleton
 class FootballRepository @Inject constructor(
@@ -17,12 +19,30 @@ class FootballRepository @Inject constructor(
 
     suspend fun getLiveMatches(): Result<List<LiveMatch>> {
         return try {
-            Log.d("FootballRepository", "Fetching live matches...")
+            Log.d("FootballRepository", "Fetching live matches with API key: ${FootballApiService.API_KEY.take(10)}...")
             val response = apiService.getLiveFixtures()
 
+            Log.d("FootballRepository", "Response code: ${response.code()}")
+            Log.d("FootballRepository", "Response message: ${response.message()}")
+            Log.d("FootballRepository", "Response headers: ${response.headers()}")
+
             if (response.isSuccessful) {
-                val fixtures = response.body()?.response ?: emptyList()
+                val body = response.body()
+                Log.d("FootballRepository", "Response body is null: ${body == null}")
+
+                // API yanıtını detaylı logla
+                if (body != null) {
+                    val gson = Gson()
+                    val jsonString = gson.toJson(body)
+                    Log.d("FootballRepository", "Full API Response: ${jsonString.take(500)}...") // İlk 500 karakter
+                }
+
+                val fixtures = body?.response ?: emptyList()
                 Log.d("FootballRepository", "API returned ${fixtures.size} live fixtures")
+
+                if (fixtures.isEmpty()) {
+                    Log.w("FootballRepository", "No live matches at the moment")
+                }
 
                 val liveMatches = fixtures.mapNotNull { fixture ->
                     try {
@@ -38,11 +58,23 @@ class FootballRepository @Inject constructor(
                 Log.d("FootballRepository", "Successfully converted ${liveMatches.size} live matches")
                 Result.success(liveMatches)
             } else {
+                val errorBody = response.errorBody()?.string()
                 Log.e("FootballRepository", "API Error: ${response.code()} - ${response.message()}")
-                Result.failure(Exception("API Error: ${response.code()} - ${response.message()}"))
+                Log.e("FootballRepository", "Error body: $errorBody")
+
+                // API-Sports specific error handling
+                when (response.code()) {
+                    401 -> Result.failure(Exception("Invalid API key. Please check your API key."))
+                    403 -> Result.failure(Exception("Access forbidden. Your API key might not have access to this endpoint."))
+                    429 -> Result.failure(Exception("Rate limit exceeded. Too many requests."))
+                    500 -> Result.failure(Exception("API server error. Please try again later."))
+                    else -> Result.failure(Exception("API Error: ${response.code()} - ${errorBody ?: response.message()}"))
+                }
             }
         } catch (e: Exception) {
             Log.e("FootballRepository", "Exception in getLiveMatches", e)
+            Log.e("FootballRepository", "Exception type: ${e.javaClass.simpleName}")
+            Log.e("FootballRepository", "Exception message: ${e.message}")
             Result.failure(e)
         }
     }
@@ -52,9 +84,16 @@ class FootballRepository @Inject constructor(
             Log.d("FootballRepository", "Fetching matches for date: $date")
             val response = apiService.getFixturesByDate(date = date)
 
+            Log.d("FootballRepository", "Response code for date $date: ${response.code()}")
+
             if (response.isSuccessful) {
-                val fixtures = response.body()?.response ?: emptyList()
+                val body = response.body()
+                val fixtures = body?.response ?: emptyList()
                 Log.d("FootballRepository", "API returned ${fixtures.size} fixtures for date: $date")
+
+                if (fixtures.isEmpty()) {
+                    Log.w("FootballRepository", "No matches found for date: $date")
+                }
 
                 val matches = fixtures.mapNotNull { fixture ->
                     try {
@@ -70,8 +109,15 @@ class FootballRepository @Inject constructor(
                 Log.d("FootballRepository", "Successfully converted ${matches.size} matches for date: $date")
                 Result.success(matches)
             } else {
+                val errorBody = response.errorBody()?.string()
                 Log.e("FootballRepository", "API Error for date $date: ${response.code()} - ${response.message()}")
-                Result.failure(Exception("API Error: ${response.code()} - ${response.message()}"))
+                Log.e("FootballRepository", "Error body: $errorBody")
+
+                when (response.code()) {
+                    401 -> Result.failure(Exception("Invalid API key"))
+                    429 -> Result.failure(Exception("Rate limit exceeded"))
+                    else -> Result.failure(Exception("API Error: ${response.code()}"))
+                }
             }
         } catch (e: Exception) {
             Log.e("FootballRepository", "Exception in getMatchesByDate for date: $date", e)
@@ -86,6 +132,8 @@ class FootballRepository @Inject constructor(
                 leagueId = leagueId,
                 season = season
             )
+
+            Log.d("FootballRepository", "Response code for league $leagueId: ${response.code()}")
 
             if (response.isSuccessful) {
                 val fixtures = response.body()?.response ?: emptyList()
@@ -108,8 +156,10 @@ class FootballRepository @Inject constructor(
                 Log.d("FootballRepository", "Successfully converted ${matches.size} matches for league: $leagueId")
                 Result.success(matches)
             } else {
+                val errorBody = response.errorBody()?.string()
                 Log.e("FootballRepository", "API Error for league $leagueId: ${response.code()} - ${response.message()}")
-                Result.failure(Exception("API Error: ${response.code()} - ${response.message()}"))
+                Log.e("FootballRepository", "Error body: $errorBody")
+                Result.failure(Exception("API Error: ${response.code()}"))
             }
         } catch (e: Exception) {
             Log.e("FootballRepository", "Exception in getMatchesByLeague for league: $leagueId", e)
@@ -280,6 +330,56 @@ class FootballRepository @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e("FootballRepository", "Exception in getMatchStatistics for ID: $matchId", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getH2HMatches(homeTeamId: Long, awayTeamId: Long): Result<List<LiveMatch>> {
+        return try {
+            val h2h = "$homeTeamId-$awayTeamId"
+            Log.d("FootballRepository", "Fetching H2H matches for: $h2h")
+            val response = apiService.getH2HMatches(h2h = h2h)
+
+            if (response.isSuccessful) {
+                val fixtures = response.body()?.response ?: emptyList()
+                Log.d("FootballRepository", "API returned ${fixtures.size} H2H matches")
+
+                val h2hMatches = fixtures.mapNotNull { fixture ->
+                    try {
+                        fixture.toLiveMatch()
+                    } catch (e: Exception) {
+                        Log.e("FootballRepository", "Error converting H2H fixture", e)
+                        null
+                    }
+                }
+
+                Result.success(h2hMatches)
+            } else {
+                Log.e("FootballRepository", "API Error for H2H: ${response.code()}")
+                Result.failure(Exception("API Error: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Log.e("FootballRepository", "Exception in getH2HMatches", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getStandings(leagueId: Int, season: Int): Result<List<TeamStanding>> {
+        return try {
+            Log.d("FootballRepository", "Fetching standings for league: $leagueId, season: $season")
+            val response = apiService.getStandings(leagueId = leagueId, season = season)
+
+            if (response.isSuccessful) {
+                val standingsData = response.body()?.response?.firstOrNull()
+                val standings = standingsData?.league?.standings?.firstOrNull() ?: emptyList()
+                Log.d("FootballRepository", "API returned ${standings.size} teams in standings")
+                Result.success(standings)
+            } else {
+                Log.e("FootballRepository", "API Error for standings: ${response.code()}")
+                Result.failure(Exception("API Error: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Log.e("FootballRepository", "Exception in getStandings", e)
             Result.failure(e)
         }
     }

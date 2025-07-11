@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="2dp"
+    app:cardCornerRadius="0dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@color/card_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp">
+
+        <!-- Position -->
+        <TextView
+            android:id="@+id/position_text"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:text="1"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:fontFamily="@font/mulish_bold"
+            android:gravity="center"
+            android:background="@drawable/position_champions_bg" />
+
+        <!-- Team -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp">
+
+            <ImageView
+                android:id="@+id/team_logo"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="6dp"
+                tools:src="@drawable/ic_placeholder" />
+
+            <TextView
+                android:id="@+id/team_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Arsenal"
+                android:textSize="12sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/mulish_bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+        </LinearLayout>
+
+        <!-- Stats -->
+        <TextView
+            android:id="@+id/played_text"
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="28"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            android:fontFamily="@font/mulish_regular"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/won_text"
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="21"
+            android:textSize="12sp"
+            android:textColor="@android:color/holo_green_light"
+            android:fontFamily="@font/mulish_regular"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/drawn_text"
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="4"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            android:fontFamily="@font/mulish_regular"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/lost_text"
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="3"
+            android:textSize="12sp"
+            android:textColor="@android:color/holo_red_light"
+            android:fontFamily="@font/mulish_regular"
+            android:textAlignment="center" />
+
+        <!-- Hidden stats for full table view -->
+        <TextView
+            android:id="@+id/gf_text"
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="68"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            android:fontFamily="@font/mulish_regular"
+            android:textAlignment="center"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/ga_text"
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="24"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray"
+            android:fontFamily="@font/mulish_regular"
+            android:textAlignment="center"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/gd_text"
+            android:layout_width="32dp"
+            android:layout_height="wrap_content"
+            android:text="+44"
+            android:textSize="12sp"
+            android:textColor="@android:color/holo_green_dark"
+            android:fontFamily="@font/mulish_regular"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/points_text"
+            android:layout_width="32dp"
+            android:layout_height="wrap_content"
+            android:text="67"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:fontFamily="@font/mulish_bold"
+            android:textAlignment="center" />
+
+        <!-- Form -->
+        <TextView
+            android:id="@+id/form_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="WWDWL"
+            android:textSize="10sp"
+            android:textColor="@android:color/darker_gray"
+            android:fontFamily="@font/mulish_regular"
+            android:layout_marginStart="4dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

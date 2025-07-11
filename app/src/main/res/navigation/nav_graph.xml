@@ -29,6 +29,11 @@
         <action
             android:id="@+id/action_allMatches_to_matchDetail"
             app:destination="@id/matchDetailFragment" />
+
+        <argument
+            android:name="selectedDate"
+            app:argType="string"
+            android:defaultValue="2025-01-01" />
     </fragment>
 
     <fragment
@@ -41,5 +46,8 @@
             android:name="matchId"
             app:argType="long" />
     </fragment>
+    <action
+        android:id="@+id/action_mainMenu_to_allMatches"
+        app:destination="@id/allMatchesFragment" />
 
 </navigation>

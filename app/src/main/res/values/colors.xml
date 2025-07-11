@@ -8,15 +8,10 @@
 
     <color name="accent_color">#0F3460</color>
 
-    <color name="home_team_color">#4CAF50</color>
-    <color name="away_team_color">#FF5722</color>
 
-    <color name="starting_player_bg">#16213E</color>
-    <color name="substitute_player_bg">#1A1A2E</color>
 
     <color name="border_color">#3A3A5C</color>
     <color name="rating_background">#2C2C54</color>
-    <color name="assist_text_color">#9E9E9E</color>
 
     <color name="goal_color">#4CAF50</color>
     <color name="yellow_card_color">#FFC107</color>
@@ -32,15 +27,30 @@
     <color name="finished_match_color">#9E9E9E</color>
     <color name="upcoming_match_color">#2196F3</color>
 
-    <color name="live_match_bg">#1B4332</color>
-    <color name="finished_match_bg">#2D2D2D</color>
-    <color name="upcoming_match_bg">#1E3A8A</color>
+
 
 
 
     <!-- Filter colors -->
     <color name="filter_selected_bg">#F63D68</color>
     <color name="filter_unselected_bg">#374151</color>
+
+
+    <!-- Match status colors -->
+    <color name="live_match_bg">#4CAF50</color>
+    <color name="finished_match_bg">#757575</color>
+    <color name="upcoming_match_bg">#2196F3</color>
+
+    <!-- Team colors -->
+    <color name="home_team_color">#2196F3</color>
+    <color name="away_team_color">#F44336</color>
+
+    <!-- Player colors -->
+    <color name="starting_player_bg">#1B5E20</color>
+    <color name="substitute_player_bg">#37474F</color>
+
+    <!-- Other colors -->
+    <color name="assist_text_color">#81C784</color>
 
 
 </resources>
