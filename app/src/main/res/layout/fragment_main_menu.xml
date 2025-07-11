@@ -101,6 +101,7 @@
         app:layout_constraintTop_toBottomOf="@id/live_header_layout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
         tools:listitem="@layout/item_live_match" />
 
     <!-- Weekly Calendar Container -->
@@ -373,5 +374,7 @@
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
