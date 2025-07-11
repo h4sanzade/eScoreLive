@@ -3,27 +3,27 @@
 
     <item
         android:id="@+id/homeButtonID"
-        android:title="Home"
+        android:title="@string/home"
         android:icon="@drawable/ic_home">
 
     </item>
     <item
         android:id="@+id/competitonButtonID"
-        android:title="Competition"
+        android:title="@string/competition"
         android:icon="@drawable/ic_competition">
 
     </item>
 
     <item
         android:id="@+id/newsButtonID"
-        android:title="News"
+        android:title="@string/news"
         android:icon="@drawable/ic_news">
 
     </item>
 
     <item
         android:id="@+id/accountButtonID"
-        android:title="Account"
+        android:title="@string/account"
         android:icon="@drawable/ic_account">
 
     </item>

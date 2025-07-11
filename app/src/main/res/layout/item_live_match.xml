@@ -153,8 +153,9 @@
                     android:id="@+id/away_team_logo"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_marginBottom="8dp"
-></ImageView>
+                    android:layout_marginBottom="8dp">
+
+                </ImageView>
                 <TextView
                     android:id="@+id/away_team_name"
                     android:layout_width="wrap_content"

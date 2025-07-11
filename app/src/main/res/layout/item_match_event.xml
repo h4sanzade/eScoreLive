@@ -31,7 +31,7 @@
             android:layout_height="24dp"
             android:layout_marginStart="12dp"
             android:src="@drawable/ic_goal"
-            android:tint="@android:color/holo_green_dark"
+            android:tint="@color/white"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/team_indicator"
             app:layout_constraintBottom_toBottomOf="@id/player_name" />
