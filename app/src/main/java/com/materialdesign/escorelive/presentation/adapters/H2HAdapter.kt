@@ -7,13 +7,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.materialdesign.escorelive.domain.model.LiveMatch
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.ItemH2hMatchBinding
+import com.materialdesign.escorelive.domain.model.Match
 import java.text.SimpleDateFormat
 import java.util.*
 
-class H2HAdapter : ListAdapter<LiveMatch, H2HAdapter.H2HViewHolder>(H2HDiffCallback()) {
+class H2HAdapter : ListAdapter<Match, H2HAdapter.H2HViewHolder>(H2HDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): H2HViewHolder {
         val binding = ItemH2hMatchBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -27,7 +27,7 @@ class H2HAdapter : ListAdapter<LiveMatch, H2HAdapter.H2HViewHolder>(H2HDiffCallb
     inner class H2HViewHolder(private val binding: ItemH2hMatchBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(match: LiveMatch) = with(binding) {
+        fun bind(match: Match) = with(binding) {
             val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
             val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
 
@@ -79,12 +79,12 @@ class H2HAdapter : ListAdapter<LiveMatch, H2HAdapter.H2HViewHolder>(H2HDiffCallb
         }
     }
 
-    class H2HDiffCallback : DiffUtil.ItemCallback<LiveMatch>() {
-        override fun areItemsTheSame(oldItem: LiveMatch, newItem: LiveMatch): Boolean {
+    class H2HDiffCallback : DiffUtil.ItemCallback<Match>() {
+        override fun areItemsTheSame(oldItem: Match, newItem: Match): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: LiveMatch, newItem: LiveMatch): Boolean {
+        override fun areContentsTheSame(oldItem: Match, newItem: Match): Boolean {
             return oldItem == newItem
         }
     }

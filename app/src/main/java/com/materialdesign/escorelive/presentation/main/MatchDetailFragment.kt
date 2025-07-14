@@ -12,9 +12,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import com.materialdesign.escorelive.domain.model.LiveMatch
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.FragmentMatchDetailBinding
+import com.materialdesign.escorelive.domain.model.Match
 import dagger.hilt.android.AndroidEntryPoint
 import com.materialdesign.escorelive.presentation.adapters.LineupAdapter
 import com.materialdesign.escorelive.presentation.adapters.MatchEventsAdapter
@@ -95,7 +95,7 @@ class MatchDetailFragment : Fragment() {
         })
     }
 
-    private fun updateMatchInfo(match: LiveMatch) {
+    private fun updateMatchInfo(match: Match) {
         with(binding) {
             // Teams
             homeTeamName.text = match.homeTeam.name
