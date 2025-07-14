@@ -1,4 +1,4 @@
-package com.materialdesign.escorelive.ui.matchdetail
+package com.materialdesign.escorelive.presentation.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,8 +8,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.ItemMatchEventBinding
+import com.materialdesign.escorelive.ui.matchdetail.MatchEvent
 
-class MatchEventsAdapter : ListAdapter<MatchEvent, MatchEventsAdapter.EventViewHolder>(EventDiffCallback()) {
+class MatchEventsAdapter : ListAdapter<MatchEvent, MatchEventsAdapter.EventViewHolder>(
+    EventDiffCallback()
+) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
         val binding = ItemMatchEventBinding.inflate(LayoutInflater.from(parent.context), parent, false)

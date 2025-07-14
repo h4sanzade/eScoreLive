@@ -1,28 +1,28 @@
-package com.materialdesign.escorelive.ui.main
+package com.materialdesign.escorelive.presentation.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.materialdesign.escorelive.LiveMatch
-import com.materialdesign.escorelive.repository.FootballRepository
+import com.materialdesign.escorelive.domain.model.Match
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import android.util.Log
+import com.materialdesign.escorelive.data.remote.repository.FootballRepository
 
 @HiltViewModel
-class MainMenuViewModel @Inject constructor(
+class HomeViewModel @Inject constructor(
     private val repository: FootballRepository
 ) : ViewModel() {
 
-    private val _liveMatches = MutableLiveData<List<LiveMatch>>()
-    val liveMatches: LiveData<List<LiveMatch>> = _liveMatches
+    private val _liveMatches = MutableLiveData<List<Match>>()
+    val liveMatches: LiveData<List<Match>> = _liveMatches
 
-    private val _todayMatches = MutableLiveData<List<LiveMatch>>()
-    val todayMatches: LiveData<List<LiveMatch>> = _todayMatches
+    private val _todayMatches = MutableLiveData<List<Match>>()
+    val todayMatches: LiveData<List<Match>> = _todayMatches
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -32,8 +32,6 @@ class MainMenuViewModel @Inject constructor(
 
     private val _selectedDate = MutableLiveData<String>()
     val selectedDate: LiveData<String> = _selectedDate
-
-
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
@@ -52,18 +50,17 @@ class MainMenuViewModel @Inject constructor(
             try {
                 repository.getLiveMatches()
                     .onSuccess { matches ->
-
                         // Filter for actually live matches
                         val actuallyLive = matches.filter { it.isLive }
                         _liveMatches.value = actuallyLive
-                        Log.d("MainMenuViewModel", "Loaded ${actuallyLive.size} live matches")
+                        Log.d("HomeViewModel", "Loaded ${actuallyLive.size} live matches")
                     }
                     .onFailure { exception ->
-                        Log.e("MainMenuViewModel", "Failed to load live matches", exception)
+                        Log.e("HomeViewModel", "Failed to load live matches", exception)
                         _error.value = exception.message
                     }
             } catch (e: Exception) {
-                Log.e("MainMenuViewModel", "Exception loading live matches", e)
+                Log.e("HomeViewModel", "Exception loading live matches", e)
                 _error.value = e.message
             }
 
@@ -79,21 +76,20 @@ class MainMenuViewModel @Inject constructor(
             try {
                 repository.getMatchesByDate(date)
                     .onSuccess { matches ->
-                        // DEBUG: Log all matches for the selected date
-                        Log.d("MainMenuViewModel", "Loaded ${matches.size} matches for date: $date")
+                        Log.d("HomeViewModel", "Loaded ${matches.size} matches for date: $date")
                         matches.forEach { match ->
-                            Log.d("MainMenuViewModel", "Match: ${match.homeTeam.name} vs ${match.awayTeam.name} - League: ${match.league.name} (ID: ${match.league.id}) - Status: ${match.matchStatus}")
+                            Log.d("HomeViewModel", "Match: ${match.homeTeam.name} vs ${match.awayTeam.name} - League: ${match.league.name} (ID: ${match.league.id}) - Status: ${match.matchStatus}")
                         }
 
                         val sortedMatches = sortMatchesByStatus(matches)
                         _todayMatches.value = sortedMatches
                     }
                     .onFailure { exception ->
-                        Log.e("MainMenuViewModel", "Failed to load matches for date: $date", exception)
+                        Log.e("HomeViewModel", "Failed to load matches for date: $date", exception)
                         _error.value = exception.message
                     }
             } catch (e: Exception) {
-                Log.e("MainMenuViewModel", "Exception loading matches for date: $date", e)
+                Log.e("HomeViewModel", "Exception loading matches for date: $date", e)
                 _error.value = e.message
             }
 
@@ -101,8 +97,8 @@ class MainMenuViewModel @Inject constructor(
         }
     }
 
-    private fun sortMatchesByStatus(matches: List<LiveMatch>): List<LiveMatch> {
-        return matches.sortedWith(compareBy<LiveMatch> { match ->
+    private fun sortMatchesByStatus(matches: List<Match>): List<Match> {
+        return matches.sortedWith(compareBy<Match> { match ->
             when {
                 match.isLive -> 0
                 match.isUpcoming -> 1
@@ -134,7 +130,7 @@ class MainMenuViewModel @Inject constructor(
     }
 
     fun selectDate(date: String) {
-        Log.d("MainMenuViewModel", "Selected date: $date")
+        Log.d("HomeViewModel", "Selected date: $date")
         _selectedDate.value = date
         loadMatchesByDate(date)
 
@@ -146,7 +142,7 @@ class MainMenuViewModel @Inject constructor(
 
     fun refreshData() {
         _selectedDate.value?.let { selectedDate ->
-            Log.d("MainMenuViewModel", "Refreshing data for date: $selectedDate")
+            Log.d("HomeViewModel", "Refreshing data for date: $selectedDate")
             loadMatchesByDate(selectedDate)
 
             val today = dateFormat.format(Date())

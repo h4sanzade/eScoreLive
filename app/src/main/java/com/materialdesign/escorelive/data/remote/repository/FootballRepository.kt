@@ -1,8 +1,8 @@
-package com.materialdesign.escorelive.repository
+package com.materialdesign.escorelive.data.remote.repository
 
-import com.materialdesign.escorelive.LiveMatch
+import com.materialdesign.escorelive.domain.model.LiveMatch
 import com.materialdesign.escorelive.data.remote.FootballApiService
-import com.materialdesign.escorelive.toLiveMatch
+import com.materialdesign.escorelive.domain.model.toLiveMatch
 import com.materialdesign.escorelive.ui.matchdetail.MatchEvent
 import com.materialdesign.escorelive.ui.matchdetail.LineupPlayer
 import com.materialdesign.escorelive.ui.matchdetail.MatchStatistics
@@ -10,6 +10,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import android.util.Log
 import com.google.gson.Gson
+import com.materialdesign.escorelive.data.remote.StatisticItem
 import com.materialdesign.escorelive.data.remote.TeamStanding
 
 @Singleton
@@ -17,7 +18,7 @@ class FootballRepository @Inject constructor(
     private val apiService: FootballApiService
 ) {
 
-    suspend fun getLiveMatches(): Result<List<LiveMatch>> {
+    suspend fun getLiveMatches(): Result<List<LiveMaztch>> {
         return try {
             Log.d("FootballRepository", "Fetching live matches with API key: ${FootballApiService.API_KEY.take(10)}...")
             val response = apiService.getLiveFixtures()
@@ -382,7 +383,7 @@ class FootballRepository @Inject constructor(
         }
     }
 
-    private fun getStatValue(statistics: List<com.materialdesign.escorelive.data.remote.StatisticItem>, type: String): Any? {
+    private fun getStatValue(statistics: List<StatisticItem>, type: String): Any? {
         return statistics.find { it.type == type }?.value
     }
 }

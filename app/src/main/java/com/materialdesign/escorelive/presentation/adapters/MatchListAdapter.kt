@@ -1,4 +1,4 @@
-package com.materialdesign.escorelive.ui.allmatchs
+package com.materialdesign.escorelive.presentation.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,29 +8,29 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.materialdesign.escorelive.LiveMatch
+import com.materialdesign.escorelive.domain.model.Match
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.ItemAllMatchesBinding
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AllMatchesAdapter(
-    private val onMatchClick: (LiveMatch) -> Unit
-) : ListAdapter<LiveMatch, AllMatchesAdapter.AllMatchesViewHolder>(AllMatchesDiffCallback()) {
+class MatchListAdapter(
+    private val onMatchClick: (Match) -> Unit
+) : ListAdapter<Match, MatchListAdapter.MatchListViewHolder>(MatchDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AllMatchesViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MatchListViewHolder {
         val binding = ItemAllMatchesBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return AllMatchesViewHolder(binding)
+        return MatchListViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: AllMatchesViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MatchListViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    inner class AllMatchesViewHolder(private val binding: ItemAllMatchesBinding) :
+    inner class MatchListViewHolder(private val binding: ItemAllMatchesBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(match: LiveMatch) = with(binding) {
+        fun bind(match: Match) = with(binding) {
             leagueName.text = match.league.name
             loadImage(leagueLogo, match.league.logo)
 
@@ -105,7 +105,7 @@ class AllMatchesAdapter(
             root.setOnClickListener { onMatchClick(match) }
         }
 
-        private fun displayMatchDate(match: LiveMatch) = with(binding) {
+        private fun displayMatchDate(match: Match) = with(binding) {
             match.kickoffTime?.let { kickoffTime ->
                 try {
                     val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
@@ -163,12 +163,12 @@ class AllMatchesAdapter(
         }
     }
 
-    class AllMatchesDiffCallback : DiffUtil.ItemCallback<LiveMatch>() {
-        override fun areItemsTheSame(oldItem: LiveMatch, newItem: LiveMatch): Boolean {
+    class MatchDiffCallback : DiffUtil.ItemCallback<Match>() {
+        override fun areItemsTheSame(oldItem: Match, newItem: Match): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: LiveMatch, newItem: LiveMatch): Boolean {
+        override fun areContentsTheSame(oldItem: Match, newItem: Match): Boolean {
             return oldItem == newItem
         }
     }

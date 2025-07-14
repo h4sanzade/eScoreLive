@@ -1,4 +1,4 @@
-package com.materialdesign.escorelive.ui.main
+package com.materialdesign.escorelive.presentation.ui.main
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -10,21 +10,22 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.materialdesign.escorelive.LiveMatch
-import com.materialdesign.escorelive.adapter.LiveMatchAdapter
+import com.materialdesign.escorelive.domain.model.Match
+import com.materialdesign.escorelive.presentation.adapters.LiveMatchAdapter
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.FragmentMainMenuBinding
+import com.materialdesign.escorelive.presentation.main.MainMenuFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint
-class MainMenuFragment : Fragment() {
+class HomeFragment : Fragment() {
 
     private var _binding: FragmentMainMenuBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: MainMenuViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels()
     private lateinit var liveMatchesAdapter: LiveMatchAdapter
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -78,13 +79,8 @@ class MainMenuFragment : Fragment() {
 
     private fun setupDayClickListeners() {
         val dayLayouts = listOf(
-            binding.day1,
-            binding.day2,
-            binding.day3,
-            binding.day4,
-            binding.day5,
-            binding.day6,
-            binding.day7
+            binding.day1, binding.day2, binding.day3, binding.day4,
+            binding.day5, binding.day6, binding.day7
         )
 
         dayLayouts.forEachIndexed { index, dayLayout ->
@@ -135,7 +131,6 @@ class MainMenuFragment : Fragment() {
         )
 
         var todayIndex = -1
-
         calendar.time = mondayDate
 
         for (i in 0..6) {
@@ -165,7 +160,6 @@ class MainMenuFragment : Fragment() {
 
     private fun getDateForDayIndex(dayIndex: Int): String {
         val calendar = Calendar.getInstance()
-
         calendar.add(Calendar.WEEK_OF_YEAR, currentWeekOffset)
 
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
@@ -245,6 +239,7 @@ class MainMenuFragment : Fragment() {
         })
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
+            // Handle loading state
         })
 
         viewModel.error.observe(viewLifecycleOwner, Observer { error ->
@@ -263,13 +258,15 @@ class MainMenuFragment : Fragment() {
         }
 
         binding.searchId.setOnClickListener {
+            // Handle search click
         }
 
         binding.notificationId.setOnClickListener {
+            // Handle notification click
         }
     }
 
-    private fun onMatchClick(match: LiveMatch) {
+    private fun onMatchClick(match: Match) {
         val action = MainMenuFragmentDirections.actionMainMenuToMatchDetail(match.id)
         findNavController().navigate(action)
     }

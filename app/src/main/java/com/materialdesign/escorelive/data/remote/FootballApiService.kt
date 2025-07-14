@@ -1,11 +1,11 @@
 package com.materialdesign.escorelive.data.remote
 
-import com.materialdesign.escorelive.FixturesResponse
-import com.materialdesign.escorelive.TeamData
+import com.materialdesign.escorelive.data.remote.dto.FixturesResponse
+import com.materialdesign.escorelive.data.remote.dto.TeamData
+
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Query
-import retrofit2.http.Path
 import retrofit2.Response
 
 interface FootballApiService {

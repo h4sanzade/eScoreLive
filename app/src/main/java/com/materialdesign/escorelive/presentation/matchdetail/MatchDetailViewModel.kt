@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.materialdesign.escorelive.LiveMatch
+import com.materialdesign.escorelive.domain.model.LiveMatch
 import com.materialdesign.escorelive.data.remote.TeamStanding
-import com.materialdesign.escorelive.repository.FootballRepository
+import com.materialdesign.escorelive.data.remote.repository.FootballRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import dagger.hilt.android.lifecycle.HiltViewModel

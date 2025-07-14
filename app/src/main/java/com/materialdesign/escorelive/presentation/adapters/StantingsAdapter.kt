@@ -1,4 +1,4 @@
-package com.materialdesign.escorelive.ui.matchdetail
+package com.materialdesign.escorelive.presentation.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,7 +11,9 @@ import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.data.remote.TeamStanding
 import com.materialdesign.escorelive.databinding.ItemStandingBinding
 
-class StandingsAdapter : ListAdapter<TeamStanding, StandingsAdapter.StandingViewHolder>(StandingDiffCallback()) {
+class StandingsAdapter : ListAdapter<TeamStanding, StandingsAdapter.StandingViewHolder>(
+    StandingDiffCallback()
+) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StandingViewHolder {
         val binding = ItemStandingBinding.inflate(LayoutInflater.from(parent.context), parent, false)
