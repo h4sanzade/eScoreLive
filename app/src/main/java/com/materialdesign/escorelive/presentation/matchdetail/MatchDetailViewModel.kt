@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.materialdesign.escorelive.domain.model.LiveMatch
+import com.materialdesign.escorelive.domain.model.Match // LiveMatch -> Match
 import com.materialdesign.escorelive.data.remote.TeamStanding
 import com.materialdesign.escorelive.data.remote.repository.FootballRepository
 import kotlinx.coroutines.launch
@@ -17,8 +17,8 @@ class MatchDetailViewModel @Inject constructor(
     private val repository: FootballRepository
 ) : ViewModel() {
 
-    private val _matchDetails = MutableLiveData<LiveMatch?>()
-    val matchDetails: LiveData<LiveMatch?> = _matchDetails
+    private val _matchDetails = MutableLiveData<Match?>() // LiveMatch -> Match
+    val matchDetails: LiveData<Match?> = _matchDetails
 
     private val _matchEvents = MutableLiveData<List<MatchEvent>>()
     val matchEvents: LiveData<List<MatchEvent>> = _matchEvents
@@ -29,8 +29,8 @@ class MatchDetailViewModel @Inject constructor(
     private val _matchStatistics = MutableLiveData<MatchStatistics?>()
     val matchStatistics: LiveData<MatchStatistics?> = _matchStatistics
 
-    private val _h2hMatches = MutableLiveData<List<LiveMatch>>()
-    val h2hMatches: LiveData<List<LiveMatch>> = _h2hMatches
+    private val _h2hMatches = MutableLiveData<List<Match>>() // LiveMatch -> Match
+    val h2hMatches: LiveData<List<Match>> = _h2hMatches
 
     private val _standings = MutableLiveData<List<TeamStanding>>()
     val standings: LiveData<List<TeamStanding>> = _standings
@@ -46,12 +46,9 @@ class MatchDetailViewModel @Inject constructor(
             _isLoading.value = true
             _error.value = null
 
-            // Load match basic details
             repository.getMatchDetails(matchId)
                 .onSuccess { match ->
                     _matchDetails.value = match
-
-                    // After getting match details, load H2H and standings
                     loadH2HMatches(match.homeTeam.id, match.awayTeam.id)
                     loadStandings(match.league.id.toInt())
                 }
@@ -59,7 +56,6 @@ class MatchDetailViewModel @Inject constructor(
                     _error.value = "Failed to load match details: ${exception.message}"
                 }
 
-            // Load match events (goals, cards, substitutions)
             repository.getMatchEvents(matchId)
                 .onSuccess { events ->
                     _matchEvents.value = events
@@ -68,7 +64,6 @@ class MatchDetailViewModel @Inject constructor(
                     _error.value = "Failed to load match events: ${exception.message}"
                 }
 
-            // Load match lineup
             repository.getMatchLineup(matchId)
                 .onSuccess { lineup ->
                     _matchLineup.value = lineup
@@ -77,7 +72,6 @@ class MatchDetailViewModel @Inject constructor(
                     _error.value = "Failed to load lineup: ${exception.message}"
                 }
 
-            // Load match statistics
             repository.getMatchStatistics(matchId)
                 .onSuccess { stats ->
                     _matchStatistics.value = stats
@@ -110,7 +104,6 @@ class MatchDetailViewModel @Inject constructor(
                     _standings.value = standings
                 }
                 .onFailure { exception ->
-                    // Try previous season if current season fails
                     repository.getStandings(leagueId, currentSeason - 1)
                         .onSuccess { standings ->
                             _standings.value = standings
@@ -128,8 +121,8 @@ class MatchDetailViewModel @Inject constructor(
 data class MatchEvent(
     val id: Long,
     val minute: Int,
-    val type: String, // goal, card, substitution
-    val detail: String, // Normal Goal, Yellow Card, etc.
+    val type: String,
+    val detail: String,
     val player: String,
     val assistPlayer: String? = null,
     val team: String,

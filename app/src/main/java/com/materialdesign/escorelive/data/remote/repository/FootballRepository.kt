@@ -1,8 +1,8 @@
 package com.materialdesign.escorelive.data.remote.repository
 
-import com.materialdesign.escorelive.domain.model.LiveMatch
+import com.materialdesign.escorelive.domain.model.Match // LiveMatch yerine Match
 import com.materialdesign.escorelive.data.remote.FootballApiService
-import com.materialdesign.escorelive.domain.model.toLiveMatch
+import com.materialdesign.escorelive.data.remote.mappers.FixtureMapper // toLiveMatch yerine
 import com.materialdesign.escorelive.ui.matchdetail.MatchEvent
 import com.materialdesign.escorelive.ui.matchdetail.LineupPlayer
 import com.materialdesign.escorelive.ui.matchdetail.MatchStatistics
@@ -18,7 +18,7 @@ class FootballRepository @Inject constructor(
     private val apiService: FootballApiService
 ) {
 
-    suspend fun getLiveMatches(): Result<List<LiveMaztch>> {
+    suspend fun getLiveMatches(): Result<List<Match>> { // LiveMatch -> Match
         return try {
             Log.d("FootballRepository", "Fetching live matches with API key: ${FootballApiService.API_KEY.take(10)}...")
             val response = apiService.getLiveFixtures()
@@ -46,11 +46,11 @@ class FootballRepository @Inject constructor(
 
                 val liveMatches = fixtures.mapNotNull { fixture ->
                     try {
-                        val match = fixture.toLiveMatch()
+                        val match = FixtureMapper.mapToMatch(fixture) // toLiveMatch() -> FixtureMapper.mapToMatch()
                         Log.d("FootballRepository", "Live match: ${match.homeTeam.name} vs ${match.awayTeam.name} - League: ${match.league.name} (${match.league.id})")
                         match
                     } catch (e: Exception) {
-                        Log.e("FootballRepository", "Error converting fixture to LiveMatch", e)
+                        Log.e("FootballRepository", "Error converting fixture to Match", e)
                         null
                     }
                 }
@@ -62,7 +62,6 @@ class FootballRepository @Inject constructor(
                 Log.e("FootballRepository", "API Error: ${response.code()} - ${response.message()}")
                 Log.e("FootballRepository", "Error body: $errorBody")
 
-                // API-Sports specific error handling
                 when (response.code()) {
                     401 -> Result.failure(Exception("Invalid API key. Please check your API key."))
                     403 -> Result.failure(Exception("Access forbidden. Your API key might not have access to this endpoint."))
@@ -79,7 +78,7 @@ class FootballRepository @Inject constructor(
         }
     }
 
-    suspend fun getMatchesByDate(date: String): Result<List<LiveMatch>> {
+    suspend fun getMatchesByDate(date: String): Result<List<Match>> { // LiveMatch -> Match
         return try {
             Log.d("FootballRepository", "Fetching matches for date: $date")
             val response = apiService.getFixturesByDate(date = date)
@@ -97,11 +96,11 @@ class FootballRepository @Inject constructor(
 
                 val matches = fixtures.mapNotNull { fixture ->
                     try {
-                        val match = fixture.toLiveMatch()
+                        val match = FixtureMapper.mapToMatch(fixture) // toLiveMatch() -> FixtureMapper.mapToMatch()
                         Log.d("FootballRepository", "Match for $date: ${match.homeTeam.name} vs ${match.awayTeam.name} - League: ${match.league.name} (${match.league.id}) - Status: ${match.matchStatus}")
                         match
                     } catch (e: Exception) {
-                        Log.e("FootballRepository", "Error converting fixture to LiveMatch for date $date", e)
+                        Log.e("FootballRepository", "Error converting fixture to Match for date $date", e)
                         null
                     }
                 }
@@ -125,7 +124,7 @@ class FootballRepository @Inject constructor(
         }
     }
 
-    suspend fun getMatchesByLeague(leagueId: Int, season: Int): Result<List<LiveMatch>> {
+    suspend fun getMatchesByLeague(leagueId: Int, season: Int): Result<List<Match>> { // LiveMatch -> Match
         return try {
             Log.d("FootballRepository", "Fetching matches for league: $leagueId, season: $season")
             val response = apiService.getFixturesByLeague(
@@ -141,13 +140,13 @@ class FootballRepository @Inject constructor(
 
                 val matches = fixtures.mapNotNull { fixture ->
                     try {
-                        val match = fixture.toLiveMatch()
+                        val match = FixtureMapper.mapToMatch(fixture) // toLiveMatch() -> FixtureMapper.mapToMatch()
                         if (fixtures.indexOf(fixture) < 3) {
                             Log.d("FootballRepository", "League $leagueId match: ${match.homeTeam.name} vs ${match.awayTeam.name} - ${match.matchStatus}")
                         }
                         match
                     } catch (e: Exception) {
-                        Log.e("FootballRepository", "Error converting fixture to LiveMatch for league $leagueId", e)
+                        Log.e("FootballRepository", "Error converting fixture to Match for league $leagueId", e)
                         null
                     }
                 }
@@ -166,7 +165,7 @@ class FootballRepository @Inject constructor(
         }
     }
 
-    suspend fun getMatchDetails(matchId: Long): Result<LiveMatch> {
+    suspend fun getMatchDetails(matchId: Long): Result<Match> { // LiveMatch -> Match
         return try {
             Log.d("FootballRepository", "Fetching match details for ID: $matchId")
             val response = apiService.getFixtureById(fixtureId = matchId)
@@ -174,7 +173,7 @@ class FootballRepository @Inject constructor(
             if (response.isSuccessful) {
                 val fixture = response.body()?.response?.firstOrNull()
                 if (fixture != null) {
-                    val match = fixture.toLiveMatch()
+                    val match = FixtureMapper.mapToMatch(fixture) // toLiveMatch() -> FixtureMapper.mapToMatch()
                     Log.d("FootballRepository", "Match details: ${match.homeTeam.name} vs ${match.awayTeam.name}")
                     Result.success(match)
                 } else {
@@ -191,6 +190,37 @@ class FootballRepository @Inject constructor(
         }
     }
 
+    suspend fun getH2HMatches(homeTeamId: Long, awayTeamId: Long): Result<List<Match>> { // LiveMatch -> Match
+        return try {
+            val h2h = "$homeTeamId-$awayTeamId"
+            Log.d("FootballRepository", "Fetching H2H matches for: $h2h")
+            val response = apiService.getH2HMatches(h2h = h2h)
+
+            if (response.isSuccessful) {
+                val fixtures = response.body()?.response ?: emptyList()
+                Log.d("FootballRepository", "API returned ${fixtures.size} H2H matches")
+
+                val h2hMatches = fixtures.mapNotNull { fixture ->
+                    try {
+                        FixtureMapper.mapToMatch(fixture) // toLiveMatch() -> FixtureMapper.mapToMatch()
+                    } catch (e: Exception) {
+                        Log.e("FootballRepository", "Error converting H2H fixture", e)
+                        null
+                    }
+                }
+
+                Result.success(h2hMatches)
+            } else {
+                Log.e("FootballRepository", "API Error for H2H: ${response.code()}")
+                Result.failure(Exception("API Error: ${response.code()}"))
+            }
+        } catch (e: Exception) {
+            Log.e("FootballRepository", "Exception in getH2HMatches", e)
+            Result.failure(e)
+        }
+    }
+
+    // Diğer metodlar aynı kalır...
     suspend fun getMatchEvents(matchId: Long): Result<List<MatchEvent>> {
         return try {
             Log.d("FootballRepository", "Fetching match events for ID: $matchId")
@@ -244,7 +274,6 @@ class FootballRepository @Inject constructor(
                 lineups.forEachIndexed { teamIndex, lineup ->
                     val isHomeTeam = teamIndex == 0
 
-                    // Starting XI
                     lineup.startXI.forEach { startingPlayer ->
                         players.add(
                             LineupPlayer(
@@ -258,7 +287,6 @@ class FootballRepository @Inject constructor(
                         )
                     }
 
-                    // Substitutes
                     lineup.substitutes.forEach { substitute ->
                         players.add(
                             LineupPlayer(
@@ -329,36 +357,6 @@ class FootballRepository @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e("FootballRepository", "Exception in getMatchStatistics for ID: $matchId", e)
-            Result.failure(e)
-        }
-    }
-
-    suspend fun getH2HMatches(homeTeamId: Long, awayTeamId: Long): Result<List<LiveMatch>> {
-        return try {
-            val h2h = "$homeTeamId-$awayTeamId"
-            Log.d("FootballRepository", "Fetching H2H matches for: $h2h")
-            val response = apiService.getH2HMatches(h2h = h2h)
-
-            if (response.isSuccessful) {
-                val fixtures = response.body()?.response ?: emptyList()
-                Log.d("FootballRepository", "API returned ${fixtures.size} H2H matches")
-
-                val h2hMatches = fixtures.mapNotNull { fixture ->
-                    try {
-                        fixture.toLiveMatch()
-                    } catch (e: Exception) {
-                        Log.e("FootballRepository", "Error converting H2H fixture", e)
-                        null
-                    }
-                }
-
-                Result.success(h2hMatches)
-            } else {
-                Log.e("FootballRepository", "API Error for H2H: ${response.code()}")
-                Result.failure(Exception("API Error: ${response.code()}"))
-            }
-        } catch (e: Exception) {
-            Log.e("FootballRepository", "Exception in getH2HMatches", e)
             Result.failure(e)
         }
     }

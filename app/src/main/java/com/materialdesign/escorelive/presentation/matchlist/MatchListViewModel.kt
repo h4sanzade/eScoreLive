@@ -5,17 +5,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.materialdesign.escorelive.domain.model.Match
-import com.materialdesign.escorelive.data.repository.FootballRepositoryImpl
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import android.util.Log
+import com.materialdesign.escorelive.data.remote.repository.FootballRepository
 
 @HiltViewModel
 class MatchListViewModel @Inject constructor(
-    private val repository: FootballRepositoryImpl
+    private val repository: FootballRepository
 ) : ViewModel() {
 
     private val _matches = MutableLiveData<List<Match>>()
