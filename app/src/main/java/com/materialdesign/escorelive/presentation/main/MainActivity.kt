@@ -1,4 +1,4 @@
-package com.materialdesign.escorelive.ui.main
+package com.materialdesign.escorelive.presentation.main
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

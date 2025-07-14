@@ -1,4 +1,4 @@
-package com.materialdesign.escorelive.ui.matchdetail
+package com.materialdesign.escorelive.presentation.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.ItemLineupPlayerBinding
+import com.materialdesign.escorelive.ui.matchdetail.LineupPlayer
 
 class LineupAdapter : ListAdapter<LineupPlayer, LineupAdapter.LineupViewHolder>(LineupDiffCallback()) {
 

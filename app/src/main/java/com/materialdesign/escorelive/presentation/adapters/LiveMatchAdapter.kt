@@ -1,4 +1,4 @@
-package com.materialdesign.escorelive.adapter
+package com.materialdesign.escorelive.presentation.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,15 +8,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.materialdesign.escorelive.LiveMatch
+import com.materialdesign.escorelive.domain.model.Match
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.ItemLiveMatchBinding
-import java.text.SimpleDateFormat
-import java.util.*
 
 class LiveMatchAdapter(
-    private val onMatchClick: (LiveMatch) -> Unit
-) : ListAdapter<LiveMatch, LiveMatchAdapter.LiveMatchViewHolder>(LiveMatchDiffCallback()) {
+    private val onMatchClick: (Match) -> Unit
+) : ListAdapter<Match, LiveMatchAdapter.LiveMatchViewHolder>(LiveMatchDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LiveMatchViewHolder {
         val binding = ItemLiveMatchBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -30,7 +28,7 @@ class LiveMatchAdapter(
     inner class LiveMatchViewHolder(private val binding: ItemLiveMatchBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(match: LiveMatch) = with(binding) {
+        fun bind(match: Match) = with(binding) {
             leagueName.text = match.league.name
             loadImage(leagueLogo, match.league.logo)
 
@@ -104,12 +102,12 @@ class LiveMatchAdapter(
         }
     }
 
-    class LiveMatchDiffCallback : DiffUtil.ItemCallback<LiveMatch>() {
-        override fun areItemsTheSame(oldItem: LiveMatch, newItem: LiveMatch): Boolean {
+    class LiveMatchDiffCallback : DiffUtil.ItemCallback<Match>() {
+        override fun areItemsTheSame(oldItem: Match, newItem: Match): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: LiveMatch, newItem: LiveMatch): Boolean {
+        override fun areContentsTheSame(oldItem: Match, newItem: Match): Boolean {
             return oldItem == newItem
         }
     }

@@ -1,11 +1,11 @@
-package com.materialdesign.escorelive.ui.allmatchs
+package com.materialdesign.escorelive.presentation.ui.matchlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.materialdesign.escorelive.LiveMatch
-import com.materialdesign.escorelive.repository.FootballRepository
+import com.materialdesign.escorelive.domain.model.Match
+import com.materialdesign.escorelive.data.repository.FootballRepositoryImpl
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -14,12 +14,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import android.util.Log
 
 @HiltViewModel
-class AllMatchesViewModel @Inject constructor(
-    private val repository: FootballRepository
+class MatchListViewModel @Inject constructor(
+    private val repository: FootballRepositoryImpl
 ) : ViewModel() {
 
-    private val _matches = MutableLiveData<List<LiveMatch>>()
-    val matches: LiveData<List<LiveMatch>> = _matches
+    private val _matches = MutableLiveData<List<Match>>()
+    val matches: LiveData<List<Match>> = _matches
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -30,7 +30,7 @@ class AllMatchesViewModel @Inject constructor(
     private val _selectedFilter = MutableLiveData<MatchFilter>()
     val selectedFilter: LiveData<MatchFilter> = _selectedFilter
 
-    private var allMatchesList: List<LiveMatch> = emptyList()
+    private var allMatchesList: List<Match> = emptyList()
     private var currentDisplayType: DisplayType = DisplayType.TODAY
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
@@ -51,25 +51,25 @@ class AllMatchesViewModel @Inject constructor(
                         // For past dates, only load matches from that specific date
                         val matches = repository.getMatchesByDate(date).getOrNull() ?: emptyList()
                         allMatchesList = matches.filter { it.isFinished }
-                        Log.d("AllMatchesViewModel", "Loaded ${allMatchesList.size} finished matches for past date: $date")
+                        Log.d("MatchListViewModel", "Loaded ${allMatchesList.size} finished matches for past date: $date")
                     }
                     DisplayType.TODAY -> {
                         // For today, load live matches and today's matches
                         val liveMatches = repository.getLiveMatches().getOrNull() ?: emptyList()
                         val todayMatches = repository.getMatchesByDate(date).getOrNull() ?: emptyList()
 
-                        val combinedSet = mutableSetOf<LiveMatch>()
+                        val combinedSet = mutableSetOf<Match>()
                         combinedSet.addAll(liveMatches)
                         combinedSet.addAll(todayMatches)
 
                         allMatchesList = combinedSet.toList()
-                        Log.d("AllMatchesViewModel", "Loaded ${allMatchesList.size} matches for today")
+                        Log.d("MatchListViewModel", "Loaded ${allMatchesList.size} matches for today")
                     }
                     DisplayType.FUTURE -> {
                         // For future dates, only load matches from that specific date
                         val matches = repository.getMatchesByDate(date).getOrNull() ?: emptyList()
                         allMatchesList = matches.filter { it.isUpcoming }
-                        Log.d("AllMatchesViewModel", "Loaded ${allMatchesList.size} upcoming matches for future date: $date")
+                        Log.d("MatchListViewModel", "Loaded ${allMatchesList.size} upcoming matches for future date: $date")
                     }
                 }
 
@@ -77,7 +77,7 @@ class AllMatchesViewModel @Inject constructor(
                 applyCurrentFilter()
 
             } catch (e: Exception) {
-                Log.e("AllMatchesViewModel", "Failed to load matches", e)
+                Log.e("MatchListViewModel", "Failed to load matches", e)
                 _error.value = "Failed to load matches: ${e.message}"
             } finally {
                 _isLoading.value = false
@@ -86,7 +86,6 @@ class AllMatchesViewModel @Inject constructor(
     }
 
     fun refreshMatches() {
-        // Reload with current settings
         _matches.value?.let {
             applyCurrentFilter()
         }
@@ -120,12 +119,12 @@ class AllMatchesViewModel @Inject constructor(
             }
         }
 
-        Log.d("AllMatchesViewModel", "Applied filter: $filter, showing ${filteredMatches.size} matches")
+        Log.d("MatchListViewModel", "Applied filter: $filter, showing ${filteredMatches.size} matches")
         _matches.value = filteredMatches
     }
 
-    private fun sortMatchesByPriority(matches: List<LiveMatch>): List<LiveMatch> {
-        return matches.sortedWith(compareBy<LiveMatch> { match ->
+    private fun sortMatchesByPriority(matches: List<Match>): List<Match> {
+        return matches.sortedWith(compareBy<Match> { match ->
             when {
                 match.isLive -> 0 // Live matches first
                 match.isUpcoming -> 1 // Upcoming matches second

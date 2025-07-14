@@ -1,4 +1,4 @@
-package com.materialdesign.escorelive.ui.allmatchs
+package com.materialdesign.escorelive.presentation.ui.matchlist
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -11,23 +11,24 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.materialdesign.escorelive.LiveMatch
+import com.materialdesign.escorelive.domain.model.Match
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.FragmentAllMatchesBinding
+import com.materialdesign.escorelive.presentation.adapters.MatchListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint
-class AllMatchesFragment : Fragment() {
+class MatchListFragment : Fragment() {
 
     private var _binding: FragmentAllMatchesBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: AllMatchesViewModel by viewModels()
-    private lateinit var allMatchesAdapter: AllMatchesAdapter
+    private val viewModel: MatchListViewModel by viewModels()
+    private lateinit var matchListAdapter: MatchListAdapter
 
-    private val args: AllMatchesFragmentArgs by navArgs()
+    private val args: MatchListFragmentArgs by navArgs()
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private val displayDateFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
@@ -52,7 +53,6 @@ class AllMatchesFragment : Fragment() {
         val displayType = determineDisplayType(selectedDate)
 
         updateUIForDisplayType(displayType, selectedDate)
-
         viewModel.loadMatchesForDate(selectedDate, displayType)
     }
 
@@ -87,7 +87,6 @@ class AllMatchesFragment : Fragment() {
     }
 
     private fun updateUIForDisplayType(displayType: DisplayType, selectedDate: String) {
-        // Update header title
         val formattedDate = try {
             val date = dateFormat.parse(selectedDate)
             date?.let { displayDateFormat.format(it) } ?: "Matches"
@@ -119,12 +118,12 @@ class AllMatchesFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        allMatchesAdapter = AllMatchesAdapter { match ->
+        matchListAdapter = MatchListAdapter { match ->
             onMatchClick(match)
         }
 
         binding.matchesRecyclerView.apply {
-            adapter = allMatchesAdapter
+            adapter = matchListAdapter
             layoutManager = LinearLayoutManager(context)
             setHasFixedSize(true)
         }
@@ -135,7 +134,6 @@ class AllMatchesFragment : Fragment() {
             viewModel.refreshMatches()
         }
 
-        // Customize swipe refresh colors
         binding.swipeRefreshLayout.setColorSchemeResources(
             R.color.accent_color,
             android.R.color.holo_blue_bright,
@@ -146,7 +144,7 @@ class AllMatchesFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.matches.observe(viewLifecycleOwner, Observer { matches ->
-            allMatchesAdapter.submitList(matches)
+            matchListAdapter.submitList(matches)
             updateEmptyState(matches.isEmpty())
         })
 
@@ -212,8 +210,8 @@ class AllMatchesFragment : Fragment() {
         }
     }
 
-    private fun onMatchClick(match: LiveMatch) {
-        val action = AllMatchesFragmentDirections.actionAllMatchesToMatchDetail(match.id)
+    private fun onMatchClick(match: Match) {
+        val action = MatchListFragmentDirections.actionAllMatchesToMatchDetail(match.id)
         findNavController().navigate(action)
     }
 

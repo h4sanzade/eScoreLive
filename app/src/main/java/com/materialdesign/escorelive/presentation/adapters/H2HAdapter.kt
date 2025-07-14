@@ -1,4 +1,4 @@
-package com.materialdesign.escorelive.ui.matchdetail
+package com.materialdesign.escorelive.presentation.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.materialdesign.escorelive.LiveMatch
+import com.materialdesign.escorelive.domain.model.LiveMatch
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.ItemH2hMatchBinding
 import java.text.SimpleDateFormat

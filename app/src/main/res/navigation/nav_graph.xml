@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/mainMenuFragment"
-        android:name="com.materialdesign.escorelive.ui.main.MainMenuFragment"
+        android:name="com.materialdesign.escorelive.presentation.main.MainMenuFragment"
         android:label="Main Menu"
         tools:layout="@layout/fragment_main_menu">
 
@@ -22,7 +22,7 @@
 
     <fragment
         android:id="@+id/allMatchesFragment"
-        android:name="com.materialdesign.escorelive.ui.allmatchs.AllMatchesFragment"
+        android:name="com.materialdesign.escorelive.presentation.matchlist.AllMatchesFragment"
         android:label="All Matches"
         tools:layout="@layout/fragment_all_matches">
 
