@@ -25,7 +25,7 @@ class MainMenuFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: MainMenuViewModel by viewModels()
-    private lateinit var liveMatchesAdapter: LiveMatchAdapter
+    private lateinit var matchesAdapter: LiveMatchAdapter
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private val displayDateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
@@ -47,18 +47,19 @@ class MainMenuFragment : Fragment() {
 
         setupRecyclerView()
         setupCalendar()
+        setupContentFilters()
         observeViewModel()
         setupClickListeners()
     }
 
     private fun setupRecyclerView() {
-        liveMatchesAdapter = LiveMatchAdapter { match ->
+        matchesAdapter = LiveMatchAdapter { match ->
             onMatchClick(match)
         }
 
-        binding.liveMatchesRecycler.apply {
-            adapter = liveMatchesAdapter
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        binding.matchesRecycler.apply {
+            adapter = matchesAdapter
+            layoutManager = LinearLayoutManager(context)
             setHasFixedSize(true)
         }
     }
@@ -76,15 +77,41 @@ class MainMenuFragment : Fragment() {
         }
     }
 
+    private fun setupContentFilters() {
+        binding.filterUpcoming.setOnClickListener {
+            viewModel.setContentFilter(ContentFilter.UPCOMING)
+            updateFilterButtons(ContentFilter.UPCOMING)
+        }
+
+        binding.filterScore.setOnClickListener {
+            viewModel.setContentFilter(ContentFilter.SCORE)
+            updateFilterButtons(ContentFilter.SCORE)
+        }
+
+        binding.filterFavorites.setOnClickListener {
+            viewModel.setContentFilter(ContentFilter.FAVORITES)
+            updateFilterButtons(ContentFilter.FAVORITES)
+        }
+    }
+
+    private fun updateFilterButtons(selectedFilter: ContentFilter) {
+        // Reset all buttons
+        binding.filterUpcoming.setBackgroundResource(R.drawable.filter_unselected_bg)
+        binding.filterScore.setBackgroundResource(R.drawable.filter_unselected_bg)
+        binding.filterFavorites.setBackgroundResource(R.drawable.filter_unselected_bg)
+
+        // Set selected button
+        when (selectedFilter) {
+            ContentFilter.UPCOMING -> binding.filterUpcoming.setBackgroundResource(R.drawable.bottom_line_selected)
+            ContentFilter.SCORE -> binding.filterScore.setBackgroundResource(R.drawable.bottom_line_selected)
+            ContentFilter.FAVORITES -> binding.filterFavorites.setBackgroundResource(R.drawable.bottom_line_selected)
+        }
+    }
+
     private fun setupDayClickListeners() {
         val dayLayouts = listOf(
-            binding.day1,
-            binding.day2,
-            binding.day3,
-            binding.day4,
-            binding.day5,
-            binding.day6,
-            binding.day7
+            binding.day1, binding.day2, binding.day3, binding.day4,
+            binding.day5, binding.day6, binding.day7
         )
 
         dayLayouts.forEachIndexed { index, dayLayout ->
@@ -93,7 +120,6 @@ class MainMenuFragment : Fragment() {
                 val selectedDate = getDateForDayIndex(index)
                 viewModel.selectDate(selectedDate)
                 updateSelectedDay(index)
-                updateHeaderBasedOnSelectedDate(selectedDate)
             }
         }
     }
@@ -135,7 +161,6 @@ class MainMenuFragment : Fragment() {
         )
 
         var todayIndex = -1
-
         calendar.time = mondayDate
 
         for (i in 0..6) {
@@ -160,12 +185,10 @@ class MainMenuFragment : Fragment() {
         updateSelectedDay(selectedDayIndex)
         val selectedDate = getDateForDayIndex(selectedDayIndex)
         viewModel.selectDate(selectedDate)
-        updateHeaderBasedOnSelectedDate(selectedDate)
     }
 
     private fun getDateForDayIndex(dayIndex: Int): String {
         val calendar = Calendar.getInstance()
-
         calendar.add(Calendar.WEEK_OF_YEAR, currentWeekOffset)
 
         val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
@@ -199,34 +222,6 @@ class MainMenuFragment : Fragment() {
         }
     }
 
-    private fun updateHeaderBasedOnSelectedDate(selectedDate: String) {
-        val today = dateFormat.format(Date())
-
-        try {
-            val selectedCalendar = Calendar.getInstance()
-            val todayCalendar = Calendar.getInstance()
-
-            selectedCalendar.time = dateFormat.parse(selectedDate) ?: Date()
-            todayCalendar.time = dateFormat.parse(today) ?: Date()
-
-            when {
-                selectedDate == today -> {
-                    binding.liveHeaderText.text = "Live Now"
-                }
-                selectedCalendar.before(todayCalendar) -> {
-                    val displayDate = displayDateFormat.format(selectedCalendar.time)
-                    binding.liveHeaderText.text = "Results - $displayDate"
-                }
-                selectedCalendar.after(todayCalendar) -> {
-                    val displayDate = displayDateFormat.format(selectedCalendar.time)
-                    binding.liveHeaderText.text = "Fixtures - $displayDate"
-                }
-            }
-        } catch (e: Exception) {
-            binding.liveHeaderText.text = "Matches"
-        }
-    }
-
     private fun navigateWeek(weekOffset: Int) {
         currentWeekOffset += weekOffset
         selectedDayIndex = -1
@@ -234,17 +229,13 @@ class MainMenuFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.liveMatches.observe(viewLifecycleOwner, Observer { matches ->
-            if (viewModel.isSelectedDateToday()) {
-                liveMatchesAdapter.submitList(matches)
-            }
-        })
-
-        viewModel.todayMatches.observe(viewLifecycleOwner, Observer { matches ->
-            liveMatchesAdapter.submitList(matches)
+        viewModel.matches.observe(viewLifecycleOwner, Observer { matches ->
+            matchesAdapter.submitList(matches)
+            updateEmptyState(matches.isEmpty())
         })
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
+            // Handle loading state if needed
         })
 
         viewModel.error.observe(viewLifecycleOwner, Observer { error ->
@@ -253,19 +244,30 @@ class MainMenuFragment : Fragment() {
                 viewModel.clearError()
             }
         })
+
+        viewModel.selectedContentFilter.observe(viewLifecycleOwner, Observer { filter ->
+            updateFilterButtons(filter)
+        })
+    }
+
+    private fun updateEmptyState(isEmpty: Boolean) {
+        if (isEmpty) {
+            binding.emptyStateLayout.visibility = View.VISIBLE
+            binding.matchesRecycler.visibility = View.GONE
+        } else {
+            binding.emptyStateLayout.visibility = View.GONE
+            binding.matchesRecycler.visibility = View.VISIBLE
+        }
     }
 
     private fun setupClickListeners() {
-        binding.seeMoreBtn.setOnClickListener {
-            val selectedDate = viewModel.selectedDate.value ?: dateFormat.format(Date())
-            val action = MainMenuFragmentDirections.actionMainMenuToAllMatches(selectedDate)
+        binding.searchId.setOnClickListener {
+            val action = MainMenuFragmentDirections.actionMainMenuToSearch()
             findNavController().navigate(action)
         }
 
-        binding.searchId.setOnClickListener {
-        }
-
         binding.notificationId.setOnClickListener {
+            // Handle notification click
         }
     }
 

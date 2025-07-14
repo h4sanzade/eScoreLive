@@ -1,5 +1,7 @@
 package com.materialdesign.escorelive.di
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.materialdesign.escorelive.data.remote.FootballApiService
 import dagger.Module
 import dagger.Provides
@@ -17,10 +19,18 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(): Retrofit {
+    fun provideGson(): Gson {
+        return GsonBuilder()
+            .setLenient()
+            .create()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(gson: Gson): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
     }
 

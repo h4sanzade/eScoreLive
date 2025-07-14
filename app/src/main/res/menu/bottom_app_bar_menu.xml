@@ -2,27 +2,27 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/homeButtonID"
+        android:id="@+id/navigation_home"
         android:title="@string/home"
         android:icon="@drawable/ic_home">
 
     </item>
     <item
-        android:id="@+id/competitonButtonID"
+        android:id="@+id/navigation_competition"
         android:title="@string/competition"
         android:icon="@drawable/ic_competition">
 
     </item>
 
     <item
-        android:id="@+id/newsButtonID"
+        android:id="@+id/navigation_news"
         android:title="@string/news"
         android:icon="@drawable/ic_news">
 
     </item>
 
     <item
-        android:id="@+id/accountButtonID"
+        android:id="@+id/navigation_account"
         android:title="@string/account"
         android:icon="@drawable/ic_account">
 

@@ -2,6 +2,7 @@ package com.materialdesign.escorelive.data.remote
 
 import com.materialdesign.escorelive.FixturesResponse
 import com.materialdesign.escorelive.TeamData
+import com.materialdesign.escorelive.data.model.SearchTeamsResponse
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Query
@@ -80,6 +81,15 @@ interface FootballApiService {
         @Query("league") leagueId: Int,
         @Query("season") season: Int
     ): Response<StandingsResponse>
+
+    @GET("teams")
+    suspend fun searchTeams(
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST,
+        @Query("search") search: String
+    ): Response<SearchTeamsResponse>
+
+
 }
 
 // Response data classes for API
