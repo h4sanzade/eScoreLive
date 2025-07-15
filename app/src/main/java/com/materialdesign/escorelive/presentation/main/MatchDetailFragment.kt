@@ -18,6 +18,8 @@ import com.materialdesign.escorelive.domain.model.Match
 import dagger.hilt.android.AndroidEntryPoint
 import com.materialdesign.escorelive.presentation.adapters.LineupAdapter
 import com.materialdesign.escorelive.presentation.adapters.MatchEventsAdapter
+import com.materialdesign.escorelive.presentation.adapters.H2HAdapter
+import com.materialdesign.escorelive.presentation.adapters.StandingsAdapter
 
 @AndroidEntryPoint
 class MatchDetailFragment : Fragment() {
@@ -28,6 +30,8 @@ class MatchDetailFragment : Fragment() {
     private val viewModel: MatchDetailViewModel by viewModels()
     private lateinit var eventsAdapter: MatchEventsAdapter
     private lateinit var lineupAdapter: LineupAdapter
+    private lateinit var h2hAdapter: H2HAdapter
+    private lateinit var standingsAdapter: StandingsAdapter
 
     private val args: MatchDetailFragmentArgs by navArgs()
 
@@ -52,6 +56,8 @@ class MatchDetailFragment : Fragment() {
     private fun setupRecyclerViews() {
         eventsAdapter = MatchEventsAdapter()
         lineupAdapter = LineupAdapter()
+        h2hAdapter = H2HAdapter()
+        standingsAdapter = StandingsAdapter()
 
         binding.eventsRecyclerView.apply {
             adapter = eventsAdapter
@@ -60,6 +66,16 @@ class MatchDetailFragment : Fragment() {
 
         binding.lineupRecyclerView.apply {
             adapter = lineupAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
+
+        binding.h2hRecyclerView.apply {
+            adapter = h2hAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
+
+        binding.standingsRecyclerView.apply {
+            adapter = standingsAdapter
             layoutManager = LinearLayoutManager(context)
         }
     }
@@ -81,6 +97,30 @@ class MatchDetailFragment : Fragment() {
 
         viewModel.matchStatistics.observe(viewLifecycleOwner, Observer { stats ->
             stats?.let { updateStatistics(it) }
+        })
+
+        // H2H Observer
+        viewModel.h2hMatches.observe(viewLifecycleOwner, Observer { h2hMatches ->
+            if (h2hMatches.isNotEmpty()) {
+                h2hAdapter.submitList(h2hMatches)
+                binding.h2hSection.visibility = View.VISIBLE
+                binding.h2hEmptyState.visibility = View.GONE
+            } else {
+                binding.h2hSection.visibility = View.GONE
+                binding.h2hEmptyState.visibility = View.VISIBLE
+            }
+        })
+
+        // Standings Observer
+        viewModel.standings.observe(viewLifecycleOwner, Observer { standings ->
+            if (standings.isNotEmpty()) {
+                standingsAdapter.submitList(standings)
+                binding.standingsSection.visibility = View.VISIBLE
+                binding.standingsEmptyState.visibility = View.GONE
+            } else {
+                binding.standingsSection.visibility = View.GONE
+                binding.standingsEmptyState.visibility = View.VISIBLE
+            }
         })
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
@@ -168,38 +208,69 @@ class MatchDetailFragment : Fragment() {
         binding.statisticsTab.setOnClickListener {
             showStatisticsSection()
         }
+
+        binding.h2hTab.setOnClickListener {
+            showH2HSection()
+        }
+
+        binding.standingsTab.setOnClickListener {
+            showStandingsSection()
+        }
     }
 
     private fun showEventsSection() {
+        hideAllSections()
         binding.eventsSection.visibility = View.VISIBLE
-        binding.lineupSection.visibility = View.GONE
-        binding.statisticsSection.visibility = View.GONE
-
-        binding.eventsTab.setBackgroundResource(R.drawable.selected_day)
-        binding.lineupTab.background = null
-        binding.statisticsTab.background = null
+        updateTabSelection(binding.eventsTab)
     }
 
     private fun showLineupSection() {
-        binding.eventsSection.visibility = View.GONE
+        hideAllSections()
         binding.lineupSection.visibility = View.VISIBLE
-        binding.statisticsSection.visibility = View.GONE
-
-        binding.eventsTab.background = null
-        binding.lineupTab.setBackgroundResource(R.drawable.selected_day)
-        binding.statisticsTab.background = null
+        updateTabSelection(binding.lineupTab)
     }
 
     private fun showStatisticsSection() {
-        binding.eventsSection.visibility = View.GONE
-        binding.lineupSection.visibility = View.GONE
+        hideAllSections()
         binding.statisticsSection.visibility = View.VISIBLE
-
-        binding.eventsTab.background = null
-        binding.lineupTab.background = null
-        binding.statisticsTab.setBackgroundResource(R.drawable.selected_day)
+        updateTabSelection(binding.statisticsTab)
     }
 
+    private fun showH2HSection() {
+        hideAllSections()
+        binding.h2hSection.visibility = View.VISIBLE
+        binding.h2hEmptyState.visibility = View.GONE
+        updateTabSelection(binding.h2hTab)
+    }
+
+    private fun showStandingsSection() {
+        hideAllSections()
+        binding.standingsSection.visibility = View.VISIBLE
+        binding.standingsEmptyState.visibility = View.GONE
+        updateTabSelection(binding.standingsTab)
+    }
+
+    private fun hideAllSections() {
+        binding.eventsSection.visibility = View.GONE
+        binding.lineupSection.visibility = View.GONE
+        binding.statisticsSection.visibility = View.GONE
+        binding.h2hSection.visibility = View.GONE
+        binding.h2hEmptyState.visibility = View.GONE
+        binding.standingsSection.visibility = View.GONE
+        binding.standingsEmptyState.visibility = View.GONE
+    }
+
+    private fun updateTabSelection(selectedTab: View) {
+        // Clear all tab backgrounds
+        binding.eventsTab.background = null
+        binding.lineupTab.background = null
+        binding.statisticsTab.background = null
+        binding.h2hTab.background = null
+        binding.standingsTab.background = null
+
+        // Set selected tab background
+        selectedTab.setBackgroundResource(R.drawable.selected_day)
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
