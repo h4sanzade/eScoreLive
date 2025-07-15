@@ -19,6 +19,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
 
+enum class DisplayType {
+    PAST, TODAY, FUTURE
+}
+
+enum class MatchFilter {
+    ALL, LIVE, FINISHED, UPCOMING
+}
+
 @AndroidEntryPoint
 class MatchListFragment : Fragment() {
 
@@ -49,11 +57,31 @@ class MatchListFragment : Fragment() {
         setupClickListeners()
         setupSwipeRefresh()
 
-        val selectedDate = args.selectedDate.ifEmpty { dateFormat.format(Date()) }
-        val displayType = determineDisplayType(selectedDate)
+        // Check if this is favorites mode
+        val isFavoritesMode = args.selectedDate == "FAVORITES_MODE"
 
-        updateUIForDisplayType(displayType, selectedDate)
-        viewModel.loadMatchesForDate(selectedDate, displayType)
+        if (isFavoritesMode) {
+            setupFavoritesMode()
+        } else {
+            val selectedDate = args.selectedDate.ifEmpty { dateFormat.format(Date()) }
+            val displayType = determineDisplayType(selectedDate)
+            updateUIForDisplayType(displayType, selectedDate)
+            viewModel.loadMatchesForDate(selectedDate, displayType)
+        }
+    }
+
+    private fun setupFavoritesMode() {
+        binding.headerTitle.text = "Favorite Teams Matches"
+
+        // Show all filter buttons for favorites
+        binding.filterScrollView.visibility = View.VISIBLE
+        binding.filterAll.visibility = View.VISIBLE
+        binding.filterLive.visibility = View.VISIBLE
+        binding.filterFinished.visibility = View.VISIBLE
+        binding.filterUpcoming.visibility = View.VISIBLE
+
+        // Load favorite team matches
+        viewModel.loadFavoriteTeamMatches()
     }
 
     private fun determineDisplayType(selectedDate: String): DisplayType {
@@ -219,8 +247,4 @@ class MatchListFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-}
-
-enum class DisplayType {
-    PAST, TODAY, FUTURE
 }

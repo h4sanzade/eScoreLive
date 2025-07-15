@@ -71,7 +71,7 @@ class TeamSearchViewModel @Inject constructor(
         }
     }
 
-    // BASIT ARAMA FONKSİYONU
+    // API TABANLI ARAMA FONKSİYONU
     fun searchTeams(query: String) {
         Log.d("TeamSearchViewModel", "searchTeams called with: '$query'")
 
@@ -143,7 +143,7 @@ class TeamSearchViewModel @Inject constructor(
         }
     }
 
-    // BASIT ÖNERİ FONKSİYONU
+    // API TABANLI ÖNERİ FONKSİYONU - MANUEL DEĞİL!
     fun getSuggestions(query: String) {
         Log.d("TeamSearchViewModel", "getSuggestions called with: '$query'")
 
@@ -157,16 +157,17 @@ class TeamSearchViewModel @Inject constructor(
 
         suggestionJob = viewModelScope.launch(Dispatchers.Main) {
             try {
-                Log.d("TeamSearchViewModel", "Starting suggestion job for: '$query'")
+                Log.d("TeamSearchViewModel", "Starting API-based suggestion job for: '$query'")
 
                 // Kısa debounce
-                delay(200)
+                delay(300)
 
                 if (!isActive) {
                     Log.d("TeamSearchViewModel", "Suggestion job cancelled during delay")
                     return@launch
                 }
 
+                // API'den gerçek öneriler al
                 val result = repository.getTeamSuggestions(query)
 
                 if (!isActive) {
@@ -176,12 +177,24 @@ class TeamSearchViewModel @Inject constructor(
 
                 result.fold(
                     onSuccess = { suggestions ->
-                        Log.d("TeamSearchViewModel", "Got ${suggestions.size} suggestions: $suggestions")
+                        Log.d("TeamSearchViewModel", "Got ${suggestions.size} API-based suggestions: $suggestions")
                         _suggestions.value = suggestions
                     },
                     onFailure = { exception ->
-                        Log.w("TeamSearchViewModel", "Failed to get suggestions for '$query'", exception)
-                        _suggestions.value = emptyList()
+                        Log.w("TeamSearchViewModel", "Failed to get API suggestions for '$query'", exception)
+
+                        // API başarısız olursa basit arama yap
+                        try {
+                            val searchResult = repository.searchTeamsAdvanced(query)
+                            searchResult.onSuccess { results ->
+                                val teamNames = results.take(5).map { it.team.name }
+                                _suggestions.value = teamNames
+                                Log.d("TeamSearchViewModel", "Fallback suggestions from search: $teamNames")
+                            }
+                        } catch (e: Exception) {
+                            Log.w("TeamSearchViewModel", "Fallback suggestions also failed", e)
+                            _suggestions.value = emptyList()
+                        }
                     }
                 )
 
@@ -408,7 +421,7 @@ class TeamSearchViewModel @Inject constructor(
         return favoriteTeamIds.size
     }
 
-    // POPÜLER TAKIMLAR - Başlangıçta gösterilecek
+    // POPÜLER TAKIMLAR - Başlangıçta gösterilecek (API'den alınacak veriler için)
     fun getPopularTeams(): List<String> {
         return listOf(
             "Arsenal", "Chelsea", "Manchester United", "Manchester City",
@@ -420,7 +433,7 @@ class TeamSearchViewModel @Inject constructor(
 
     // TEST FONKSİYONU - Debug için
     fun testSearch() {
-        Log.d("TeamSearchViewModel", "testSearch called")
+        Log.d("TeamSearchViewModel", "testSearch called - using API search")
         searchTeams("Arsenal")
     }
 

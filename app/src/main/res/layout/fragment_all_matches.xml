@@ -6,11 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/background_color">
 
-
-
     <!-- Header -->
-
-    <!-- Filter Buttons -->
     <LinearLayout
         android:id="@+id/header_layout"
         android:layout_width="match_parent"
@@ -37,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="@font/mulish_bold"
-            android:text="All Matches"
+            android:text="@string/all_matches"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="18sp" />
@@ -48,6 +44,7 @@
 
     </LinearLayout>
 
+    <!-- Filter Buttons -->
     <HorizontalScrollView
         android:id="@+id/filter_scroll_view"
         android:layout_width="match_parent"
@@ -66,27 +63,24 @@
             android:orientation="horizontal"
             android:paddingEnd="16dp">
 
-
-                <TextView
-                    android:id="@+id/filter_all"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="All"
-                    android:textSize="14sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="@font/mulish_bold"
-                    android:padding="12dp"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:background="@drawable/bottom_line_selected" />
-
-
+            <TextView
+                android:id="@+id/filter_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/all"
+                android:textSize="14sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/mulish_bold"
+                android:padding="12dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:background="@drawable/bottom_line_selected" />
 
             <TextView
                 android:id="@+id/filter_live"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Live"
+                android:text="@string/live_filter"
                 android:textSize="14sp"
                 android:textColor="@color/white"
                 android:fontFamily="@font/mulish_bold"
@@ -100,7 +94,7 @@
                 android:id="@+id/filter_today"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Today"
+                android:text="@string/today"
                 android:textSize="14sp"
                 android:textColor="@color/white"
                 android:fontFamily="@font/mulish_bold"
@@ -114,7 +108,7 @@
                 android:id="@+id/filter_finished"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Finished"
+                android:text="@string/finished"
                 android:textSize="14sp"
                 android:textColor="@color/white"
                 android:fontFamily="@font/mulish_bold"
@@ -128,7 +122,7 @@
                 android:id="@+id/filter_upcoming"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Upcoming"
+                android:text="@string/upcoming"
                 android:textSize="14sp"
                 android:textColor="@color/white"
                 android:fontFamily="@font/mulish_bold"
@@ -188,7 +182,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No matches found"
+            android:text="@string/no_matches_found"
             android:textSize="16sp"
             android:textColor="@android:color/darker_gray"
             android:fontFamily="@font/mulish_bold"
@@ -197,7 +191,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pull down to refresh"
+            android:text="@string/pull_down_to_refresh"
             android:textSize="14sp"
             android:textColor="@android:color/darker_gray"
             android:fontFamily="@font/mulish_regular" />

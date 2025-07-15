@@ -11,7 +11,7 @@ import retrofit2.Response
 interface FootballApiService {
 
     companion object {
-        const val API_KEY = "8767b67b14200a87603b7211cf4239dd"
+        const val API_KEY = "a2092a9a7cafe51baa290ff026b5c170"
         const val API_HOST = "v3.football.api-sports.io"
     }
 
