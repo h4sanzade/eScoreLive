@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.materialdesign.escorelive.domain.model.Team
+import com.materialdesign.escorelive.domain.model.Match
 import com.materialdesign.escorelive.data.remote.TeamStanding
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -14,7 +15,12 @@ import com.materialdesign.escorelive.data.remote.repository.FootballRepository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
 import java.util.Calendar
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @HiltViewModel
 class TeamSearchViewModel @Inject constructor(
@@ -25,6 +31,9 @@ class TeamSearchViewModel @Inject constructor(
     private val _searchResults = MutableLiveData<List<TeamSearchResult>>()
     val searchResults: LiveData<List<TeamSearchResult>> = _searchResults
 
+    private val _suggestions = MutableLiveData<List<String>>()
+    val suggestions: LiveData<List<String>> = _suggestions
+
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -34,132 +43,300 @@ class TeamSearchViewModel @Inject constructor(
     private val _selectedTeamStandings = MutableLiveData<List<TeamStanding>>()
     val selectedTeamStandings: LiveData<List<TeamStanding>> = _selectedTeamStandings
 
+    private val _favoriteMatches = MutableLiveData<List<Match>>()
+    val favoriteMatches: LiveData<List<Match>> = _favoriteMatches
+
     private val favoriteTeamIds = mutableSetOf<Long>()
     private var currentSearchQuery = ""
+    private var searchJob: Job? = null
+    private var suggestionJob: Job? = null
+
+    // Debugging için arama geçmişi
+    private val searchHistory = mutableListOf<String>()
 
     init {
         loadFavoriteTeamIds()
+        Log.d("TeamSearchViewModel", "ViewModel initialized")
     }
-
 
     private fun loadFavoriteTeamIds() {
-        val prefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE)
-        val favoriteIds = prefs.getStringSet("favorite_team_ids", emptySet()) ?: emptySet()
-        favoriteTeamIds.clear()
-        favoriteTeamIds.addAll(favoriteIds.map { it.toLong() })
+        try {
+            val prefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE)
+            val favoriteIds = prefs.getStringSet("favorite_team_ids", emptySet()) ?: emptySet()
+            favoriteTeamIds.clear()
+            favoriteTeamIds.addAll(favoriteIds.map { it.toLong() })
+            Log.d("TeamSearchViewModel", "Loaded ${favoriteTeamIds.size} favorite teams")
+        } catch (e: Exception) {
+            Log.e("TeamSearchViewModel", "Error loading favorite teams", e)
+        }
     }
 
-
+    // BASIT ARAMA FONKSİYONU
     fun searchTeams(query: String) {
-        if (query.length < 2) return
+        Log.d("TeamSearchViewModel", "searchTeams called with: '$query'")
+
+        if (query.length < 2) {
+            Log.d("TeamSearchViewModel", "Query too short, clearing results")
+            _searchResults.value = emptyList()
+            _suggestions.value = emptyList()
+            currentSearchQuery = ""
+            return
+        }
 
         currentSearchQuery = query
 
-        viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
+        // Önceki işi iptal et
+        searchJob?.cancel()
 
+        searchJob = viewModelScope.launch(Dispatchers.Main) {
             try {
-                delay(300) // Debounce search
+                Log.d("TeamSearchViewModel", "Starting search job for: '$query'")
+                _isLoading.value = true
+                _error.value = null
 
-                val searchResults = mutableSetOf<TeamSearchResult>()
+                // Debounce
+                delay(500)
 
-                // Search through popular leagues to find teams
-                val popularLeagues = listOf(
-                    39 to "Premier League",      // England
-                    140 to "La Liga",           // Spain
-                    78 to "Bundesliga",         // Germany
-                    135 to "Serie A",           // Italy
-                    61 to "Ligue 1",            // France
-                    2 to "Champions League",     // UEFA
-                    3 to "Europa League",        // UEFA
-                    203 to "Süper Lig",         // Turkey
-                    342 to "Premier League"      // Azerbaijan
-                )
-
-                for ((leagueId, leagueName) in popularLeagues) {
-                    try {
-                        val currentSeason = Calendar.getInstance().get(Calendar.YEAR)
-                        repository.getMatchesByLeague(leagueId, currentSeason)
-                            .onSuccess { matches ->
-                                matches.forEach { match ->
-                                    // Check if home team matches search query
-                                    if (match.homeTeam.name.contains(query, ignoreCase = true)) {
-                                        searchResults.add(
-                                            TeamSearchResult(
-                                                team = match.homeTeam,
-                                                leagueId = leagueId,
-                                                leagueName = leagueName,
-                                                season = currentSeason
-                                            )
-                                        )
-                                    }
-                                    // Check if away team matches search query
-                                    if (match.awayTeam.name.contains(query, ignoreCase = true)) {
-                                        searchResults.add(
-                                            TeamSearchResult(
-                                                team = match.awayTeam,
-                                                leagueId = leagueId,
-                                                leagueName = leagueName,
-                                                season = currentSeason
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-                    } catch (e: Exception) {
-                        Log.e("TeamSearchViewModel", "Error searching league $leagueId", e)
-                    }
+                if (!isActive) {
+                    Log.d("TeamSearchViewModel", "Job cancelled during delay")
+                    return@launch
                 }
 
-                // Convert to list and sort by name
-                val teamsList = searchResults.toList()
-                    .distinctBy { it.team.id } // Remove duplicates by team ID
-                    .sortedBy { it.team.name }
+                Log.d("TeamSearchViewModel", "Calling repository search...")
 
-                _searchResults.value = teamsList
+                val result = repository.searchTeamsAdvanced(query)
 
-                Log.d("TeamSearchViewModel", "Found ${teamsList.size} teams matching '$query'")
+                if (!isActive) {
+                    Log.d("TeamSearchViewModel", "Job cancelled after repository call")
+                    return@launch
+                }
+
+                result.fold(
+                    onSuccess = { results ->
+                        Log.d("TeamSearchViewModel", "Search successful: ${results.size} results")
+                        _searchResults.value = results
+
+                        results.take(3).forEach { result ->
+                            Log.d("TeamSearchViewModel", "Result: ${result.team.name} (${result.leagueName})")
+                        }
+                    },
+                    onFailure = { exception ->
+                        Log.e("TeamSearchViewModel", "Search failed for '$query'", exception)
+                        _error.value = "Search failed: ${exception.message}"
+                        _searchResults.value = emptyList()
+                    }
+                )
 
             } catch (e: Exception) {
-                Log.e("TeamSearchViewModel", "Exception in searchTeams", e)
-                _error.value = "Failed to search teams: ${e.message}"
+                if (isActive) {
+                    Log.e("TeamSearchViewModel", "Exception in searchTeams", e)
+                    _error.value = "Search error: ${e.message}"
+                    _searchResults.value = emptyList()
+                } else {
+                    Log.d("TeamSearchViewModel", "Job was cancelled, ignoring exception")
+                }
+            } finally {
+                if (isActive) {
+                    _isLoading.value = false
+                }
             }
+        }
+    }
 
-            _isLoading.value = false
+    // BASIT ÖNERİ FONKSİYONU
+    fun getSuggestions(query: String) {
+        Log.d("TeamSearchViewModel", "getSuggestions called with: '$query'")
+
+        if (query.isEmpty()) {
+            _suggestions.value = emptyList()
+            return
+        }
+
+        // Önceki işi iptal et
+        suggestionJob?.cancel()
+
+        suggestionJob = viewModelScope.launch(Dispatchers.Main) {
+            try {
+                Log.d("TeamSearchViewModel", "Starting suggestion job for: '$query'")
+
+                // Kısa debounce
+                delay(200)
+
+                if (!isActive) {
+                    Log.d("TeamSearchViewModel", "Suggestion job cancelled during delay")
+                    return@launch
+                }
+
+                val result = repository.getTeamSuggestions(query)
+
+                if (!isActive) {
+                    Log.d("TeamSearchViewModel", "Suggestion job cancelled after repository call")
+                    return@launch
+                }
+
+                result.fold(
+                    onSuccess = { suggestions ->
+                        Log.d("TeamSearchViewModel", "Got ${suggestions.size} suggestions: $suggestions")
+                        _suggestions.value = suggestions
+                    },
+                    onFailure = { exception ->
+                        Log.w("TeamSearchViewModel", "Failed to get suggestions for '$query'", exception)
+                        _suggestions.value = emptyList()
+                    }
+                )
+
+            } catch (e: Exception) {
+                if (isActive) {
+                    Log.w("TeamSearchViewModel", "Exception in getSuggestions", e)
+                    _suggestions.value = emptyList()
+                } else {
+                    Log.d("TeamSearchViewModel", "Suggestion job was cancelled, ignoring exception")
+                }
+            }
+        }
+    }
+
+    // HIZLI ARAMA - Suggestion'a tıklandığında
+    fun searchTeamByExactName(teamName: String) {
+        Log.d("TeamSearchViewModel", "searchTeamByExactName called with: '$teamName'")
+
+        viewModelScope.launch(Dispatchers.Main) {
+            try {
+                _isLoading.value = true
+                _error.value = null
+
+                Log.d("TeamSearchViewModel", "Searching exact name: '$teamName'")
+
+                val result = repository.searchTeamsAdvanced(teamName)
+
+                result.fold(
+                    onSuccess = { results ->
+                        // Tam eşleşme öncelikli
+                        val exactMatch = results.find {
+                            it.team.name.equals(teamName, ignoreCase = true)
+                        }
+
+                        if (exactMatch != null) {
+                            Log.d("TeamSearchViewModel", "Found exact match for '$teamName'")
+                            _searchResults.value = listOf(exactMatch)
+                        } else if (results.isNotEmpty()) {
+                            Log.d("TeamSearchViewModel", "Found similar match for '$teamName'")
+                            _searchResults.value = results.take(1)
+                        } else {
+                            Log.d("TeamSearchViewModel", "No matches found for '$teamName'")
+                            _searchResults.value = emptyList()
+                        }
+
+                        currentSearchQuery = teamName
+                    },
+                    onFailure = { exception ->
+                        Log.e("TeamSearchViewModel", "Exact search failed for '$teamName'", exception)
+                        _error.value = "Team not found: ${exception.message}"
+                        _searchResults.value = emptyList()
+                    }
+                )
+
+            } catch (e: Exception) {
+                Log.e("TeamSearchViewModel", "Exception in searchTeamByExactName", e)
+                _error.value = "Search error: ${e.message}"
+                _searchResults.value = emptyList()
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 
     fun loadTeamStandings(teamSearchResult: TeamSearchResult) {
+        Log.d("TeamSearchViewModel", "loadTeamStandings called for: ${teamSearchResult.team.name}")
+
+        viewModelScope.launch(Dispatchers.Main) {
+            try {
+                _isLoading.value = true
+                _error.value = null
+
+                val result = repository.getStandings(teamSearchResult.leagueId, teamSearchResult.season)
+
+                result.fold(
+                    onSuccess = { standings ->
+                        Log.d("TeamSearchViewModel", "Loaded standings: ${standings.size} teams")
+                        _selectedTeamStandings.value = standings
+                    },
+                    onFailure = { exception ->
+                        // Try previous season if current season fails
+                        Log.w("TeamSearchViewModel", "Current season failed, trying previous season")
+
+                        val prevResult = repository.getStandings(teamSearchResult.leagueId, teamSearchResult.season - 1)
+                        prevResult.fold(
+                            onSuccess = { standings ->
+                                Log.d("TeamSearchViewModel", "Loaded standings from previous season: ${standings.size} teams")
+                                _selectedTeamStandings.value = standings
+                            },
+                            onFailure = {
+                                Log.e("TeamSearchViewModel", "Failed to load standings", exception)
+                                _error.value = "Failed to load standings for ${teamSearchResult.team.name}"
+                            }
+                        )
+                    }
+                )
+            } catch (e: Exception) {
+                Log.e("TeamSearchViewModel", "Exception in loadTeamStandings", e)
+                _error.value = "Failed to load standings: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun loadFavoriteTeamMatches() {
+        if (favoriteTeamIds.isEmpty()) {
+            _favoriteMatches.value = emptyList()
+            return
+        }
+
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
 
             try {
-                repository.getStandings(teamSearchResult.leagueId, teamSearchResult.season)
-                    .onSuccess { standings ->
-                        _selectedTeamStandings.value = standings
-                        Log.d("TeamSearchViewModel", "Loaded standings for ${teamSearchResult.team.name} in ${teamSearchResult.leagueName}")
+                Log.d("TeamSearchViewModel", "Loading matches for ${favoriteTeamIds.size} favorite teams")
+
+                repository.getFavoriteTeamsMatches(favoriteTeamIds)
+                    .onSuccess { matches ->
+                        val sortedMatches = sortMatchesByStatus(matches)
+                        _favoriteMatches.value = sortedMatches
+                        Log.d("TeamSearchViewModel", "Loaded ${sortedMatches.size} favorite team matches")
                     }
                     .onFailure { exception ->
-                        // Try previous season if current season fails
-                        repository.getStandings(teamSearchResult.leagueId, teamSearchResult.season - 1)
-                            .onSuccess { standings ->
-                                _selectedTeamStandings.value = standings
-                                Log.d("TeamSearchViewModel", "Loaded standings for ${teamSearchResult.team.name} from previous season")
-                            }
-                            .onFailure {
-                                Log.e("TeamSearchViewModel", "Failed to load standings", exception)
-                                _error.value = "Failed to load standings for ${teamSearchResult.team.name}"
-                            }
+                        Log.e("TeamSearchViewModel", "Failed to load favorite team matches", exception)
+                        _error.value = "Failed to load favorite team matches: ${exception.message}"
+                        _favoriteMatches.value = emptyList()
                     }
             } catch (e: Exception) {
-                Log.e("TeamSearchViewModel", "Exception in loadTeamStandings", e)
-                _error.value = "Failed to load standings: ${e.message}"
+                Log.e("TeamSearchViewModel", "Exception loading favorite team matches", e)
+                _error.value = "Failed to load matches: ${e.message}"
+                _favoriteMatches.value = emptyList()
             }
 
             _isLoading.value = false
         }
+    }
+
+    private fun sortMatchesByStatus(matches: List<Match>): List<Match> {
+        return matches.sortedWith(compareBy<Match> { match ->
+            when {
+                match.isLive -> 0
+                match.isUpcoming -> 1
+                match.isFinished -> 2
+                else -> 3
+            }
+        }.thenBy { match ->
+            try {
+                val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
+                match.kickoffTime?.let { inputFormat.parse(it)?.time } ?: Long.MAX_VALUE
+            } catch (e: Exception) {
+                Long.MAX_VALUE
+            }
+        })
     }
 
     fun getTeamPositionInStandings(teamId: Long): TeamStanding? {
@@ -167,15 +344,23 @@ class TeamSearchViewModel @Inject constructor(
     }
 
     fun addToFavorites(teamId: Long) {
-        favoriteTeamIds.add(teamId)
-        saveFavoriteTeamIds()
-        Log.d("TeamSearchViewModel", "Added team $teamId to favorites")
+        try {
+            favoriteTeamIds.add(teamId)
+            saveFavoriteTeamIds()
+            Log.d("TeamSearchViewModel", "Added team $teamId to favorites")
+        } catch (e: Exception) {
+            Log.e("TeamSearchViewModel", "Error adding to favorites", e)
+        }
     }
 
     fun removeFromFavorites(teamId: Long) {
-        favoriteTeamIds.remove(teamId)
-        saveFavoriteTeamIds()
-        Log.d("TeamSearchViewModel", "Removed team $teamId from favorites")
+        try {
+            favoriteTeamIds.remove(teamId)
+            saveFavoriteTeamIds()
+            Log.d("TeamSearchViewModel", "Removed team $teamId from favorites")
+        } catch (e: Exception) {
+            Log.e("TeamSearchViewModel", "Error removing from favorites", e)
+        }
     }
 
     fun isTeamFavorite(teamId: Long): Boolean {
@@ -183,16 +368,32 @@ class TeamSearchViewModel @Inject constructor(
     }
 
     private fun saveFavoriteTeamIds() {
-        val prefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE)
-        prefs.edit()
-            .putStringSet("favorite_team_ids", favoriteTeamIds.map { it.toString() }.toSet())
-            .apply()
+        try {
+            val prefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE)
+            prefs.edit()
+                .putStringSet("favorite_team_ids", favoriteTeamIds.map { it.toString() }.toSet())
+                .apply()
+        } catch (e: Exception) {
+            Log.e("TeamSearchViewModel", "Error saving favorite teams", e)
+        }
     }
 
     fun clearSearch() {
+        Log.d("TeamSearchViewModel", "clearSearch called")
+
         currentSearchQuery = ""
         _searchResults.value = emptyList()
         _selectedTeamStandings.value = emptyList()
+        _suggestions.value = emptyList()
+
+        // Cancel ongoing jobs
+        searchJob?.cancel()
+        suggestionJob?.cancel()
+        searchJob = null
+        suggestionJob = null
+
+        // Clear repository cache
+        repository.clearSearchCache()
     }
 
     fun hasSearchQuery(): Boolean {
@@ -205,6 +406,55 @@ class TeamSearchViewModel @Inject constructor(
 
     fun getFavoriteTeamsCount(): Int {
         return favoriteTeamIds.size
+    }
+
+    // POPÜLER TAKIMLAR - Başlangıçta gösterilecek
+    fun getPopularTeams(): List<String> {
+        return listOf(
+            "Arsenal", "Chelsea", "Manchester United", "Manchester City",
+            "Liverpool", "Tottenham", "Barcelona", "Real Madrid",
+            "Bayern Munich", "Juventus", "Paris Saint-Germain",
+            "Galatasaray", "Fenerbahce", "Besiktas"
+        )
+    }
+
+    // TEST FONKSİYONU - Debug için
+    fun testSearch() {
+        Log.d("TeamSearchViewModel", "testSearch called")
+        searchTeams("Arsenal")
+    }
+
+    fun addToSearchHistory(query: String) {
+        try {
+            if (query.isNotEmpty() && !searchHistory.contains(query)) {
+                searchHistory.add(0, query)
+                if (searchHistory.size > 10) {
+                    searchHistory.removeAt(10)
+                }
+                Log.d("TeamSearchViewModel", "Added '$query' to search history")
+            }
+        } catch (e: Exception) {
+            Log.e("TeamSearchViewModel", "Error adding to search history", e)
+        }
+    }
+
+    fun getSearchHistory(): List<String> {
+        return searchHistory.toList()
+    }
+
+    fun getFavoriteTeamIds(): Set<Long> {
+        return favoriteTeamIds.toSet()
+    }
+
+    fun hasAnyFavoriteTeams(): Boolean {
+        return favoriteTeamIds.isNotEmpty()
+    }
+
+    override fun onCleared() {
+        Log.d("TeamSearchViewModel", "onCleared called")
+        super.onCleared()
+        searchJob?.cancel()
+        suggestionJob?.cancel()
     }
 }
 

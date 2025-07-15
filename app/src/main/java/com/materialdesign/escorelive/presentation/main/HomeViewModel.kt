@@ -14,6 +14,8 @@ import android.util.Log
 import com.materialdesign.escorelive.data.remote.repository.FootballRepository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -50,30 +52,47 @@ class HomeViewModel @Inject constructor(
         _selectedDate.value = today
         loadFavoriteTeamIds()
         loadInitialData()
+        Log.d("HomeViewModel", "HomeViewModel initialized with date: $today")
     }
 
     private fun loadInitialData() {
         val today = dateFormat.format(Date())
+        Log.d("HomeViewModel", "Loading initial data for: $today")
         loadUpcomingMatches(today)
     }
 
     private fun loadFavoriteTeamIds() {
-        val prefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE)
-        val favoriteIds = prefs.getStringSet("favorite_team_ids", emptySet()) ?: emptySet()
-        favoriteTeamIds.clear()
-        favoriteTeamIds.addAll(favoriteIds.map { it.toLong() })
+        try {
+            val prefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE)
+            val favoriteIds = prefs.getStringSet("favorite_team_ids", emptySet()) ?: emptySet()
+            favoriteTeamIds.clear()
+            favoriteTeamIds.addAll(favoriteIds.map { it.toLong() })
+            Log.d("HomeViewModel", "Loaded ${favoriteTeamIds.size} favorite team IDs: $favoriteTeamIds")
+        } catch (e: Exception) {
+            Log.e("HomeViewModel", "Error loading favorite team IDs", e)
+        }
     }
 
     fun addToFavorites(teamId: Long) {
-        favoriteTeamIds.add(teamId)
-        saveFavoriteTeamIds()
-        loadFavoriteTeamMatches()
+        try {
+            favoriteTeamIds.add(teamId)
+            saveFavoriteTeamIds()
+            loadFavoriteTeamMatches()
+            Log.d("HomeViewModel", "Added team $teamId to favorites")
+        } catch (e: Exception) {
+            Log.e("HomeViewModel", "Error adding team to favorites", e)
+        }
     }
 
     fun removeFromFavorites(teamId: Long) {
-        favoriteTeamIds.remove(teamId)
-        saveFavoriteTeamIds()
-        loadFavoriteTeamMatches()
+        try {
+            favoriteTeamIds.remove(teamId)
+            saveFavoriteTeamIds()
+            loadFavoriteTeamMatches()
+            Log.d("HomeViewModel", "Removed team $teamId from favorites")
+        } catch (e: Exception) {
+            Log.e("HomeViewModel", "Error removing team from favorites", e)
+        }
     }
 
     fun isTeamFavorite(teamId: Long): Boolean {
@@ -81,10 +100,15 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun saveFavoriteTeamIds() {
-        val prefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE)
-        prefs.edit()
-            .putStringSet("favorite_team_ids", favoriteTeamIds.map { it.toString() }.toSet())
-            .apply()
+        try {
+            val prefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE)
+            prefs.edit()
+                .putStringSet("favorite_team_ids", favoriteTeamIds.map { it.toString() }.toSet())
+                .apply()
+            Log.d("HomeViewModel", "Saved ${favoriteTeamIds.size} favorite team IDs")
+        } catch (e: Exception) {
+            Log.e("HomeViewModel", "Error saving favorite team IDs", e)
+        }
     }
 
     fun loadUpcomingMatches(date: String) {
@@ -93,6 +117,8 @@ class HomeViewModel @Inject constructor(
             _error.value = null
 
             try {
+                Log.d("HomeViewModel", "Loading upcoming matches for date: $date")
+
                 repository.getMatchesByDate(date)
                     .onSuccess { matches ->
                         val upcomingMatches = matches.filter { it.isUpcoming }
@@ -100,14 +126,23 @@ class HomeViewModel @Inject constructor(
                         _todayMatches.value = sortedMatches
                         _upcomingMatches.value = sortedMatches
                         Log.d("HomeViewModel", "Loaded ${upcomingMatches.size} upcoming matches for date: $date")
+
+                        // Debug: Log first few matches
+                        sortedMatches.take(3).forEach { match ->
+                            Log.d("HomeViewModel", "Upcoming: ${match.homeTeam.name} vs ${match.awayTeam.name} at ${match.kickoffTimeFormatted}")
+                        }
                     }
                     .onFailure { exception ->
                         Log.e("HomeViewModel", "Failed to load upcoming matches for date: $date", exception)
                         _error.value = exception.message
+                        _todayMatches.value = emptyList()
+                        _upcomingMatches.value = emptyList()
                     }
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "Exception loading upcoming matches for date: $date", e)
                 _error.value = e.message
+                _todayMatches.value = emptyList()
+                _upcomingMatches.value = emptyList()
             }
 
             _isLoading.value = false
@@ -120,6 +155,8 @@ class HomeViewModel @Inject constructor(
             _error.value = null
 
             try {
+                Log.d("HomeViewModel", "Loading live and finished matches for date: $date")
+
                 // Load live matches
                 val liveMatchesResult = repository.getLiveMatches()
                 // Load today's finished matches
@@ -135,12 +172,20 @@ class HomeViewModel @Inject constructor(
                         val sortedMatches = sortMatchesByStatus(combinedMatches)
                         _todayMatches.value = sortedMatches
                         _liveMatches.value = liveMatches.filter { it.isLive }
+
                         Log.d("HomeViewModel", "Loaded ${liveMatches.size} live and ${finishedMatches.size} finished matches")
+
+                        // Debug: Log live matches
+                        liveMatches.filter { it.isLive }.take(3).forEach { match ->
+                            Log.d("HomeViewModel", "Live: ${match.homeTeam.name} vs ${match.awayTeam.name} - ${match.matchMinute}")
+                        }
                     }
                 }
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "Exception loading live and finished matches", e)
                 _error.value = e.message
+                _todayMatches.value = emptyList()
+                _liveMatches.value = emptyList()
             }
 
             _isLoading.value = false
@@ -149,6 +194,7 @@ class HomeViewModel @Inject constructor(
 
     fun loadFavoriteTeamMatches() {
         if (favoriteTeamIds.isEmpty()) {
+            Log.d("HomeViewModel", "No favorite teams, returning empty list")
             _favoriteMatches.value = emptyList()
             return
         }
@@ -158,34 +204,30 @@ class HomeViewModel @Inject constructor(
             _error.value = null
 
             try {
-                val allFavoriteMatches = mutableListOf<Match>()
-                val today = Calendar.getInstance()
-                val endDate = Calendar.getInstance()
-                endDate.add(Calendar.DAY_OF_MONTH, 7) // Next 7 days
+                Log.d("HomeViewModel", "Loading matches for ${favoriteTeamIds.size} favorite teams")
 
-                // Load matches for each favorite team for the next week
-                for (teamId in favoriteTeamIds) {
-                    val currentDate = today.clone() as Calendar
-                    while (currentDate.before(endDate) || currentDate.equals(endDate)) {
-                        val dateStr = dateFormat.format(currentDate.time)
-                        repository.getMatchesByDate(dateStr)
-                            .onSuccess { matches ->
-                                val teamMatches = matches.filter { match ->
-                                    match.homeTeam.id == teamId || match.awayTeam.id == teamId
-                                }
-                                allFavoriteMatches.addAll(teamMatches)
-                            }
-                        currentDate.add(Calendar.DAY_OF_MONTH, 1)
+                // Repository'den favori takımların maçlarını getir
+                repository.getFavoriteTeamsMatches(favoriteTeamIds)
+                    .onSuccess { matches ->
+                        val sortedMatches = sortMatchesByStatus(matches)
+                        _favoriteMatches.value = sortedMatches
+                        Log.d("HomeViewModel", "Loaded ${sortedMatches.size} favorite team matches")
+
+                        // Debug: İlk birkaç maçı logla
+                        sortedMatches.take(3).forEach { match ->
+                            Log.d("HomeViewModel", "Favorite match: ${match.homeTeam.name} vs ${match.awayTeam.name} (${match.league.name})")
+                        }
                     }
-                }
-
-                val sortedMatches = sortMatchesByStatus(allFavoriteMatches.distinctBy { it.id })
-                _favoriteMatches.value = sortedMatches
-                Log.d("HomeViewModel", "Loaded ${sortedMatches.size} favorite team matches")
+                    .onFailure { exception ->
+                        Log.e("HomeViewModel", "Failed to load favorite team matches", exception)
+                        _error.value = "Failed to load favorite team matches"
+                        _favoriteMatches.value = emptyList()
+                    }
 
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "Exception loading favorite team matches", e)
                 _error.value = e.message
+                _favoriteMatches.value = emptyList()
             }
 
             _isLoading.value = false
@@ -198,19 +240,28 @@ class HomeViewModel @Inject constructor(
             _error.value = null
 
             try {
+                Log.d("HomeViewModel", "Loading live matches")
+
                 repository.getLiveMatches()
                     .onSuccess { matches ->
                         val actuallyLive = matches.filter { it.isLive }
                         _liveMatches.value = actuallyLive
                         Log.d("HomeViewModel", "Loaded ${actuallyLive.size} live matches")
+
+                        // Debug: Log live matches
+                        actuallyLive.take(3).forEach { match ->
+                            Log.d("HomeViewModel", "Live: ${match.homeTeam.name} vs ${match.awayTeam.name} - ${match.matchMinute}")
+                        }
                     }
                     .onFailure { exception ->
                         Log.e("HomeViewModel", "Failed to load live matches", exception)
                         _error.value = exception.message
+                        _liveMatches.value = emptyList()
                     }
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "Exception loading live matches", e)
                 _error.value = e.message
+                _liveMatches.value = emptyList()
             }
 
             _isLoading.value = false
@@ -223,10 +274,19 @@ class HomeViewModel @Inject constructor(
             _error.value = null
 
             try {
+                Log.d("HomeViewModel", "Loading matches by date: $date")
+
                 repository.getMatchesByDate(date)
                     .onSuccess { matches ->
                         Log.d("HomeViewModel", "Loaded ${matches.size} matches for date: $date")
-                        matches.forEach { match ->
+
+                        // Debug: Log matches by status
+                        val liveCount = matches.count { it.isLive }
+                        val upcomingCount = matches.count { it.isUpcoming }
+                        val finishedCount = matches.count { it.isFinished }
+                        Log.d("HomeViewModel", "Matches breakdown - Live: $liveCount, Upcoming: $upcomingCount, Finished: $finishedCount")
+
+                        matches.take(3).forEach { match ->
                             Log.d("HomeViewModel", "Match: ${match.homeTeam.name} vs ${match.awayTeam.name} - League: ${match.league.name} (ID: ${match.league.id}) - Status: ${match.matchStatus}")
                         }
 
@@ -236,10 +296,12 @@ class HomeViewModel @Inject constructor(
                     .onFailure { exception ->
                         Log.e("HomeViewModel", "Failed to load matches for date: $date", exception)
                         _error.value = exception.message
+                        _todayMatches.value = emptyList()
                     }
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "Exception loading matches for date: $date", e)
                 _error.value = e.message
+                _todayMatches.value = emptyList()
             }
 
             _isLoading.value = false
@@ -301,7 +363,9 @@ class HomeViewModel @Inject constructor(
         }
 
         // Also refresh favorite matches
-        loadFavoriteTeamMatches()
+        if (favoriteTeamIds.isNotEmpty()) {
+            loadFavoriteTeamMatches()
+        }
     }
 
     fun clearError() {
@@ -336,6 +400,7 @@ class HomeViewModel @Inject constructor(
 
             selectedCalendar.before(todayCalendar)
         } catch (e: Exception) {
+            Log.e("HomeViewModel", "Error checking if selected date is in past", e)
             false
         }
     }
@@ -363,6 +428,7 @@ class HomeViewModel @Inject constructor(
 
             selectedCalendar.after(todayCalendar)
         } catch (e: Exception) {
+            Log.e("HomeViewModel", "Error checking if selected date is in future", e)
             false
         }
     }
@@ -388,5 +454,79 @@ class HomeViewModel @Inject constructor(
             "favorites" -> loadFavoriteTeamMatches()
             else -> loadMatchesByDate(date)
         }
+    }
+
+    // Test method for debugging
+    fun testFavoriteTeamMatches() {
+        Log.d("HomeViewModel", "Testing favorite team matches with IDs: $favoriteTeamIds")
+        if (favoriteTeamIds.isNotEmpty()) {
+            loadFavoriteTeamMatches()
+        } else {
+            Log.d("HomeViewModel", "No favorite teams to test")
+        }
+    }
+
+    // Method to manually add test favorite teams (for debugging)
+    fun addTestFavoriteTeams() {
+        favoriteTeamIds.addAll(listOf(1L, 7L, 16L)) // Arsenal, Barcelona, Galatasaray
+        saveFavoriteTeamIds()
+        Log.d("HomeViewModel", "Added test favorite teams: $favoriteTeamIds")
+        loadFavoriteTeamMatches()
+    }
+
+    // Get current matches by status
+    fun getCurrentLiveMatches(): List<Match> {
+        return _liveMatches.value ?: emptyList()
+    }
+
+    fun getCurrentUpcomingMatches(): List<Match> {
+        return _upcomingMatches.value ?: emptyList()
+    }
+
+    fun getCurrentFavoriteMatches(): List<Match> {
+        return _favoriteMatches.value ?: emptyList()
+    }
+
+    fun getCurrentTodayMatches(): List<Match> {
+        return _todayMatches.value ?: emptyList()
+    }
+
+    // Force refresh all data
+    fun forceRefreshAll() {
+        viewModelScope.launch {
+            Log.d("HomeViewModel", "Force refreshing all data")
+
+            _isLoading.value = true
+
+            try {
+                // Reload favorite team IDs
+                loadFavoriteTeamIds()
+
+                // Refresh current date matches
+                _selectedDate.value?.let { date ->
+                    loadMatchesByDate(date)
+                }
+
+                // Refresh live matches
+                loadLiveMatches()
+
+                // Refresh favorite matches if any
+                if (favoriteTeamIds.isNotEmpty()) {
+                    loadFavoriteTeamMatches()
+                }
+
+                Log.d("HomeViewModel", "Force refresh completed")
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error during force refresh", e)
+                _error.value = "Failed to refresh data"
+            }
+
+            _isLoading.value = false
+        }
+    }
+
+    override fun onCleared() {
+        Log.d("HomeViewModel", "HomeViewModel onCleared called")
+        super.onCleared()
     }
 }
