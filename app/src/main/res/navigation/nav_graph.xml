@@ -5,12 +5,14 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/mainMenuFragment">
 
+    <!-- Main Menu Fragment with Bottom Navigation -->
     <fragment
         android:id="@+id/mainMenuFragment"
         android:name="com.materialdesign.escorelive.presentation.ui.main.HomeFragment"
         android:label="Main Menu"
         tools:layout="@layout/fragment_main_menu">
 
+        <!-- Home Tab Actions -->
         <action
             android:id="@+id/action_mainMenu_to_allMatches"
             app:destination="@id/allMatchesFragment" />
@@ -31,8 +33,10 @@
         <action
             android:id="@+id/action_mainMenu_to_teamSearch"
             app:destination="@id/teamSearchFragment" />
+
     </fragment>
 
+    <!-- All Matches Fragment -->
     <fragment
         android:id="@+id/allMatchesFragment"
         android:name="com.materialdesign.escorelive.presentation.ui.matchlist.MatchListFragment"
@@ -49,6 +53,7 @@
             android:defaultValue="2025-01-01" />
     </fragment>
 
+    <!-- Match Detail Fragment -->
     <fragment
         android:id="@+id/matchDetailFragment"
         android:name="com.materialdesign.escorelive.ui.matchdetail.MatchDetailFragment"
@@ -60,10 +65,32 @@
             app:argType="long" />
     </fragment>
 
+    <!-- Team Search Fragment -->
     <fragment
         android:id="@+id/teamSearchFragment"
         android:name="com.materialdesign.escorelive.presentation.search.TeamSearchFragment"
         android:label="Team Search"
         tools:layout="@layout/fragment_team_search" />
+
+    <!-- Competition Fragment -->
+    <fragment
+        android:id="@+id/competitionFragment"
+        android:name="com.materialdesign.escorelive.presentation.ui.competition.CompetitionFragment"
+        android:label="Competition"
+        tools:layout="@layout/fragment_competition" />
+
+    <!-- News Fragment -->
+    <fragment
+        android:id="@+id/newsFragment"
+        android:name="com.materialdesign.escorelive.presentation.ui.news.NewsFragment"
+        android:label="News"
+        tools:layout="@layout/fragment_news" />
+
+    <!-- Account Fragment -->
+    <fragment
+        android:id="@+id/accountFragment"
+        android:name="com.materialdesign.escorelive.presentation.ui.account.AccountFragment"
+        android:label="Account"
+        tools:layout="@layout/fragment_account" />
 
 </navigation>

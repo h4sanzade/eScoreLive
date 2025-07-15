@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color">
+
+    <!-- Header -->
+    <LinearLayout
+        android:id="@+id/header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_news"
+            android:tint="@color/accent_color"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:id="@+id/news_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="News"
+            android:textSize="28sp"
+            android:textColor="@color/white"
+            android:fontFamily="@font/mulish_bold"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/news_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Latest football news and updates"
+            android:textSize="16sp"
+            android:textColor="@android:color/darker_gray"
+            android:fontFamily="@font/mulish_regular"
+            android:textAlignment="center"
+            android:layout_marginBottom="32dp" />
+
+        <Button
+            android:id="@+id/refresh_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Refresh News"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/accent_color"
+            android:fontFamily="@font/mulish_bold"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp" />
+
+    </LinearLayout>
+
+    <!-- Content Area -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/header_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Categories -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="All News"
+                            android:textSize="14sp"
+                            android:textColor="@color/white"
+                            android:fontFamily="@font/mulish_bold"
+                            android:background="@drawable/bottom_line_selected"
+                            android:padding="12dp"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Transfers"
+                            android:textSize="14sp"
+                            android:textColor="@color/white"
+                            android:fontFamily="@font/mulish_bold"
+                            android:background="@drawable/filter_unselected_bg"
+                            android:padding="12dp"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Matches"
+                            android:textSize="14sp"
+                            android:textColor="@color/white"
+                            android:fontFamily="@font/mulish_bold"
+                            android:background="@drawable/filter_unselected_bg"
+                            android:padding="12dp"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Injuries"
+                            android:textSize="14sp"
+                            android:textColor="@color/white"
+                            android:fontFamily="@font/mulish_bold"
+                            android:background="@drawable/filter_unselected_bg"
+                            android:padding="12dp"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="16dp" />
+
+                    </LinearLayout>
+
+                </HorizontalScrollView>
+
+                <!-- Breaking News Section -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Breaking News"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/mulish_bold"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- News List -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/news_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_news" />
+
+                <!-- Coming Soon Section -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    app:cardBackgroundColor="@color/card_background">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📰"
+                            android:textSize="32sp"
+                            android:layout_marginBottom="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Real-time News Coming Soon"
+                            android:textSize="16sp"
+                            android:textColor="@color/white"
+                            android:fontFamily="@font/mulish_bold"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Live transfer updates, match reports, and breaking news"
+                            android:textSize="14sp"
+                            android:textColor="@android:color/darker_gray"
+                            android:fontFamily="@font/mulish_regular"
+                            android:textAlignment="center" />
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- Loading Indicator -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

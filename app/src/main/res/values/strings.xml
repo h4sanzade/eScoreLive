@@ -124,5 +124,7 @@
     <string name="team_not_found">Team not found</string>
     <string name="api_error">API Error</string>
     <string name="match_not_found">Match not found</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="BottomNavActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">#1AF63D68</item>
+        <item name="android:width">64dp</item>
+        <item name="android:height">32dp</item>
+        <item name="cornerRadius">16dp</item>
+    </style>
+</resources>
