@@ -14,7 +14,6 @@ import com.materialdesign.escorelive.domain.model.Match
 import com.materialdesign.escorelive.presentation.adapters.LiveMatchAdapter
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.FragmentMainMenuBinding
-import com.materialdesign.escorelive.presentation.main.MainMenuFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
@@ -253,7 +252,7 @@ class HomeFragment : Fragment() {
     private fun setupClickListeners() {
         binding.seeMoreBtn.setOnClickListener {
             val selectedDate = viewModel.selectedDate.value ?: dateFormat.format(Date())
-            val action = MainMenuFragmentDirections.actionMainMenuToAllMatches(selectedDate)
+            val action = HomeFragmentDirections.actionHomeToAllMatches(selectedDate)
             findNavController().navigate(action)
         }
 
@@ -267,7 +266,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun onMatchClick(match: Match) {
-        val action = MainMenuFragmentDirections.actionMainMenuToMatchDetail(match.id)
+        val action = HomeFragmentDirections.actionHomeToMatchDetail(match.id)
         findNavController().navigate(action)
     }
 
