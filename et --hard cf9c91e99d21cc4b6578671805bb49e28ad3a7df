@@ -1,0 +1,161 @@
+[33mcommit cf9c91e99d21cc4b6578671805bb49e28ad3a7df[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Mon Jul 14 11:35:53 2025 +0400
+
+    Search Functions added, BottomNavBar added, bugs fixed
+
+[33mcommit f3281b3793c686fbdd0da0fd653c38b7a50ec658[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Sat Jul 12 01:25:41 2025 +0400
+
+    UI and code structure normalized
+
+[33mcommit 58bf3ad98a1a23ac068162aae7b51e4f31e6b6b2[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Fri Jul 11 16:36:47 2025 +0400
+
+    Some Strings changed, added
+
+[33mcommit 256f0779c5d0cb70e2c62ab8ac67267d29fde6bc[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Fri Jul 11 16:15:17 2025 +0400
+
+    BottomAppBarMenu added
+
+[33mcommit bcc7fc4ab13b38a546f18310275dca0d19a653b6[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Fri Jul 11 16:00:43 2025 +0400
+
+    Summary functionality fixed. MatchDetailFragment bugs fixed.
+
+[33mcommit 0cc18c8da6190bdcc2f614cefd99ed366637720b[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Fri Jul 11 11:20:45 2025 +0400
+
+    API Key changed. H2H,Summary,Standings functions added
+
+[33mcommit c1f7b1b188d9070eeac6a05789a490890f6983a9[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Thu Jul 10 17:05:47 2025 +0400
+
+    Integrated newly available leagues into the system
+
+[33mcommit 6e217ef33fe69a23a7b230afe9886dbf0f0abb84[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Thu Jul 10 16:49:21 2025 +0400
+
+    NavGraph added, SeeMoreButton Added.
+
+[33mcommit 4a0b9fc7c6d12e9d4dbd9bc59d002e82d115b1b0[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Fri Jul 4 11:25:50 2025 +0400
+
+    calendar bug fixed
+
+[33mcommit d624f7b28c978288c02a473f1cbffb43ee97db9b[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Wed Jun 25 03:28:05 2025 +0400
+
+    MatchDetaisl ui added
+
+[33mcommit 259ac8400f66472c54fc6f6c80218fa0ba73e69d[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Wed Jun 25 02:51:58 2025 +0400
+
+    MatchDetaisl ui added
+
+[33mcommit dbf845f2b4650380398d3b2d7b75791c69fad402[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Wed Jun 25 02:39:40 2025 +0400
+
+    Match Report added
+
+[33mcommit a81116dbcdc3bda18aa881b66343f456a415e5b3[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Wed Jun 25 02:34:05 2025 +0400
+
+    Match Report added
+
+[33mcommit 16bf5a2996825203015529b3aa9f42ae3a3787c0[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Wed Jun 25 02:27:31 2025 +0400
+
+    calendar details fixed
+
+[33mcommit 0d0d41c986c68e5ae6c8c4b38c133fd9f3bef336[m
+Author: Huseyn Hasanzade <h4sanzade@gmail.com>
+Date:   Tue Jun 24 16:29:51 2025 +0400
+
+    fix: show correct results for past matches in calendar view
+
+[33mcommit 1d4fdc837459845f4a84a55deedf5edf07af07aa[m
+Author: Huseyn Hasanzade <h4sanzade@gmail.com>
+Date:   Tue Jun 24 11:44:09 2025 +0400
+
+    fix: show correct results for past matches in calendar view
+
+[33mcommit 9dd4ba95b471421275a6203aefccd398d730bc5e[m
+Author: Huseyn Hasanzade <h4sanzade@gmail.com>
+Date:   Tue Jun 24 11:33:22 2025 +0400
+
+    fix: show correct results for past matches in calendar view
+
+[33mcommit cc6068b89f39456de8989f8ea04a3124a386d0bd[m
+Author: Huseyn Hasanzade <h4sanzade@gmail.com>
+Date:   Tue Jun 24 11:10:40 2025 +0400
+
+    restructure file hierarchy for better separation of concerns
+
+[33mcommit 93e9be0e88a7f2aeb7aeee9c6ecae9369600e951[m
+Author: Huseyn Hasanzade <h4sanzade@gmail.com>
+Date:   Tue Jun 24 10:41:00 2025 +0400
+
+    Recommit
+
+[33mcommit 7e0f30f06e38799dd6b5b895b187f81b9f951811[m
+Author: Huseyn Hasanzade <h4sanzade@gmail.com>
+Date:   Mon Jun 23 09:53:17 2025 +0400
+
+    Calendar details fixed
+
+[33mcommit 5cfc62fd0aa3ecf63eca5b8dcae787b246fa3adb[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Sun Jun 22 23:02:11 2025 +0400
+
+    Error fixed
+
+[33mcommit a2db9ae51ee0672baba4e2b2e1228cd45baf7bd4[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Sun Jun 22 22:45:15 2025 +0400
+
+    Error fixed
+
+[33mcommit 10416bb3a4b7d5e20a0884c80db47719098eeae2[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Sun Jun 22 22:35:57 2025 +0400
+
+    Live score added
+
+[33mcommit 48b1e5ca4f528fa44396f06c5c509166f04af416[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Sun Jun 22 22:22:15 2025 +0400
+
+    Live score added
+
+[33mcommit d8466a37ec1e3aa5113176deb7c18834ea1a8fc4[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Sun Jun 22 17:51:54 2025 +0400
+
+    Calendar added
+
+[33mcommit 2a8e4b51c2e81710d9bd4e4abea15c0e4beca7f8[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Sun Jun 22 17:33:29 2025 +0400
+
+    Calendar added
+
+[33mcommit e36c94fffb66ea6f68632836f4cf43907101dae4[m
+Author: h4sanzade <h4sanzade@gmail.com>
+Date:   Sun Jun 22 17:14:57 2025 +0400
+
+    Initial commit

@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/mainMenuFragment"
-        android:name="com.materialdesign.escorelive.presentation.main.MainMenuFragment"
+        android:name="com.materialdesign.escorelive.presentation.ui.main.HomeFragment"
         android:label="Main Menu"
         tools:layout="@layout/fragment_main_menu">
 
@@ -18,11 +18,15 @@
         <action
             android:id="@+id/action_mainMenu_to_matchDetail"
             app:destination="@id/matchDetailFragment" />
+
+        <action
+            android:id="@+id/action_mainMenu_to_teamSearch"
+            app:destination="@id/teamSearchFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/allMatchesFragment"
-        android:name="com.materialdesign.escorelive.presentation.matchlist.AllMatchesFragment"
+        android:name="com.materialdesign.escorelive.presentation.ui.matchlist.MatchListFragment"
         android:label="All Matches"
         tools:layout="@layout/fragment_all_matches">
 
@@ -46,8 +50,11 @@
             android:name="matchId"
             app:argType="long" />
     </fragment>
-    <action
-        android:id="@+id/action_mainMenu_to_allMatches"
-        app:destination="@id/allMatchesFragment" />
+
+    <fragment
+        android:id="@+id/teamSearchFragment"
+        android:name="com.materialdesign.escorelive.presentation.search.TeamSearchFragment"
+        android:label="Team Search"
+        tools:layout="@layout/fragment_team_search" />
 
 </navigation>

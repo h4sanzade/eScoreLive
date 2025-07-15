@@ -1,8 +1,10 @@
 package com.materialdesign.escorelive.data.remote.repository
 
-import com.materialdesign.escorelive.domain.model.Match // LiveMatch yerine Match
+import com.materialdesign.escorelive.domain.model.Match
+import com.materialdesign.escorelive.domain.model.Team
 import com.materialdesign.escorelive.data.remote.FootballApiService
-import com.materialdesign.escorelive.data.remote.mappers.FixtureMapper // toLiveMatch yerine
+import com.materialdesign.escorelive.data.remote.mappers.FixtureMapper
+import com.materialdesign.escorelive.data.remote.mappers.TeamMapper
 import com.materialdesign.escorelive.ui.matchdetail.MatchEvent
 import com.materialdesign.escorelive.ui.matchdetail.LineupPlayer
 import com.materialdesign.escorelive.ui.matchdetail.MatchStatistics
@@ -18,7 +20,11 @@ class FootballRepository @Inject constructor(
     private val apiService: FootballApiService
 ) {
 
-    suspend fun getLiveMatches(): Result<List<Match>> { // LiveMatch -> Match
+    // Cache for teams to avoid repeated API calls
+    private val teamsCache = mutableMapOf<Long, Team>()
+    private val leagueTeamsCache = mutableMapOf<Int, List<Team>>()
+
+    suspend fun getLiveMatches(): Result<List<Match>> {
         return try {
             Log.d("FootballRepository", "Fetching live matches with API key: ${FootballApiService.API_KEY.take(10)}...")
             val response = apiService.getLiveFixtures()
@@ -46,7 +52,10 @@ class FootballRepository @Inject constructor(
 
                 val liveMatches = fixtures.mapNotNull { fixture ->
                     try {
-                        val match = FixtureMapper.mapToMatch(fixture) // toLiveMatch() -> FixtureMapper.mapToMatch()
+                        val match = FixtureMapper.mapToMatch(fixture)
+                        // Cache teams
+                        cacheTeam(match.homeTeam)
+                        cacheTeam(match.awayTeam)
                         Log.d("FootballRepository", "Live match: ${match.homeTeam.name} vs ${match.awayTeam.name} - League: ${match.league.name} (${match.league.id})")
                         match
                     } catch (e: Exception) {
@@ -78,7 +87,7 @@ class FootballRepository @Inject constructor(
         }
     }
 
-    suspend fun getMatchesByDate(date: String): Result<List<Match>> { // LiveMatch -> Match
+    suspend fun getMatchesByDate(date: String): Result<List<Match>> {
         return try {
             Log.d("FootballRepository", "Fetching matches for date: $date")
             val response = apiService.getFixturesByDate(date = date)
@@ -96,7 +105,10 @@ class FootballRepository @Inject constructor(
 
                 val matches = fixtures.mapNotNull { fixture ->
                     try {
-                        val match = FixtureMapper.mapToMatch(fixture) // toLiveMatch() -> FixtureMapper.mapToMatch()
+                        val match = FixtureMapper.mapToMatch(fixture)
+                        // Cache teams
+                        cacheTeam(match.homeTeam)
+                        cacheTeam(match.awayTeam)
                         Log.d("FootballRepository", "Match for $date: ${match.homeTeam.name} vs ${match.awayTeam.name} - League: ${match.league.name} (${match.league.id}) - Status: ${match.matchStatus}")
                         match
                     } catch (e: Exception) {
@@ -124,7 +136,7 @@ class FootballRepository @Inject constructor(
         }
     }
 
-    suspend fun getMatchesByLeague(leagueId: Int, season: Int): Result<List<Match>> { // LiveMatch -> Match
+    suspend fun getMatchesByLeague(leagueId: Int, season: Int): Result<List<Match>> {
         return try {
             Log.d("FootballRepository", "Fetching matches for league: $leagueId, season: $season")
             val response = apiService.getFixturesByLeague(
@@ -140,7 +152,10 @@ class FootballRepository @Inject constructor(
 
                 val matches = fixtures.mapNotNull { fixture ->
                     try {
-                        val match = FixtureMapper.mapToMatch(fixture) // toLiveMatch() -> FixtureMapper.mapToMatch()
+                        val match = FixtureMapper.mapToMatch(fixture)
+                        // Cache teams
+                        cacheTeam(match.homeTeam)
+                        cacheTeam(match.awayTeam)
                         if (fixtures.indexOf(fixture) < 3) {
                             Log.d("FootballRepository", "League $leagueId match: ${match.homeTeam.name} vs ${match.awayTeam.name} - ${match.matchStatus}")
                         }
@@ -150,6 +165,14 @@ class FootballRepository @Inject constructor(
                         null
                     }
                 }
+
+                // Cache teams for this league
+                val leagueTeams = mutableSetOf<Team>()
+                matches.forEach { match ->
+                    leagueTeams.add(match.homeTeam)
+                    leagueTeams.add(match.awayTeam)
+                }
+                leagueTeamsCache[leagueId] = leagueTeams.toList()
 
                 Log.d("FootballRepository", "Successfully converted ${matches.size} matches for league: $leagueId")
                 Result.success(matches)
@@ -165,7 +188,7 @@ class FootballRepository @Inject constructor(
         }
     }
 
-    suspend fun getMatchDetails(matchId: Long): Result<Match> { // LiveMatch -> Match
+    suspend fun getMatchDetails(matchId: Long): Result<Match> {
         return try {
             Log.d("FootballRepository", "Fetching match details for ID: $matchId")
             val response = apiService.getFixtureById(fixtureId = matchId)
@@ -173,7 +196,10 @@ class FootballRepository @Inject constructor(
             if (response.isSuccessful) {
                 val fixture = response.body()?.response?.firstOrNull()
                 if (fixture != null) {
-                    val match = FixtureMapper.mapToMatch(fixture) // toLiveMatch() -> FixtureMapper.mapToMatch()
+                    val match = FixtureMapper.mapToMatch(fixture)
+                    // Cache teams
+                    cacheTeam(match.homeTeam)
+                    cacheTeam(match.awayTeam)
                     Log.d("FootballRepository", "Match details: ${match.homeTeam.name} vs ${match.awayTeam.name}")
                     Result.success(match)
                 } else {
@@ -190,7 +216,7 @@ class FootballRepository @Inject constructor(
         }
     }
 
-    suspend fun getH2HMatches(homeTeamId: Long, awayTeamId: Long): Result<List<Match>> { // LiveMatch -> Match
+    suspend fun getH2HMatches(homeTeamId: Long, awayTeamId: Long): Result<List<Match>> {
         return try {
             val h2h = "$homeTeamId-$awayTeamId"
             Log.d("FootballRepository", "Fetching H2H matches for: $h2h")
@@ -202,7 +228,7 @@ class FootballRepository @Inject constructor(
 
                 val h2hMatches = fixtures.mapNotNull { fixture ->
                     try {
-                        FixtureMapper.mapToMatch(fixture) // toLiveMatch() -> FixtureMapper.mapToMatch()
+                        FixtureMapper.mapToMatch(fixture)
                     } catch (e: Exception) {
                         Log.e("FootballRepository", "Error converting H2H fixture", e)
                         null
@@ -220,7 +246,70 @@ class FootballRepository @Inject constructor(
         }
     }
 
-    // Diğer metodlar aynı kalır...
+    // Team search functionality
+    suspend fun searchTeams(query: String): Result<List<Team>> {
+        return try {
+            Log.d("FootballRepository", "Searching teams with query: $query")
+
+            // First check cache
+            val cachedResults = searchInCache(query)
+            if (cachedResults.isNotEmpty()) {
+                Log.d("FootballRepository", "Found ${cachedResults.size} teams in cache")
+                return Result.success(cachedResults)
+            }
+
+            // Search through popular leagues
+            val allTeams = mutableSetOf<Team>()
+            val popularLeagues = listOf(39, 140, 78, 135, 61, 2, 3) // Premier League, La Liga, etc.
+
+            for (leagueId in popularLeagues) {
+                // Check if we have this league cached
+                val cachedLeagueTeams = leagueTeamsCache[leagueId]
+                if (cachedLeagueTeams != null) {
+                    val matchingTeams = cachedLeagueTeams.filter {
+                        it.name.contains(query, ignoreCase = true)
+                    }
+                    allTeams.addAll(matchingTeams)
+                } else {
+                    // Fetch matches from this league to get teams
+                    getMatchesByLeague(leagueId, 2024).onSuccess { matches ->
+                        matches.forEach { match ->
+                            if (match.homeTeam.name.contains(query, ignoreCase = true)) {
+                                allTeams.add(match.homeTeam)
+                            }
+                            if (match.awayTeam.name.contains(query, ignoreCase = true)) {
+                                allTeams.add(match.awayTeam)
+                            }
+                        }
+                    }
+                }
+            }
+
+            val results = allTeams.toList().sortedBy { it.name }
+            Log.d("FootballRepository", "Found ${results.size} teams matching '$query'")
+            Result.success(results)
+
+        } catch (e: Exception) {
+            Log.e("FootballRepository", "Exception in searchTeams", e)
+            Result.failure(e)
+        }
+    }
+
+    private fun searchInCache(query: String): List<Team> {
+        return teamsCache.values.filter { team ->
+            team.name.contains(query, ignoreCase = true)
+        }.sortedBy { it.name }
+    }
+
+    private fun cacheTeam(team: Team) {
+        teamsCache[team.id] = team
+    }
+
+    fun getCachedTeam(teamId: Long): Team? {
+        return teamsCache[teamId]
+    }
+
+    // Rest of the existing methods remain the same...
     suspend fun getMatchEvents(matchId: Long): Result<List<MatchEvent>> {
         return try {
             Log.d("FootballRepository", "Fetching match events for ID: $matchId")

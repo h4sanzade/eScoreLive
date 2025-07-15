@@ -14,7 +14,6 @@ import com.materialdesign.escorelive.domain.model.Match
 import com.materialdesign.escorelive.presentation.adapters.LiveMatchAdapter
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.FragmentMainMenuBinding
-import com.materialdesign.escorelive.presentation.main.MainMenuFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,6 +33,11 @@ class HomeFragment : Fragment() {
 
     private var currentWeekOffset = 0
     private var selectedDayIndex = -1
+    private var currentTab = MatchTab.UPCOMING
+
+    enum class MatchTab {
+        UPCOMING, SCORE, FAVORITES
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,8 +52,12 @@ class HomeFragment : Fragment() {
 
         setupRecyclerView()
         setupCalendar()
+        setupTabs()
         observeViewModel()
         setupClickListeners()
+
+        // Load initial data
+        loadDataForSelectedDate()
     }
 
     private fun setupRecyclerView() {
@@ -61,6 +69,44 @@ class HomeFragment : Fragment() {
             adapter = liveMatchesAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             setHasFixedSize(true)
+            visibility = View.VISIBLE // Always show matches
+        }
+    }
+
+    private fun setupTabs() {
+        // Set default tab selection
+        updateTabSelection(MatchTab.UPCOMING)
+
+        binding.upcomingTab.setOnClickListener {
+            currentTab = MatchTab.UPCOMING
+            updateTabSelection(MatchTab.UPCOMING)
+            loadDataForSelectedDate()
+        }
+
+        binding.scoreTab.setOnClickListener {
+            currentTab = MatchTab.SCORE
+            updateTabSelection(MatchTab.SCORE)
+            loadDataForSelectedDate()
+        }
+
+        binding.favoritesTab.setOnClickListener {
+            currentTab = MatchTab.FAVORITES
+            updateTabSelection(MatchTab.FAVORITES)
+            loadFavoriteMatches()
+        }
+    }
+
+    private fun updateTabSelection(selectedTab: MatchTab) {
+        // Reset all tabs
+        binding.upcomingTab.setBackgroundResource(R.drawable.filter_unselected_bg)
+        binding.scoreTab.setBackgroundResource(R.drawable.filter_unselected_bg)
+        binding.favoritesTab.setBackgroundResource(R.drawable.filter_unselected_bg)
+
+        // Set selected tab
+        when (selectedTab) {
+            MatchTab.UPCOMING -> binding.upcomingTab.setBackgroundResource(R.drawable.bottom_line_selected)
+            MatchTab.SCORE -> binding.scoreTab.setBackgroundResource(R.drawable.bottom_line_selected)
+            MatchTab.FAVORITES -> binding.favoritesTab.setBackgroundResource(R.drawable.bottom_line_selected)
         }
     }
 
@@ -90,8 +136,36 @@ class HomeFragment : Fragment() {
                 viewModel.selectDate(selectedDate)
                 updateSelectedDay(index)
                 updateHeaderBasedOnSelectedDate(selectedDate)
+                loadDataForSelectedDate()
             }
         }
+    }
+
+    private fun loadDataForSelectedDate() {
+        val selectedDate = viewModel.selectedDate.value ?: dateFormat.format(Date())
+
+        when (currentTab) {
+            MatchTab.UPCOMING -> {
+                viewModel.loadUpcomingMatches(selectedDate)
+                updateLiveHeaderText("Upcoming Matches")
+            }
+            MatchTab.SCORE -> {
+                viewModel.loadLiveAndFinishedMatches(selectedDate)
+                updateLiveHeaderText("Live & Results")
+            }
+            MatchTab.FAVORITES -> {
+                loadFavoriteMatches()
+                updateLiveHeaderText("Favorite Teams")
+            }
+        }
+    }
+
+    private fun loadFavoriteMatches() {
+        viewModel.loadFavoriteTeamMatches()
+    }
+
+    private fun updateLiveHeaderText(text: String) {
+        binding.liveHeaderText.text = text
     }
 
     private fun updateWeekCalendar() {
@@ -205,19 +279,23 @@ class HomeFragment : Fragment() {
 
             when {
                 selectedDate == today -> {
-                    binding.liveHeaderText.text = "Live Now"
+                    when (currentTab) {
+                        MatchTab.UPCOMING -> updateLiveHeaderText("Today's Upcoming")
+                        MatchTab.SCORE -> updateLiveHeaderText("Live Now")
+                        MatchTab.FAVORITES -> updateLiveHeaderText("Favorite Teams")
+                    }
                 }
                 selectedCalendar.before(todayCalendar) -> {
                     val displayDate = displayDateFormat.format(selectedCalendar.time)
-                    binding.liveHeaderText.text = "Results - $displayDate"
+                    updateLiveHeaderText("Results - $displayDate")
                 }
                 selectedCalendar.after(todayCalendar) -> {
                     val displayDate = displayDateFormat.format(selectedCalendar.time)
-                    binding.liveHeaderText.text = "Fixtures - $displayDate"
+                    updateLiveHeaderText("Fixtures - $displayDate")
                 }
             }
         } catch (e: Exception) {
-            binding.liveHeaderText.text = "Matches"
+            updateLiveHeaderText("Matches")
         }
     }
 
@@ -225,21 +303,40 @@ class HomeFragment : Fragment() {
         currentWeekOffset += weekOffset
         selectedDayIndex = -1
         updateWeekCalendar()
+        loadDataForSelectedDate()
     }
 
     private fun observeViewModel() {
         viewModel.liveMatches.observe(viewLifecycleOwner, Observer { matches ->
-            if (viewModel.isSelectedDateToday()) {
+            if (currentTab == MatchTab.SCORE) {
                 liveMatchesAdapter.submitList(matches)
             }
         })
 
         viewModel.todayMatches.observe(viewLifecycleOwner, Observer { matches ->
-            liveMatchesAdapter.submitList(matches)
+            when (currentTab) {
+                MatchTab.UPCOMING -> {
+                    val upcomingMatches = matches.filter { it.isUpcoming }
+                    liveMatchesAdapter.submitList(upcomingMatches)
+                }
+                MatchTab.SCORE -> {
+                    val liveAndFinished = matches.filter { it.isLive || it.isFinished }
+                    liveMatchesAdapter.submitList(liveAndFinished)
+                }
+                MatchTab.FAVORITES -> {
+                    // Favorites will be handled separately
+                }
+            }
+        })
+
+        viewModel.favoriteMatches.observe(viewLifecycleOwner, Observer { matches ->
+            if (currentTab == MatchTab.FAVORITES) {
+                liveMatchesAdapter.submitList(matches)
+            }
         })
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
-            // Handle loading state
+            // Handle loading state if needed
         })
 
         viewModel.error.observe(viewLifecycleOwner, Observer { error ->
@@ -253,27 +350,35 @@ class HomeFragment : Fragment() {
     private fun setupClickListeners() {
         binding.seeMoreBtn.setOnClickListener {
             val selectedDate = viewModel.selectedDate.value ?: dateFormat.format(Date())
-            val action = MainMenuFragmentDirections.actionMainMenuToAllMatches(selectedDate)
+            val action = HomeFragmentDirections.actionMainMenuToAllMatches(selectedDate)
             findNavController().navigate(action)
         }
 
         binding.searchId.setOnClickListener {
-            // Handle search click
+            try {
+                // Navigate to team search fragment
+                val action = HomeFragmentDirections.actionMainMenuToTeamSearch()
+                findNavController().navigate(action)
+            } catch (e: Exception) {
+                // Fallback navigation if directions fail
+                findNavController().navigate(R.id.teamSearchFragment)
+            }
         }
 
         binding.notificationId.setOnClickListener {
             // Handle notification click
+            Toast.makeText(context, "Notifications clicked", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun onMatchClick(match: Match) {
-        val action = MainMenuFragmentDirections.actionMainMenuToMatchDetail(match.id)
+        val action = HomeFragmentDirections.actionMainMenuToMatchDetail(match.id)
         findNavController().navigate(action)
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.refreshData()
+        loadDataForSelectedDate()
     }
 
     override fun onDestroyView() {
