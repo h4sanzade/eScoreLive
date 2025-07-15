@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    android:layout_marginStart="4dp"
+    android:layout_marginEnd="4dp"
+    app:cardBackgroundColor="@color/card_background"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- News Image -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/image_card"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/background_color"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/news_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:background="@color/background_color"
+                tools:src="@drawable/ic_placeholder" />
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- News Content Container -->
+        <LinearLayout
+            android:id="@+id/content_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/image_card"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/image_card"
+            app:layout_constraintTop_toTopOf="@id/image_card">
+
+            <!-- Category Badge -->
+            <TextView
+                android:id="@+id/news_category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/indicator_background"
+                android:fontFamily="@font/mulish_bold"
+                android:padding="4dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:text="Transfer News"
+                android:textColor="@color/accent_color"
+                android:textSize="10sp" />
+
+            <!-- News Title -->
+            <TextView
+                android:id="@+id/news_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/mulish_bold"
+                android:maxLines="2"
+                android:text="Breaking: Major transfer completed in Premier League"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:lineSpacingExtra="2dp" />
+
+            <!-- News Summary -->
+            <TextView
+                android:id="@+id/news_summary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:ellipsize="end"
+                android:fontFamily="@font/mulish_regular"
+                android:maxLines="2"
+                android:text="A major signing has been confirmed as the transfer window heats up with unexpected developments..."
+                android:textColor="@android:color/darker_gray"
+                android:textSize="12sp"
+                android:lineSpacingExtra="1dp" />
+
+        </LinearLayout>
+
+        <!-- News Footer Info -->
+        <LinearLayout
+            android:id="@+id/footer_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/image_card">
+
+            <!-- Publish Date -->
+            <TextView
+                android:id="@+id/news_date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/mulish_regular"
+                android:text="2 hours ago"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="11sp" />
+
+            <!-- Read Time -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginEnd="4dp"
+                    android:src="@drawable/ic_news"
+                    android:tint="@android:color/darker_gray" />
+
+                <TextView
+                    android:id="@+id/read_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/mulish_regular"
+                    android:text="3 min read"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="11sp" />
+
+            </LinearLayout>
+
+            <!-- Trending Indicator -->
+            <LinearLayout
+                android:id="@+id/trending_indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginEnd="4dp"
+                    android:src="@drawable/ic_goal"
+                    android:tint="@color/accent_color" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/mulish_bold"
+                    android:text="Trending"
+                    android:textColor="@color/accent_color"
+                    android:textSize="10sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Breaking News Overlay -->
+        <LinearLayout
+            android:id="@+id/breaking_overlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/live_indicator_bg"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="6dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/image_card"
+            app:layout_constraintTop_toTopOf="@id/image_card"
+            tools:visibility="visible">
+
+            <View
+                android:layout_width="4dp"
+                android:layout_height="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/live_dot" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/mulish_bold"
+                android:text="BREAKING"
+                android:textColor="@color/white"
+                android:textSize="8sp" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
