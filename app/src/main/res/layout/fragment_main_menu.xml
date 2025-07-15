@@ -11,7 +11,7 @@
         android:id="@+id/app_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="eScoreLive"
+        android:text="@string/app_name"
         android:textSize="24sp"
         android:textColor="@color/white"
         android:fontFamily="@font/mulish_bold"
@@ -80,7 +80,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="14 Apr - 20 Apr"
+                    tools:text="14 Apr - 20 Apr"
                     android:textSize="16sp"
                     android:textColor="@color/white"
                     android:textAlignment="center"
@@ -116,7 +116,7 @@
                         android:id="@+id/day_1_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Fri"
+                        tools:text="Fri"
                         android:textSize="12sp"
                         android:textColor="@android:color/darker_gray" />
 
@@ -124,7 +124,7 @@
                         android:id="@+id/day_1_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="14"
+                        tools:text="14"
                         android:textSize="16sp"
                         android:textColor="@color/white"
                         android:layout_marginTop="4dp" />
@@ -145,7 +145,7 @@
                         android:id="@+id/day_2_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Sat"
+                        tools:text="Sat"
                         android:textSize="12sp"
                         android:textColor="@android:color/darker_gray" />
 
@@ -154,7 +154,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="15"
+                        tools:text="15"
                         android:textColor="@color/white"
                         android:textSize="16sp" />
 
@@ -174,7 +174,7 @@
                         android:id="@+id/day_3_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Today"
+                        android:text="@string/today"
                         android:textSize="12sp"
                         android:textColor="@color/white" />
 
@@ -182,7 +182,7 @@
                         android:id="@+id/day_3_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="16"
+                        tools:text="16"
                         android:textSize="16sp"
                         android:textColor="@color/white"
                         android:layout_marginTop="4dp" />
@@ -203,7 +203,7 @@
                         android:id="@+id/day_4_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Mon"
+                        tools:text="Mon"
                         android:textSize="12sp"
                         android:textColor="@android:color/darker_gray" />
 
@@ -211,7 +211,7 @@
                         android:id="@+id/day_4_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="17"
+                        tools:text="17"
                         android:textSize="16sp"
                         android:textColor="@color/white"
                         android:layout_marginTop="4dp" />
@@ -232,7 +232,7 @@
                         android:id="@+id/day_5_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tue"
+                        tools:text="Tue"
                         android:textSize="12sp"
                         android:textColor="@android:color/darker_gray" />
 
@@ -240,7 +240,7 @@
                         android:id="@+id/day_5_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="18"
+                        tools:text="18"
                         android:textSize="16sp"
                         android:textColor="@color/white"
                         android:layout_marginTop="4dp" />
@@ -261,7 +261,7 @@
                         android:id="@+id/day_6_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Wed"
+                        tools:text="Wed"
                         android:textSize="12sp"
                         android:textColor="@android:color/darker_gray" />
 
@@ -269,7 +269,7 @@
                         android:id="@+id/day_6_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="19"
+                        tools:text="19"
                         android:textSize="16sp"
                         android:textColor="@color/white"
                         android:layout_marginTop="4dp" />
@@ -290,7 +290,7 @@
                         android:id="@+id/day_7_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Thu"
+                        tools:text="Thu"
                         android:textSize="12sp"
                         android:textColor="@android:color/darker_gray" />
 
@@ -298,7 +298,7 @@
                         android:id="@+id/day_7_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="20"
+                        tools:text="20"
                         android:textSize="16sp"
                         android:textColor="@color/white"
                         android:layout_marginTop="4dp" />
@@ -334,7 +334,7 @@
                 android:id="@+id/upcoming_tab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Upcoming"
+                android:text="@string/upcoming"
                 android:textSize="14sp"
                 android:textColor="@color/white"
                 android:fontFamily="@font/mulish_bold"
@@ -348,7 +348,7 @@
                 android:id="@+id/score_tab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Score"
+                android:text="@string/score"
                 android:textSize="14sp"
                 android:textColor="@color/white"
                 android:fontFamily="@font/mulish_bold"
@@ -362,7 +362,7 @@
                 android:id="@+id/favorites_tab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Favorites"
+                android:text="@string/favorites"
                 android:textSize="14sp"
                 android:textColor="@color/white"
                 android:fontFamily="@font/mulish_bold"
@@ -399,7 +399,7 @@
                 android:id="@+id/live_header_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Upcoming Matches"
+                android:text="@string/upcoming_matches"
                 android:textSize="18sp"
                 android:textColor="@color/white"
                 android:fontFamily="@font/mulish_bold" />
@@ -415,7 +415,7 @@
             android:id="@+id/see_more_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="See More"
+            android:text="@string/see_more"
             android:textSize="14sp"
             android:textColor="#F63D68"
             android:fontFamily="@font/mulish_bold"

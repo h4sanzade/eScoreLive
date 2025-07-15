@@ -16,6 +16,15 @@
             app:destination="@id/allMatchesFragment" />
 
         <action
+            android:id="@+id/action_mainMenu_to_favoriteMatches"
+            app:destination="@id/allMatchesFragment">
+            <argument
+                android:name="selectedDate"
+                app:argType="string"
+                android:defaultValue="FAVORITES_MODE" />
+        </action>
+
+        <action
             android:id="@+id/action_mainMenu_to_matchDetail"
             app:destination="@id/matchDetailFragment" />
 

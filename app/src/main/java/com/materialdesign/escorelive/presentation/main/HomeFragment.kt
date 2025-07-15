@@ -69,12 +69,11 @@ class HomeFragment : Fragment() {
             adapter = liveMatchesAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             setHasFixedSize(true)
-            visibility = View.VISIBLE // Always show matches
+            visibility = View.VISIBLE
         }
     }
 
     private fun setupTabs() {
-        // Set default tab selection
         updateTabSelection(MatchTab.UPCOMING)
 
         binding.upcomingTab.setOnClickListener {
@@ -97,12 +96,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateTabSelection(selectedTab: MatchTab) {
-        // Reset all tabs
         binding.upcomingTab.setBackgroundResource(R.drawable.filter_unselected_bg)
         binding.scoreTab.setBackgroundResource(R.drawable.filter_unselected_bg)
         binding.favoritesTab.setBackgroundResource(R.drawable.filter_unselected_bg)
 
-        // Set selected tab
         when (selectedTab) {
             MatchTab.UPCOMING -> binding.upcomingTab.setBackgroundResource(R.drawable.bottom_line_selected)
             MatchTab.SCORE -> binding.scoreTab.setBackgroundResource(R.drawable.bottom_line_selected)
@@ -136,7 +133,11 @@ class HomeFragment : Fragment() {
                 viewModel.selectDate(selectedDate)
                 updateSelectedDay(index)
                 updateHeaderBasedOnSelectedDate(selectedDate)
-                loadDataForSelectedDate()
+
+                // Favorites seçili değilse takvim değişikliğinde veriyi yükle
+                if (currentTab != MatchTab.FAVORITES) {
+                    loadDataForSelectedDate()
+                }
             }
         }
     }
@@ -154,6 +155,7 @@ class HomeFragment : Fragment() {
                 updateLiveHeaderText("Live & Results")
             }
             MatchTab.FAVORITES -> {
+                // Favorites'te takvim değişikliği veriyi değiştirmez
                 loadFavoriteMatches()
                 updateLiveHeaderText("Favorite Teams")
             }
@@ -162,6 +164,7 @@ class HomeFragment : Fragment() {
 
     private fun loadFavoriteMatches() {
         viewModel.loadFavoriteTeamMatches()
+        updateLiveHeaderText("Favorite Teams")
     }
 
     private fun updateLiveHeaderText(text: String) {
@@ -287,11 +290,17 @@ class HomeFragment : Fragment() {
                 }
                 selectedCalendar.before(todayCalendar) -> {
                     val displayDate = displayDateFormat.format(selectedCalendar.time)
-                    updateLiveHeaderText("Results - $displayDate")
+                    when (currentTab) {
+                        MatchTab.FAVORITES -> updateLiveHeaderText("Favorite Teams")
+                        else -> updateLiveHeaderText("Results - $displayDate")
+                    }
                 }
                 selectedCalendar.after(todayCalendar) -> {
                     val displayDate = displayDateFormat.format(selectedCalendar.time)
-                    updateLiveHeaderText("Fixtures - $displayDate")
+                    when (currentTab) {
+                        MatchTab.FAVORITES -> updateLiveHeaderText("Favorite Teams")
+                        else -> updateLiveHeaderText("Fixtures - $displayDate")
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -303,7 +312,11 @@ class HomeFragment : Fragment() {
         currentWeekOffset += weekOffset
         selectedDayIndex = -1
         updateWeekCalendar()
-        loadDataForSelectedDate()
+
+        // Favorites seçili değilse takvim değişikliğinde veriyi yükle
+        if (currentTab != MatchTab.FAVORITES) {
+            loadDataForSelectedDate()
+        }
     }
 
     private fun observeViewModel() {
@@ -324,7 +337,7 @@ class HomeFragment : Fragment() {
                     liveMatchesAdapter.submitList(liveAndFinished)
                 }
                 MatchTab.FAVORITES -> {
-                    // Favorites will be handled separately
+                    // Favorites ayrı olarak handle edilir
                 }
             }
         })
@@ -349,24 +362,31 @@ class HomeFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.seeMoreBtn.setOnClickListener {
-            val selectedDate = viewModel.selectedDate.value ?: dateFormat.format(Date())
-            val action = HomeFragmentDirections.actionMainMenuToAllMatches(selectedDate)
-            findNavController().navigate(action)
+            when (currentTab) {
+                MatchTab.FAVORITES -> {
+                    // Favorites için special navigation
+                    val action = HomeFragmentDirections.actionMainMenuToFavoriteMatches()
+                    findNavController().navigate(action)
+                }
+                else -> {
+                    // Normal date-based navigation
+                    val selectedDate = viewModel.selectedDate.value ?: dateFormat.format(Date())
+                    val action = HomeFragmentDirections.actionMainMenuToAllMatches(selectedDate)
+                    findNavController().navigate(action)
+                }
+            }
         }
 
         binding.searchId.setOnClickListener {
             try {
-                // Navigate to team search fragment
                 val action = HomeFragmentDirections.actionMainMenuToTeamSearch()
                 findNavController().navigate(action)
             } catch (e: Exception) {
-                // Fallback navigation if directions fail
                 findNavController().navigate(R.id.teamSearchFragment)
             }
         }
 
         binding.notificationId.setOnClickListener {
-            // Handle notification click
             Toast.makeText(context, "Notifications clicked", Toast.LENGTH_SHORT).show()
         }
     }

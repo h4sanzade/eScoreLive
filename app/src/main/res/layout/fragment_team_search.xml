@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="@font/mulish_bold"
-            android:text="Takım Ara"
+            android:text="Team Search"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="18sp" />
@@ -58,7 +58,7 @@
         android:padding="8dp"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
-        android:text="5 favori takım"
+        android:text="5 favorite teams"
         android:textColor="@color/accent_color"
         android:textSize="12sp"
         android:visibility="gone"
@@ -89,12 +89,12 @@
             android:layout_margin="8dp"
             android:background="@android:color/transparent"
             android:iconifiedByDefault="false"
-            android:queryHint="Takım adı yazın..."
+            android:queryHint="Search team name..."
             android:searchIcon="@drawable/vector_search" />
 
     </androidx.cardview.widget.CardView>
 
-    <!-- YENİ: Suggestions Container -->
+    <!-- Suggestions Container -->
     <HorizontalScrollView
         android:id="@+id/suggestions_scroll"
         android:layout_width="match_parent"
@@ -171,7 +171,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:fontFamily="@font/mulish_bold"
-            android:text="Takım bulunamadı"
+            android:text="No teams found"
             android:textColor="@android:color/darker_gray"
             android:textSize="16sp" />
 
@@ -179,7 +179,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/mulish_regular"
-            android:text="Farklı anahtar kelimelerle deneyin"
+            android:text="Try different keywords"
             android:textColor="@android:color/darker_gray"
             android:textSize="14sp" />
 
@@ -210,7 +210,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:fontFamily="@font/mulish_bold"
-            android:text="Favori takımlarınızı arayın"
+            android:text="Search your favorite teams"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
@@ -219,18 +219,18 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:fontFamily="@font/mulish_regular"
-            android:text="Dünyanın önde gelen liglerinden takımları bulun"
+            android:text="Find teams from world's top leagues"
             android:textAlignment="center"
             android:textColor="@android:color/darker_gray"
             android:textSize="14sp" />
 
-        <!-- YENİ: Popular Teams Container -->
+        <!-- Popular Teams Container -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:fontFamily="@font/mulish_bold"
-            android:text="Popüler Takımlar"
+            android:text="Popular Teams"
             android:textColor="@color/white"
             android:textSize="14sp" />
 
@@ -256,7 +256,7 @@
                 android:padding="8dp"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:text="💡 Yazmaya başlayın, öneriler göreceksiniz..."
+                android:text="💡 Start typing to see suggestions..."
                 android:textColor="@color/accent_color"
                 android:textSize="12sp" />
 

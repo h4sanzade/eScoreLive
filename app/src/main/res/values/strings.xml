@@ -1,9 +1,128 @@
 <resources>
     <string name="app_name">eScoreLive</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Bottom Navigation -->
     <string name="home">Home</string>
-    <string name="competition">Competition</string>
+    <string name="competition">Leagues</string>
     <string name="news">News</string>
-    <string name="account">Account</string>
+    <string name="account">Profile</string>
+
+    <!-- Home Screen -->
+    <string name="upcoming_matches">Upcoming Matches</string>
+    <string name="live_results">Live &amp; Results</string>
+    <string name="favorite_teams">Favorite Teams</string>
+    <string name="todays_upcoming">Today\'s Upcoming</string>
+    <string name="live_now">Live Now</string>
+    <string name="see_more">See More</string>
+
+    <!-- Match Status -->
+    <string name="live">LIVE</string>
+    <string name="ft">FT</string>
+    <string name="vs">VS</string>
+    <string name="today">Today</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="score">Score</string>
+    <string name="favorites">Favorites</string>
+
+    <!-- Team Search -->
+    <string name="team_search">Team Search</string>
+    <string name="search_team_hint">Search team name...</string>
+    <string name="no_teams_found">No teams found</string>
+    <string name="try_different_keywords">Try different keywords</string>
+    <string name="search_your_favorite_teams">Search your favorite teams</string>
+    <string name="find_teams_from_top_leagues">Find teams from world\'s top leagues</string>
+    <string name="popular_teams">Popular Teams</string>
+    <string name="start_typing_suggestions">💡 Start typing to see suggestions...</string>
+    <string name="favorite_teams_count">%d favorite teams</string>
+    <string name="added_to_favorites">%s added to favorites</string>
+    <string name="removed_from_favorites">%s removed from favorites</string>
+    <string name="loading_standings">Loading %s standings...</string>
+    <string name="testing_search">Testing search...</string>
+    <string name="selected_team">Selected: %s (%s)</string>
+
+    <!-- Match Details -->
+    <string name="match_details">Match Details</string>
+    <string name="summary">Summary</string>
+    <string name="lineup">Lineup</string>
+    <string name="statistics">Statistics</string>
+    <string name="h2h">H2H</string>
+    <string name="standings">Standings</string>
+    <string name="match_events">Match Events</string>
+    <string name="team_lineups">Team Lineups</string>
+    <string name="match_statistics">Match Statistics</string>
+    <string name="league_standings">League Standings</string>
+    <string name="head_to_head">Head to Head</string>
+    <string name="no_h2h_data">No H2H data available</string>
+    <string name="no_standings_data">No standings data available</string>
+
+    <!-- All Matches -->
+    <string name="all_matches">All Matches</string>
+    <string name="todays_matches">Today\'s Matches</string>
+    <string name="favorite_teams_matches">Favorite Teams Matches</string>
+    <string name="results_date">Results - %s</string>
+    <string name="fixtures_date">Fixtures - %s</string>
+    <string name="all">All</string>
+    <string name="live_filter">Live</string>
+    <string name="finished">Finished</string>
+    <string name="no_matches_found">No matches found</string>
+    <string name="pull_down_to_refresh">Pull down to refresh</string>
+
+    <!-- Statistics -->
+    <string name="ball_possession">Ball Possession</string>
+    <string name="total_shots">Total Shots</string>
+    <string name="shots_on_target">Shots on Target</string>
+    <string name="corner_kicks">Corner Kicks</string>
+    <string name="yellow_cards">Yellow Cards</string>
+    <string name="red_cards">Red Cards</string>
+
+    <!-- Lineup -->
+    <string name="starting_xi">Starting XI</string>
+    <string name="substitute">Substitute</string>
+    <string name="assist">Assist: %s</string>
+
+    <!-- Match Actions -->
+    <string name="live_details">Live Details</string>
+    <string name="match_report">Match Report</string>
+    <string name="preview">Preview</string>
+    <string name="details">Details</string>
+
+    <!-- Standings -->
+    <string name="pos">#</string>
+    <string name="team">Team</string>
+    <string name="mp">MP</string>
+    <string name="w">W</string>
+    <string name="d">D</string>
+    <string name="l">L</string>
+    <string name="gd">GD</string>
+    <string name="pts">Pts</string>
+    <string name="season">Season %d</string>
+    <string name="team_position">%s is in position %d</string>
+    <string name="legend">Legend:</string>
+    <string name="champions_league">Champions League</string>
+    <string name="europa_league">Europa League</string>
+    <string name="relegation">Relegation</string>
+
+    <!-- Notifications -->
+    <string name="notifications_clicked">Notifications clicked</string>
+
+    <!-- Common -->
+    <string name="loading">Loading...</string>
+    <string name="date_na">Date N/A</string>
+    <string name="tbd">TBD</string>
+
+    <!-- Events -->
+    <string name="normal_goal">Normal Goal</string>
+    <string name="yellow_card">Yellow Card</string>
+    <string name="red_card">Red Card</string>
+    <string name="substitution">Substitution</string>
+
+    <!-- Error Messages -->
+    <string name="failed_to_load_matches">Failed to load matches</string>
+    <string name="failed_to_load_standings">Failed to load standings</string>
+    <string name="failed_to_load_favorite_matches">Failed to load favorite team matches</string>
+    <string name="search_failed">Search failed</string>
+    <string name="team_not_found">Team not found</string>
+    <string name="api_error">API Error</string>
+    <string name="match_not_found">Match not found</string>
+
 </resources>

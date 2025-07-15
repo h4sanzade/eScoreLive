@@ -49,11 +49,11 @@ class FootballRepository @Inject constructor(
         val season: Int
     )
 
-    // BASIT TAKIM ARAMA FONKSİYONU - Debug için
+    // API TABANLI TAKIM ARAMA FONKSİYONU
     suspend fun searchTeamsAdvanced(query: String): Result<List<TeamSearchResult>> {
         return withContext(Dispatchers.IO) {
             try {
-                Log.d("FootballRepository", "Starting search for: '$query'")
+                Log.d("FootballRepository", "Starting API search for: '$query'")
 
                 if (query.length < 2) {
                     Log.d("FootballRepository", "Query too short, returning empty")
@@ -71,27 +71,40 @@ class FootballRepository @Inject constructor(
 
                 val allResults = mutableSetOf<TeamSearchResult>()
 
-                // Önce manuel takım listesinden ara (offline)
-                val manualResults = searchManualTeams(query)
-                allResults.addAll(manualResults)
-                Log.d("FootballRepository", "Manual search found ${manualResults.size} teams")
+                // API'den gerçek arama yap
+                try {
+                    Log.d("FootballRepository", "Calling API search for: '$query'")
+                    val response = apiService.searchTeams(searchQuery = query)
 
-                // Eğer manuel aramadan sonuç varsa ve 5'den fazlaysa, API aramayı atla
-                if (allResults.size >= 5) {
-                    val results = allResults.toList().take(10)
-                    searchCache[cacheKey] = results
-                    Log.d("FootballRepository", "Returning ${results.size} manual results")
-                    return@withContext Result.success(results)
+                    if (response.isSuccessful) {
+                        val apiResults = response.body()?.response?.mapNotNull { teamSearchData ->
+                            val team = TeamMapper.mapToTeam(teamSearchData.team)
+                            cacheTeam(team)
+
+                            findTeamLeague(team.id)?.let { leagueInfo ->
+                                TeamSearchResult(
+                                    team = team,
+                                    leagueId = leagueInfo.id,
+                                    leagueName = leagueInfo.name,
+                                    season = leagueInfo.season
+                                )
+                            }
+                        } ?: emptyList()
+
+                        allResults.addAll(apiResults)
+                        Log.d("FootballRepository", "API search returned ${apiResults.size} teams")
+                    } else {
+                        Log.w("FootballRepository", "API search failed with code: ${response.code()}")
+                    }
+                } catch (e: Exception) {
+                    Log.w("FootballRepository", "API search failed, using fallback", e)
                 }
 
-                // API araması (sadece yetersiz sonuç varsa)
-                try {
-                    Log.d("FootballRepository", "Trying API search...")
-                    val apiResults = searchFromApi(query)
-                    allResults.addAll(apiResults)
-                    Log.d("FootballRepository", "API search added ${apiResults.size} more teams")
-                } catch (e: Exception) {
-                    Log.w("FootballRepository", "API search failed, using manual results only", e)
+                // Eğer API'den yeterli sonuç yoksa manuel takımları ekle
+                if (allResults.size < 5) {
+                    val manualResults = searchManualTeams(query)
+                    allResults.addAll(manualResults)
+                    Log.d("FootballRepository", "Added ${manualResults.size} manual results")
                 }
 
                 // Sonuçları filtrele ve sırala
@@ -113,10 +126,6 @@ class FootballRepository @Inject constructor(
                 searchCache[cacheKey] = filteredResults
 
                 Log.d("FootballRepository", "Final result: ${filteredResults.size} teams for '$query'")
-                filteredResults.take(3).forEach { result ->
-                    Log.d("FootballRepository", "Result: ${result.team.name} (${result.leagueName})")
-                }
-
                 Result.success(filteredResults)
 
             } catch (e: Exception) {
@@ -126,28 +135,108 @@ class FootballRepository @Inject constructor(
         }
     }
 
+    // API TABANLI ÖNERİ FONKSİYONU
+    suspend fun getTeamSuggestions(query: String): Result<List<String>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                Log.d("FootballRepository", "Getting API-based suggestions for: '$query'")
+
+                if (query.isEmpty()) {
+                    return@withContext Result.success(emptyList())
+                }
+
+                val suggestions = mutableSetOf<String>()
+
+                // ÖNCE API'DEN GERÇEK ARAMA YAP
+                try {
+                    val searchResult = searchTeamsAdvanced(query)
+
+                    searchResult.onSuccess { results ->
+                        // Arama sonuçlarından takım isimlerini al
+                        results.forEach { teamSearchResult ->
+                            val teamName = teamSearchResult.team.name
+
+                            // Query ile başlayan veya içeren takımları öneriye ekle
+                            if (teamName.contains(query, ignoreCase = true)) {
+                                suggestions.add(teamName)
+                            }
+
+                            // Takım adının kelimelerini kontrol et
+                            teamName.split(" ").forEach { word ->
+                                if (word.startsWith(query, ignoreCase = true) && word.length > query.length) {
+                                    suggestions.add(word)
+                                }
+                            }
+                        }
+
+                        Log.d("FootballRepository", "API search generated ${suggestions.size} suggestions")
+                    }
+                } catch (e: Exception) {
+                    Log.w("FootballRepository", "API search for suggestions failed", e)
+                }
+
+                // Eğer API'den yeterli öneri yoksa cache'den ekle
+                if (suggestions.size < 3) {
+                    teamsCache.values.forEach { team ->
+                        if (team.name.contains(query, ignoreCase = true)) {
+                            suggestions.add(team.name)
+                        }
+
+                        // Takım adının kelimelerini kontrol et
+                        team.name.split(" ").forEach { word ->
+                            if (word.startsWith(query, ignoreCase = true) && word.length > query.length) {
+                                suggestions.add(word)
+                            }
+                        }
+                    }
+                    Log.d("FootballRepository", "Cache added suggestions, total: ${suggestions.size}")
+                }
+
+                // Önerileri sırala ve sınırla
+                val sortedSuggestions = suggestions
+                    .filter { it.length >= query.length } // En az query kadar uzun olmalı
+                    .sortedWith(compareBy<String> { suggestion ->
+                        when {
+                            suggestion.equals(query, ignoreCase = true) -> 0
+                            suggestion.startsWith(query, ignoreCase = true) -> 1
+                            suggestion.contains(query, ignoreCase = true) -> 2
+                            else -> 3
+                        }
+                    }.thenBy { it.length }.thenBy { it })
+                    .take(8) // Maksimum 8 öneri
+
+                Log.d("FootballRepository", "Final API-based suggestions (${sortedSuggestions.size}): $sortedSuggestions")
+                Result.success(sortedSuggestions)
+
+            } catch (e: Exception) {
+                Log.e("FootballRepository", "Exception in getTeamSuggestions", e)
+                Result.failure(e)
+            }
+        }
+    }
+
     // Manuel takım listesi (gerçek logo URL'leri ile)
     private fun searchManualTeams(query: String): List<TeamSearchResult> {
         val manualTeams = listOf(
-            ManualTeam(1, "Arsenal", 39, "Premier League", "https://media.api-sports.io/football/teams/42.png"),
-            ManualTeam(2, "Chelsea", 39, "Premier League", "https://media.api-sports.io/football/teams/49.png"),
-            ManualTeam(3, "Manchester United", 39, "Premier League", "https://media.api-sports.io/football/teams/33.png"),
-            ManualTeam(4, "Manchester City", 39, "Premier League", "https://media.api-sports.io/football/teams/50.png"),
-            ManualTeam(5, "Liverpool", 39, "Premier League", "https://media.api-sports.io/football/teams/40.png"),
-            ManualTeam(6, "Tottenham", 39, "Premier League", "https://media.api-sports.io/football/teams/47.png"),
-            ManualTeam(7, "Barcelona", 140, "La Liga", "https://media.api-sports.io/football/teams/529.png"),
-            ManualTeam(8, "Real Madrid", 140, "La Liga", "https://media.api-sports.io/football/teams/541.png"),
-            ManualTeam(9, "Atletico Madrid", 140, "La Liga", "https://media.api-sports.io/football/teams/530.png"),
-            ManualTeam(10, "Bayern Munich", 78, "Bundesliga", "https://media.api-sports.io/football/teams/157.png"),
-            ManualTeam(11, "Borussia Dortmund", 78, "Bundesliga", "https://media.api-sports.io/football/teams/165.png"),
-            ManualTeam(12, "Juventus", 135, "Serie A", "https://media.api-sports.io/football/teams/496.png"),
-            ManualTeam(13, "Inter Milan", 135, "Serie A", "https://media.api-sports.io/football/teams/505.png"),
-            ManualTeam(14, "AC Milan", 135, "Serie A", "https://media.api-sports.io/football/teams/489.png"),
-            ManualTeam(15, "Paris Saint-Germain", 61, "Ligue 1", "https://media.api-sports.io/football/teams/85.png"),
-            ManualTeam(16, "Galatasaray", 203, "Super Lig", "https://media.api-sports.io/football/teams/559.png"),
-            ManualTeam(17, "Fenerbahce", 203, "Super Lig", "https://media.api-sports.io/football/teams/562.png"),
-            ManualTeam(18, "Besiktas", 203, "Super Lig", "https://media.api-sports.io/football/teams/558.png"),
-            ManualTeam(19, "Trabzonspor", 203, "Super Lig", "https://media.api-sports.io/football/teams/564.png")
+            ManualTeam(42, "Arsenal", 39, "Premier League", "https://media.api-sports.io/football/teams/42.png"),
+            ManualTeam(49, "Chelsea", 39, "Premier League", "https://media.api-sports.io/football/teams/49.png"),
+            ManualTeam(33, "Manchester United", 39, "Premier League", "https://media.api-sports.io/football/teams/33.png"),
+            ManualTeam(50, "Manchester City", 39, "Premier League", "https://media.api-sports.io/football/teams/50.png"),
+            ManualTeam(40, "Liverpool", 39, "Premier League", "https://media.api-sports.io/football/teams/40.png"),
+            ManualTeam(47, "Tottenham", 39, "Premier League", "https://media.api-sports.io/football/teams/47.png"),
+            ManualTeam(529, "Barcelona", 140, "La Liga", "https://media.api-sports.io/football/teams/529.png"),
+            ManualTeam(541, "Real Madrid", 140, "La Liga", "https://media.api-sports.io/football/teams/541.png"),
+            ManualTeam(530, "Atletico Madrid", 140, "La Liga", "https://media.api-sports.io/football/teams/530.png"),
+            ManualTeam(157, "Bayern Munich", 78, "Bundesliga", "https://media.api-sports.io/football/teams/157.png"),
+            ManualTeam(165, "Borussia Dortmund", 78, "Bundesliga", "https://media.api-sports.io/football/teams/165.png"),
+            ManualTeam(496, "Juventus", 135, "Serie A", "https://media.api-sports.io/football/teams/496.png"),
+            ManualTeam(505, "Inter Milan", 135, "Serie A", "https://media.api-sports.io/football/teams/505.png"),
+            ManualTeam(489, "AC Milan", 135, "Serie A", "https://media.api-sports.io/football/teams/489.png"),
+            ManualTeam(85, "Paris Saint-Germain", 61, "Ligue 1", "https://media.api-sports.io/football/teams/85.png"),
+            ManualTeam(559, "Galatasaray", 203, "Super Lig", "https://media.api-sports.io/football/teams/559.png"),
+            ManualTeam(562, "Fenerbahce", 203, "Super Lig", "https://media.api-sports.io/football/teams/562.png"),
+            ManualTeam(558, "Besiktas", 203, "Super Lig", "https://media.api-sports.io/football/teams/558.png"),
+            ManualTeam(564, "Trabzonspor", 203, "Super Lig", "https://media.api-sports.io/football/teams/564.png")
         )
 
         return manualTeams
@@ -178,107 +267,31 @@ class FootballRepository @Inject constructor(
         val logoUrl: String
     )
 
-    // API'den arama (logo ile birlikte)
-    private suspend fun searchFromApi(query: String): List<TeamSearchResult> {
-        return try {
-            Log.d("FootballRepository", "API search for: $query")
-
-            // Gerçek API çağrısını aktif hale getir
-            val response = apiService.searchTeams(searchQuery = query)
-            if (response.isSuccessful) {
-                val apiResults = response.body()?.response?.mapNotNull { teamSearchData ->
-                    val team = TeamMapper.mapToTeam(teamSearchData.team)
-                    cacheTeam(team)
-
-                    findTeamLeague(team.id)?.let { leagueInfo ->
-                        TeamSearchResult(
-                            team = team,
-                            leagueId = leagueInfo.id,
-                            leagueName = leagueInfo.name,
-                            season = leagueInfo.season
-                        )
-                    }
-                } ?: emptyList()
-
-                Log.d("FootballRepository", "API returned ${apiResults.size} teams")
-                apiResults
-            } else {
-                Log.w("FootballRepository", "API search failed: ${response.code()}")
-                emptyList()
-            }
-        } catch (e: Exception) {
-            Log.w("FootballRepository", "API search failed for '$query'", e)
-            emptyList()
-        }
-    }
-
     private suspend fun findTeamLeague(teamId: Long): LeagueInfo? {
-        for (league in popularLeagues) {
-            try {
-                val response = apiService.getTeamsByLeague(
-                    leagueId = league.id,
-                    season = league.season
-                )
-
-                if (response.isSuccessful) {
-                    val teamExists = response.body()?.response?.any { it.team.id == teamId } == true
-                    if (teamExists) {
-                        return league
+        // Manuel takımlar için ID tabanlı mapping
+        return when (teamId.toInt()) {
+            in listOf(42, 49, 33, 50, 40, 47) -> LeagueInfo(39, "Premier League", "England", 2024)
+            in listOf(529, 541, 530) -> LeagueInfo(140, "La Liga", "Spain", 2024)
+            in listOf(157, 165) -> LeagueInfo(78, "Bundesliga", "Germany", 2024)
+            in listOf(496, 505, 489) -> LeagueInfo(135, "Serie A", "Italy", 2024)
+            85 -> LeagueInfo(61, "Ligue 1", "France", 2024)
+            in listOf(559, 562, 558, 564) -> LeagueInfo(203, "Super Lig", "Turkey", 2024)
+            else -> {
+                // API'den kontrol et
+                for (league in popularLeagues) {
+                    try {
+                        val response = apiService.getTeamsByLeague(leagueId = league.id, season = league.season)
+                        if (response.isSuccessful) {
+                            val teamExists = response.body()?.response?.any { it.team.id == teamId } == true
+                            if (teamExists) {
+                                return league
+                            }
+                        }
+                    } catch (e: Exception) {
+                        continue
                     }
                 }
-            } catch (e: Exception) {
-                continue
-            }
-        }
-        return null
-    }
-
-    // Takım önerileri getir (basitleştirilmiş)
-    suspend fun getTeamSuggestions(query: String): Result<List<String>> {
-        return withContext(Dispatchers.IO) {
-            try {
-                Log.d("FootballRepository", "Getting suggestions for: '$query'")
-
-                if (query.isEmpty()) {
-                    return@withContext Result.success(emptyList())
-                }
-
-                val suggestions = mutableSetOf<String>()
-
-                // Manuel takım isimlerinden önerileri topla
-                val manualTeams = listOf(
-                    "Arsenal", "Chelsea", "Manchester United", "Manchester City",
-                    "Liverpool", "Tottenham", "Barcelona", "Real Madrid",
-                    "Atletico Madrid", "Bayern Munich", "Borussia Dortmund",
-                    "Juventus", "Inter Milan", "AC Milan", "Paris Saint-Germain",
-                    "Galatasaray", "Fenerbahce", "Besiktas", "Trabzonspor"
-                )
-
-                manualTeams.forEach { teamName ->
-                    if (teamName.contains(query, ignoreCase = true)) {
-                        suggestions.add(teamName)
-                    }
-                }
-
-                // Cache'den önerileri topla
-                teamsCache.values.forEach { team ->
-                    if (team.name.contains(query, ignoreCase = true)) {
-                        suggestions.add(team.name)
-                    }
-                }
-
-                val sortedSuggestions = suggestions
-                    .sortedWith(compareBy<String> { suggestion ->
-                        if (suggestion.startsWith(query, ignoreCase = true)) 0 else 1
-                    }.thenBy { it })
-                    .take(5)
-
-                Log.d("FootballRepository", "Generated ${sortedSuggestions.size} suggestions: $sortedSuggestions")
-                Result.success(sortedSuggestions)
-
-            } catch (e: Exception) {
-                Log.e("FootballRepository", "Exception in getTeamSuggestions", e)
-                Result.failure(e)
+                null
             }
         }
     }
@@ -294,9 +307,6 @@ class FootballRepository @Inject constructor(
                 }
 
                 val allMatches = mutableListOf<Match>()
-                val today = Calendar.getInstance()
-                val startDate = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -7) } // Son 7 gün
-                val endDate = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, 7) } // Gelecek 7 gün
 
                 // Her favori takım için maçları getir
                 for (teamId in favoriteTeamIds) {
@@ -347,36 +357,32 @@ class FootballRepository @Inject constructor(
 
     // Takım ID'sine göre lige bul
     private suspend fun findTeamLeagueById(teamId: Long): LeagueInfo? {
-        // Önce cache'den kontrol et
-        teamsCache[teamId]?.let { cachedTeam ->
-            // Manuel takımlar için lige göre mapping
-            return when (teamId.toInt()) {
-                in 1..6 -> LeagueInfo(39, "Premier League", "England", 2024)
-                in 7..9 -> LeagueInfo(140, "La Liga", "Spain", 2024)
-                in 10..11 -> LeagueInfo(78, "Bundesliga", "Germany", 2024)
-                in 12..14 -> LeagueInfo(135, "Serie A", "Italy", 2024)
-                15 -> LeagueInfo(61, "Ligue 1", "France", 2024)
-                in 16..19 -> LeagueInfo(203, "Super Lig", "Turkey", 2024)
-                else -> popularLeagues.firstOrNull()
-            }
-        }
-
-        // API'den kontrol et
-        for (league in popularLeagues) {
-            try {
-                val response = apiService.getTeamsByLeague(leagueId = league.id, season = league.season)
-                if (response.isSuccessful) {
-                    val teamExists = response.body()?.response?.any { it.team.id == teamId } == true
-                    if (teamExists) {
-                        return league
+        // Önce manuel mapping
+        return when (teamId.toInt()) {
+            in listOf(42, 49, 33, 50, 40, 47) -> LeagueInfo(39, "Premier League", "England", 2024)
+            in listOf(529, 541, 530) -> LeagueInfo(140, "La Liga", "Spain", 2024)
+            in listOf(157, 165) -> LeagueInfo(78, "Bundesliga", "Germany", 2024)
+            in listOf(496, 505, 489) -> LeagueInfo(135, "Serie A", "Italy", 2024)
+            85 -> LeagueInfo(61, "Ligue 1", "France", 2024)
+            in listOf(559, 562, 558, 564) -> LeagueInfo(203, "Super Lig", "Turkey", 2024)
+            else -> {
+                // API'den kontrol et
+                for (league in popularLeagues) {
+                    try {
+                        val response = apiService.getTeamsByLeague(leagueId = league.id, season = league.season)
+                        if (response.isSuccessful) {
+                            val teamExists = response.body()?.response?.any { it.team.id == teamId } == true
+                            if (teamExists) {
+                                return league
+                            }
+                        }
+                    } catch (e: Exception) {
+                        continue
                     }
                 }
-            } catch (e: Exception) {
-                continue
+                popularLeagues.firstOrNull() // Fallback
             }
         }
-
-        return null
     }
 
     // Mevcut fonksiyonları güncelle
@@ -682,4 +688,21 @@ class FootballRepository @Inject constructor(
     private fun getStatValue(statistics: List<StatisticItem>, type: String): Any? {
         return statistics.find { it.type == type }?.value
     }
+
+    // Utility methods
+    fun getTeamsCacheSize(): Int = teamsCache.size
+
+    fun getSearchCacheSize(): Int = searchCache.size
+
+    fun clearAllCaches() {
+        teamsCache.clear()
+        leagueTeamsCache.clear()
+        searchCache.clear()
+        Log.d("FootballRepository", "All caches cleared")
+    }
+
+    // For debugging
+    fun getPopularLeagues(): List<LeagueInfo> = popularLeagues.toList()
+
+    fun isTeamCached(teamId: Long): Boolean = teamsCache.containsKey(teamId)
 }
