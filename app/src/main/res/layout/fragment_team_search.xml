@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="@font/mulish_bold"
-            android:text="Search Teams"
+            android:text="Takım Ara"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="18sp" />
@@ -58,7 +58,7 @@
         android:padding="8dp"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
-        android:text="5 favorite teams"
+        android:text="5 favori takım"
         android:textColor="@color/accent_color"
         android:textSize="12sp"
         android:visibility="gone"
@@ -89,10 +89,33 @@
             android:layout_margin="8dp"
             android:background="@android:color/transparent"
             android:iconifiedByDefault="false"
-            android:queryHint="Search for teams..."
+            android:queryHint="Takım adı yazın..."
             android:searchIcon="@drawable/vector_search" />
 
     </androidx.cardview.widget.CardView>
+
+    <!-- YENİ: Suggestions Container -->
+    <HorizontalScrollView
+        android:id="@+id/suggestions_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:scrollbars="none"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/search_card">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/suggestions_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:singleLine="true" />
+
+    </HorizontalScrollView>
 
     <!-- Loading Indicator -->
     <ProgressBar
@@ -103,7 +126,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/search_card" />
+        app:layout_constraintTop_toBottomOf="@id/suggestions_scroll" />
 
     <!-- Search Results -->
     <androidx.recyclerview.widget.RecyclerView
@@ -119,7 +142,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/search_card"
+        app:layout_constraintTop_toBottomOf="@id/suggestions_scroll"
         tools:listitem="@layout/item_team_search"
         tools:visibility="visible" />
 
@@ -134,7 +157,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/search_card">
+        app:layout_constraintTop_toBottomOf="@id/suggestions_scroll">
 
         <ImageView
             android:layout_width="64dp"
@@ -148,7 +171,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:fontFamily="@font/mulish_bold"
-            android:text="No teams found"
+            android:text="Takım bulunamadı"
             android:textColor="@android:color/darker_gray"
             android:textSize="16sp" />
 
@@ -156,7 +179,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/mulish_regular"
-            android:text="Try searching with different keywords"
+            android:text="Farklı anahtar kelimelerle deneyin"
             android:textColor="@android:color/darker_gray"
             android:textSize="14sp" />
 
@@ -172,7 +195,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/search_card">
+        app:layout_constraintTop_toBottomOf="@id/suggestions_scroll">
 
         <ImageView
             android:layout_width="80dp"
@@ -187,7 +210,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:fontFamily="@font/mulish_bold"
-            android:text="Search for your favorite teams"
+            android:text="Favori takımlarınızı arayın"
             android:textColor="@color/white"
             android:textSize="18sp" />
 
@@ -196,10 +219,28 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:fontFamily="@font/mulish_regular"
-            android:text="Find teams from major leagues around the world"
+            android:text="Dünyanın önde gelen liglerinden takımları bulun"
             android:textAlignment="center"
             android:textColor="@android:color/darker_gray"
             android:textSize="14sp" />
+
+        <!-- YENİ: Popular Teams Container -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:fontFamily="@font/mulish_bold"
+            android:text="Popüler Takımlar"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/popular_teams_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:chipSpacing="8dp"
+            app:lineSpacing="8dp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -215,7 +256,7 @@
                 android:padding="8dp"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:text="💡 Start typing to search..."
+                android:text="💡 Yazmaya başlayın, öneriler göreceksiniz..."
                 android:textColor="@color/accent_color"
                 android:textSize="12sp" />
 

@@ -17,6 +17,8 @@ import com.materialdesign.escorelive.presentation.adapters.StandingsAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.appcompat.widget.SearchView
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.chip.Chip
+import android.util.Log
 
 @AndroidEntryPoint
 class TeamSearchFragment : Fragment() {
@@ -33,34 +35,47 @@ class TeamSearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentTeamSearchBinding.inflate(inflater, container, false)
+        Log.d("TeamSearchFragment", "onCreateView called")
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d("TeamSearchFragment", "onViewCreated called")
 
         setupRecyclerView()
         setupSearchView()
+        setupSuggestions()
         observeViewModel()
         setupClickListeners()
 
         // Show initial state
         showInitialState()
+
+        // Test the search functionality
+        Log.d("TeamSearchFragment", "Setup complete")
     }
 
     private fun setupRecyclerView() {
+        Log.d("TeamSearchFragment", "setupRecyclerView called")
+
         teamSearchAdapter = TeamSearchAdapter(
             onTeamClick = { teamSearchResult ->
-                // Show team details or matches
-                Toast.makeText(context, "Selected: ${teamSearchResult.team.name}", Toast.LENGTH_SHORT).show()
-                // TODO: Navigate to team details/matches
-                // val action = TeamSearchFragmentDirections.actionTeamSearchToTeamDetail(teamSearchResult.team.id)
-                // findNavController().navigate(action)
+                Log.d("TeamSearchFragment", "Team clicked: ${teamSearchResult.team.name}")
+                Toast.makeText(
+                    context,
+                    "Selected: ${teamSearchResult.team.name} (${teamSearchResult.leagueName})",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                viewModel.addToSearchHistory(teamSearchResult.team.name)
             },
             onFavoriteClick = { teamSearchResult ->
+                Log.d("TeamSearchFragment", "Favorite clicked: ${teamSearchResult.team.name}")
                 handleFavoriteClick(teamSearchResult)
             },
             onStandingsClick = { teamSearchResult ->
+                Log.d("TeamSearchFragment", "Standings clicked: ${teamSearchResult.team.name}")
                 showStandingsBottomSheet(teamSearchResult)
             },
             isTeamFavorite = { teamId ->
@@ -75,31 +90,179 @@ class TeamSearchFragment : Fragment() {
         }
     }
 
+    private fun setupSearchView() {
+        Log.d("TeamSearchFragment", "setupSearchView called")
+
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                Log.d("TeamSearchFragment", "onQueryTextSubmit: '$query'")
+                query?.let { searchQuery ->
+                    if (searchQuery.isNotEmpty()) {
+                        viewModel.searchTeams(searchQuery)
+                        viewModel.addToSearchHistory(searchQuery)
+                        binding.clearSearchBtn.visibility = View.VISIBLE
+                        hideInitialState()
+                        hideSuggestions()
+                    }
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                Log.d("TeamSearchFragment", "onQueryTextChange: '$newText'")
+                return when {
+                    newText.isNullOrEmpty() -> {
+                        Log.d("TeamSearchFragment", "Query empty, clearing search")
+                        viewModel.clearSearch()
+                        binding.clearSearchBtn.visibility = View.GONE
+                        showInitialState()
+                        hideSuggestions()
+                        true
+                    }
+                    newText.length == 1 -> {
+                        Log.d("TeamSearchFragment", "First character, getting suggestions")
+                        viewModel.getSuggestions(newText)
+                        hideInitialState()
+                        showSuggestions()
+                        true
+                    }
+                    newText.length >= 2 -> {
+                        Log.d("TeamSearchFragment", "2+ characters, searching and getting suggestions")
+                        viewModel.searchTeams(newText)
+                        viewModel.getSuggestions(newText)
+                        binding.clearSearchBtn.visibility = View.VISIBLE
+                        hideInitialState()
+                        showSuggestions()
+                        true
+                    }
+                    else -> {
+                        hideInitialState()
+                        true
+                    }
+                }
+            }
+        })
+
+        // SearchView'a focus ver
+        binding.searchView.requestFocus()
+        binding.searchView.isIconified = false
+    }
+
+    private fun setupSuggestions() {
+        Log.d("TeamSearchFragment", "setupSuggestions called")
+        binding.suggestionsContainer.visibility = View.GONE
+    }
+
+    private fun observeViewModel() {
+        Log.d("TeamSearchFragment", "observeViewModel called")
+
+        viewModel.searchResults.observe(viewLifecycleOwner, Observer { teams ->
+            Log.d("TeamSearchFragment", "Search results received: ${teams.size} teams")
+            teamSearchAdapter.submitList(teams)
+
+            when {
+                !viewModel.hasSearchQuery() -> {
+                    Log.d("TeamSearchFragment", "No search query, showing initial state")
+                    showInitialState()
+                }
+                teams.isEmpty() -> {
+                    Log.d("TeamSearchFragment", "Empty results, showing empty state")
+                    showEmptyState()
+                }
+                else -> {
+                    Log.d("TeamSearchFragment", "Showing search results")
+                    showSearchResults()
+                }
+            }
+        })
+
+        viewModel.suggestions.observe(viewLifecycleOwner, Observer { suggestions ->
+            Log.d("TeamSearchFragment", "Suggestions received: ${suggestions.size} suggestions")
+            updateSuggestions(suggestions)
+        })
+
+        viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
+            Log.d("TeamSearchFragment", "Loading state: $isLoading")
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+
+            if (isLoading) {
+                hideAllStates()
+            }
+        })
+
+        viewModel.error.observe(viewLifecycleOwner, Observer { error ->
+            error?.let { errorMessage ->
+                Log.e("TeamSearchFragment", "Error received: $errorMessage")
+                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+                viewModel.clearError()
+            }
+        })
+
+        viewModel.selectedTeamStandings.observe(viewLifecycleOwner, Observer { standings ->
+            Log.d("TeamSearchFragment", "Standings received: ${standings.size} teams")
+        })
+    }
+
+    private fun updateSuggestions(suggestions: List<String>) {
+        Log.d("TeamSearchFragment", "updateSuggestions called with ${suggestions.size} suggestions")
+
+        binding.suggestionsContainer.removeAllViews()
+
+        if (suggestions.isNotEmpty()) {
+            Log.d("TeamSearchFragment", "Adding ${suggestions.size} suggestion chips")
+            suggestions.take(5).forEach { suggestion ->
+                val chip = Chip(requireContext()).apply {
+                    text = suggestion
+                    isClickable = true
+                    setChipBackgroundColorResource(R.color.card_background)
+                    setTextColor(resources.getColor(R.color.white, null))
+                    setOnClickListener {
+                        Log.d("TeamSearchFragment", "Suggestion chip clicked: $suggestion")
+                        binding.searchView.setQuery(suggestion, false)
+                        viewModel.searchTeamByExactName(suggestion)
+                        viewModel.addToSearchHistory(suggestion)
+                        hideSuggestions()
+                    }
+                }
+                binding.suggestionsContainer.addView(chip)
+            }
+            binding.suggestionsContainer.visibility = View.VISIBLE
+        } else {
+            Log.d("TeamSearchFragment", "No suggestions, hiding container")
+            binding.suggestionsContainer.visibility = View.GONE
+        }
+    }
+
+    private fun showSuggestions() {
+        if (binding.suggestionsContainer.childCount > 0) {
+            Log.d("TeamSearchFragment", "Showing suggestions")
+            binding.suggestionsContainer.visibility = View.VISIBLE
+        }
+    }
+
+    private fun hideSuggestions() {
+        Log.d("TeamSearchFragment", "Hiding suggestions")
+        binding.suggestionsContainer.visibility = View.GONE
+    }
+
     private fun handleFavoriteClick(teamSearchResult: TeamSearchResult) {
         val team = teamSearchResult.team
 
         if (viewModel.isTeamFavorite(team.id)) {
             viewModel.removeFromFavorites(team.id)
-            Toast.makeText(context, "${team.name} removed from favorites ❤️", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "${team.name} removed from favorites", Toast.LENGTH_SHORT).show()
         } else {
             viewModel.addToFavorites(team.id)
-            Toast.makeText(context, "${team.name} added to favorites 💚", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "${team.name} added to favorites", Toast.LENGTH_SHORT).show()
         }
 
-        // Update favorites counter
         updateFavoritesCounter()
-        // Refresh adapter to update heart icon
         teamSearchAdapter.notifyDataSetChanged()
     }
 
     private fun showStandingsBottomSheet(teamSearchResult: TeamSearchResult) {
-        // Load standings for the team's league
         viewModel.loadTeamStandings(teamSearchResult)
-
-        // Show loading toast
-        Toast.makeText(context, "Loading standings for ${teamSearchResult.leagueName}...", Toast.LENGTH_SHORT).show()
-
-        // Create and show bottom sheet
+        Toast.makeText(context, "Loading ${teamSearchResult.leagueName} standings...", Toast.LENGTH_SHORT).show()
         createStandingsBottomSheet(teamSearchResult)
     }
 
@@ -110,7 +273,6 @@ class TeamSearchFragment : Fragment() {
         standingsBottomSheet = BottomSheetDialog(requireContext()).apply {
             setContentView(bottomSheetView)
 
-            // Setup standings RecyclerView
             val standingsRecyclerView = bottomSheetView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.standings_recycler_view)
             val standingsAdapter = StandingsAdapter()
 
@@ -119,25 +281,20 @@ class TeamSearchFragment : Fragment() {
                 layoutManager = LinearLayoutManager(context)
             }
 
-            // Set title
             val titleView = bottomSheetView.findViewById<android.widget.TextView>(R.id.standings_title)
             titleView.text = "${teamSearchResult.leagueName} Standings"
 
-            // Set season
             val seasonView = bottomSheetView.findViewById<android.widget.TextView>(R.id.standings_season)
             seasonView.text = "Season ${teamSearchResult.season}"
 
-            // Close button
             val closeButton = bottomSheetView.findViewById<android.widget.ImageView>(R.id.close_button)
             closeButton.setOnClickListener {
                 dismiss()
             }
 
-            // Show the bottom sheet immediately
             show()
         }
 
-        // Observe standings data separately - not inside the bottom sheet
         observeStandingsForBottomSheet(teamSearchResult, standingsBottomSheet!!)
     }
 
@@ -153,7 +310,6 @@ class TeamSearchFragment : Fragment() {
 
                 standingsAdapter?.submitList(standings)
 
-                // Highlight selected team
                 val teamPosition = viewModel.getTeamPositionInStandings(teamSearchResult.team.id)
                 teamPosition?.let { position ->
                     val teamPositionView = bottomSheetView?.findViewById<android.widget.TextView>(R.id.team_position)
@@ -164,85 +320,9 @@ class TeamSearchFragment : Fragment() {
         }
     }
 
-    private fun setupSearchView() {
-        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                query?.let { searchQuery ->
-                    if (searchQuery.isNotEmpty()) {
-                        viewModel.searchTeams(searchQuery)
-                        binding.clearSearchBtn.visibility = View.VISIBLE
-                        hideInitialState()
-                    }
-                }
-                return true
-            }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                return when {
-                    newText.isNullOrEmpty() -> {
-                        viewModel.clearSearch()
-                        binding.clearSearchBtn.visibility = View.GONE
-                        showInitialState()
-                        true
-                    }
-                    newText.length >= 2 -> {
-                        viewModel.searchTeams(newText)
-                        binding.clearSearchBtn.visibility = View.VISIBLE
-                        hideInitialState()
-                        true
-                    }
-                    else -> {
-                        hideInitialState()
-                        true
-                    }
-                }
-            }
-        })
-
-        // Set focus to search view when fragment opens
-        binding.searchView.requestFocus()
-        binding.searchView.isIconified = false
-    }
-
-    private fun observeViewModel() {
-        viewModel.searchResults.observe(viewLifecycleOwner, Observer { teams ->
-            teamSearchAdapter.submitList(teams)
-
-            when {
-                !viewModel.hasSearchQuery() -> {
-                    showInitialState()
-                }
-                teams.isEmpty() -> {
-                    showEmptyState()
-                }
-                else -> {
-                    showSearchResults()
-                }
-            }
-        })
-
-        viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
-            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
-
-            if (isLoading) {
-                hideAllStates()
-            }
-        })
-
-        viewModel.error.observe(viewLifecycleOwner, Observer { error ->
-            error?.let { errorMessage ->
-                Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
-                viewModel.clearError()
-            }
-        })
-
-        viewModel.selectedTeamStandings.observe(viewLifecycleOwner, Observer { standings ->
-            // This observer will be used by the bottom sheet
-            // The actual handling is done in createStandingsBottomSheet method
-        })
-    }
-
     private fun setupClickListeners() {
+        Log.d("TeamSearchFragment", "setupClickListeners called")
+
         binding.backButton.setOnClickListener {
             findNavController().popBackStack()
         }
@@ -251,8 +331,38 @@ class TeamSearchFragment : Fragment() {
             clearSearch()
         }
 
-        // Update favorites counter initially
+        setupPopularTeamsChips()
         updateFavoritesCounter()
+
+        // TEST BUTTON - Debug için
+        binding.root.setOnLongClickListener {
+            Log.d("TeamSearchFragment", "Long click detected, testing search")
+            viewModel.testSearch()
+            Toast.makeText(context, "Testing search...", Toast.LENGTH_SHORT).show()
+            true
+        }
+    }
+
+    private fun setupPopularTeamsChips() {
+        Log.d("TeamSearchFragment", "setupPopularTeamsChips called")
+
+        val popularTeams = viewModel.getPopularTeams()
+
+        popularTeams.take(6).forEach { teamName ->
+            val chip = Chip(requireContext()).apply {
+                text = teamName
+                isClickable = true
+                setChipBackgroundColorResource(R.color.accent_color)
+                setTextColor(resources.getColor(R.color.white, null))
+                setOnClickListener {
+                    Log.d("TeamSearchFragment", "Popular team chip clicked: $teamName")
+                    binding.searchView.setQuery(teamName, false)
+                    viewModel.searchTeamByExactName(teamName)
+                    viewModel.addToSearchHistory(teamName)
+                }
+            }
+            binding.popularTeamsContainer.addView(chip)
+        }
     }
 
     private fun updateFavoritesCounter() {
@@ -262,13 +372,16 @@ class TeamSearchFragment : Fragment() {
     }
 
     private fun clearSearch() {
+        Log.d("TeamSearchFragment", "clearSearch called")
         binding.searchView.setQuery("", false)
         viewModel.clearSearch()
         binding.clearSearchBtn.visibility = View.GONE
         showInitialState()
+        hideSuggestions()
     }
 
     private fun showInitialState() {
+        Log.d("TeamSearchFragment", "showInitialState called")
         binding.initialStateLayout.visibility = View.VISIBLE
         binding.emptyStateLayout.visibility = View.GONE
         binding.searchResultsRecyclerView.visibility = View.GONE
@@ -276,15 +389,19 @@ class TeamSearchFragment : Fragment() {
     }
 
     private fun showEmptyState() {
+        Log.d("TeamSearchFragment", "showEmptyState called")
         binding.initialStateLayout.visibility = View.GONE
         binding.emptyStateLayout.visibility = View.VISIBLE
         binding.searchResultsRecyclerView.visibility = View.GONE
+        hideSuggestions()
     }
 
     private fun showSearchResults() {
+        Log.d("TeamSearchFragment", "showSearchResults called")
         binding.initialStateLayout.visibility = View.GONE
         binding.emptyStateLayout.visibility = View.GONE
         binding.searchResultsRecyclerView.visibility = View.VISIBLE
+        hideSuggestions()
     }
 
     private fun hideInitialState() {
@@ -295,30 +412,31 @@ class TeamSearchFragment : Fragment() {
         binding.initialStateLayout.visibility = View.GONE
         binding.emptyStateLayout.visibility = View.GONE
         binding.searchResultsRecyclerView.visibility = View.GONE
+        hideSuggestions()
     }
 
     override fun onResume() {
         super.onResume()
-        // Refresh favorite status when returning to fragment
+        Log.d("TeamSearchFragment", "onResume called")
         teamSearchAdapter.notifyDataSetChanged()
         updateFavoritesCounter()
     }
 
     override fun onPause() {
         super.onPause()
-        // Dismiss bottom sheet when leaving fragment
+        Log.d("TeamSearchFragment", "onPause called")
         standingsBottomSheet?.dismiss()
     }
 
     override fun onStop() {
         super.onStop()
-        // Clear any ongoing searches
+        Log.d("TeamSearchFragment", "onStop called")
         viewModel.clearSearch()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // Clean up resources
+        Log.d("TeamSearchFragment", "onDestroyView called")
         standingsBottomSheet?.dismiss()
         standingsBottomSheet = null
         _binding = null
