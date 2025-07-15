@@ -3,22 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/mainMenuFragment">
+    app:startDestination="@id/homeFragment">
 
-    <!-- Main Menu Fragment with Bottom Navigation -->
+    <!-- Home Fragment -->
     <fragment
-        android:id="@+id/mainMenuFragment"
+        android:id="@+id/homeFragment"
         android:name="com.materialdesign.escorelive.presentation.ui.main.HomeFragment"
-        android:label="Main Menu"
+        android:label="Home"
         tools:layout="@layout/fragment_main_menu">
 
-        <!-- Home Tab Actions -->
         <action
-            android:id="@+id/action_mainMenu_to_allMatches"
+            android:id="@+id/action_home_to_allMatches"
             app:destination="@id/allMatchesFragment" />
 
         <action
-            android:id="@+id/action_mainMenu_to_favoriteMatches"
+            android:id="@+id/action_home_to_favoriteMatches"
             app:destination="@id/allMatchesFragment">
             <argument
                 android:name="selectedDate"
@@ -27,11 +26,44 @@
         </action>
 
         <action
-            android:id="@+id/action_mainMenu_to_matchDetail"
+            android:id="@+id/action_home_to_matchDetail"
             app:destination="@id/matchDetailFragment" />
 
         <action
-            android:id="@+id/action_mainMenu_to_teamSearch"
+            android:id="@+id/action_home_to_teamSearch"
+            app:destination="@id/teamSearchFragment" />
+
+    </fragment>
+
+    <!-- Competition Fragment -->
+    <fragment
+        android:id="@+id/competitionFragment"
+        android:name="com.materialdesign.escorelive.presentation.ui.competition.CompetitionFragment"
+        android:label="Competition"
+        tools:layout="@layout/fragment_competition" />
+
+    <!-- News Fragment -->
+    <fragment
+        android:id="@+id/newsFragment"
+        android:name="com.materialdesign.escorelive.presentation.ui.news.NewsFragment"
+        android:label="News"
+        tools:layout="@layout/fragment_news">
+
+        <action
+            android:id="@+id/action_news_to_newsDetail"
+            app:destination="@id/newsDetailFragment" />
+
+    </fragment>
+
+    <!-- Account Fragment -->
+    <fragment
+        android:id="@+id/accountFragment"
+        android:name="com.materialdesign.escorelive.presentation.ui.account.AccountFragment"
+        android:label="Account"
+        tools:layout="@layout/fragment_account">
+
+        <action
+            android:id="@+id/action_account_to_teamSearch"
             app:destination="@id/teamSearchFragment" />
 
     </fragment>
@@ -72,25 +104,15 @@
         android:label="Team Search"
         tools:layout="@layout/fragment_team_search" />
 
-    <!-- Competition Fragment -->
+    <!-- News Detail Fragment (placeholder) -->
     <fragment
-        android:id="@+id/competitionFragment"
-        android:name="com.materialdesign.escorelive.presentation.ui.competition.CompetitionFragment"
-        android:label="Competition"
-        tools:layout="@layout/fragment_competition" />
-
-    <!-- News Fragment -->
-    <fragment
-        android:id="@+id/newsFragment"
+        android:id="@+id/newsDetailFragment"
         android:name="com.materialdesign.escorelive.presentation.ui.news.NewsFragment"
-        android:label="News"
-        tools:layout="@layout/fragment_news" />
+        android:label="News Detail">
 
-    <!-- Account Fragment -->
-    <fragment
-        android:id="@+id/accountFragment"
-        android:name="com.materialdesign.escorelive.presentation.ui.account.AccountFragment"
-        android:label="Account"
-        tools:layout="@layout/fragment_account" />
+        <argument
+            android:name="newsId"
+            app:argType="long" />
+    </fragment>
 
 </navigation>

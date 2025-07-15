@@ -68,11 +68,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupBottomNavigation() {
-        binding.bottomNavigation.selectedItemId = R.id.mainMenuFragment
+        binding.bottomNavigation.selectedItemId = R.id.homeFragment
 
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.mainMenuFragment -> {
+                R.id.homeFragment -> {
                     showHomeContent()
                     currentNavigationTab = NavigationTab.HOME
                     true
@@ -475,7 +475,6 @@ class HomeFragment : Fragment() {
 
             when (currentTab) {
                 MatchTab.FAVORITES -> {
-                    // Favorites için team search açalım - oradan favoriler yönetilebilir
                     try {
                         findNavController().navigate(R.id.teamSearchFragment)
                     } catch (e: Exception) {
