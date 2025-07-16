@@ -76,22 +76,22 @@ class FootballRepository @Inject constructor(
         LeagueInfo(286, "Thai League 1", "Thailand", 2024),
         LeagueInfo(289, "V.League 1", "Vietnam", 2024),
         LeagueInfo(299, "Malaysia Super League", "Malaysia", 2024),
-        LeagueInfo(188, "Liga 1", "Indonesia", 2024),
+        LeagueInfo(350, "Liga 1", "Indonesia", 2024),
 
         // Amerika
         LeagueInfo(253, "MLS", "USA", 2024),
         LeagueInfo(71, "Serie A", "Brazil", 2024),
         LeagueInfo(128, "Liga Profesional", "Argentina", 2024),
         LeagueInfo(265, "Primera División", "Chile", 2024),
-        LeagueInfo(239, "Liga MX", "Mexico", 2024),
-        LeagueInfo(274, "Primera A", "Colombia", 2024),
+        LeagueInfo(262, "Liga MX", "Mexico", 2024),
+        LeagueInfo(239, "Primera A", "Colombia", 2024),
 
         // Afrika
         LeagueInfo(307, "Premier Division", "South Africa", 2024),
         LeagueInfo(233, "Premier League", "Egypt", 2024),
         LeagueInfo(200, "Botola Pro", "Morocco", 2024),
         LeagueInfo(244, "Ligue 1", "Tunisia", 2024),
-        LeagueInfo(274, "Ligue 1", "Algeria", 2024),
+        LeagueInfo(187, "Ligue 1", "Algeria", 2024),
 
         // Uluslararası Turnuvalar
         LeagueInfo(2, "Champions League", "UEFA", 2024),
@@ -105,8 +105,8 @@ class FootballRepository @Inject constructor(
         // Azerbaycan ve çevre ülkeler
         LeagueInfo(342, "Premier League", "Azerbaijan", 2024),
         LeagueInfo(327, "Erovnuli Liga", "Georgia", 2024),
-        LeagueInfo(342, "Premier League", "Armenia", 2024),
-        LeagueInfo(327, "Superliga", "Kazakhstan", 2024),
+        LeagueInfo(419, "Premier League", "Armenia", 2024),
+        LeagueInfo(387, "Premier League", "Kazakhstan", 2024),
 
         // Türkiye çevre ligleri
         LeagueInfo(204, "TFF 1. Lig", "Turkey", 2024),
@@ -255,7 +255,7 @@ class FootballRepository @Inject constructor(
 
         // Eğer hala yeterli sonuç yoksa diğer liglerde de ara
         if (results.size < 10) {
-            for (league in popularLeagues.filter { it.id !in priorityLeagues }.take(10)) {
+            for (league in popularLeagues.filter { it.id !in priorityLeagues }.take(20)) {
                 try {
                     val response = apiService.getTeamsByLeague(leagueId = league.id, season = league.season)
                     if (response.isSuccessful) {
@@ -901,6 +901,107 @@ class FootballRepository @Inject constructor(
         return statistics.find { it.type == type }?.value
     }
 
+    // Favori takımların maçlarını getir (geçmiş, live, gelecek)
+    suspend fun getFavoriteTeamsMatches(favoriteTeamIds: Set<Long>): Result<List<Match>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                Log.d("FootballRepository", "Getting matches for ${favoriteTeamIds.size} favorite teams")
+
+                if (favoriteTeamIds.isEmpty()) {
+                    return@withContext Result.success(emptyList())
+                }
+
+                val allMatches = mutableListOf<Match>()
+
+                // Her favori takım için maçları getir
+                for (teamId in favoriteTeamIds) {
+                    try {
+                        // Takımın ligini bul
+                        val teamLeague = findTeamLeagueById(teamId)
+
+                        if (teamLeague != null) {
+                            // Bu ligdeki tüm maçları getir
+                            val leagueMatches = getMatchesByLeague(teamLeague.id, teamLeague.season)
+
+                            leagueMatches.onSuccess { matches ->
+                                // Sadece bu takımın maçlarını filtrele
+                                val teamMatches = matches.filter { match ->
+                                    match.homeTeam.id == teamId || match.awayTeam.id == teamId
+                                }
+                                allMatches.addAll(teamMatches)
+                                Log.d("FootballRepository", "Found ${teamMatches.size} matches for team $teamId")
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.w("FootballRepository", "Error getting matches for team $teamId", e)
+                        continue
+                    }
+                }
+
+                // Maçları tarihe göre sırala (son maçlar önce)
+                val sortedMatches = allMatches
+                    .distinctBy { it.id }
+                    .sortedWith(compareByDescending<Match> { match ->
+                        try {
+                            val inputFormat = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", java.util.Locale.getDefault())
+                            match.kickoffTime?.let { inputFormat.parse(it)?.time } ?: 0L
+                        } catch (e: Exception) {
+                            0L
+                        }
+                    })
+
+                Log.d("FootballRepository", "Total favorite team matches: ${sortedMatches.size}")
+                Result.success(sortedMatches)
+
+            } catch (e: Exception) {
+                Log.e("FootballRepository", "Exception in getFavoriteTeamsMatches", e)
+                Result.failure(e)
+            }
+        }
+    }
+
+    // Takım ID'sine göre lige bul
+    private suspend fun findTeamLeagueById(teamId: Long): LeagueInfo? {
+        // Önce manuel mapping
+        return when (teamId.toInt()) {
+            // Premier League
+            in listOf(42, 49, 33, 50, 40, 47, 66, 34, 51, 48) -> LeagueInfo(39, "Premier League", "England", 2024)
+            // La Liga
+            in listOf(529, 541, 530, 536, 532, 533, 531, 548) -> LeagueInfo(140, "La Liga", "Spain", 2024)
+            // Bundesliga
+            in listOf(157, 165, 173, 168, 161, 169) -> LeagueInfo(78, "Bundesliga", "Germany", 2024)
+            // Serie A
+            in listOf(496, 505, 489, 497, 492, 487, 499) -> LeagueInfo(135, "Serie A", "Italy", 2024)
+            // Ligue 1
+            in listOf(85, 79, 80, 82, 94) -> LeagueInfo(61, "Ligue 1", "France", 2024)
+            // Türkiye Super Lig
+            in listOf(559, 562, 558, 564, 612, 565, 567, 563, 579, 566, 568, 570, 571, 572, 573) -> LeagueInfo(203, "Super Lig", "Turkey", 2024)
+            // Azerbaycan Premier League
+            in listOf(553, 554, 555, 556, 557, 558, 559) -> LeagueInfo(342, "Premier League", "Azerbaijan", 2024)
+            // Eredivisie
+            in listOf(194, 195, 196) -> LeagueInfo(88, "Eredivisie", "Netherlands", 2024)
+            // Primeira Liga
+            in listOf(211, 212, 213) -> LeagueInfo(94, "Primeira Liga", "Portugal", 2024)
+            else -> {
+                // API'den kontrol et
+                for (league in popularLeagues) {
+                    try {
+                        val response = apiService.getTeamsByLeague(leagueId = league.id, season = league.season)
+                        if (response.isSuccessful) {
+                            val teamExists = response.body()?.response?.any { it.team.id == teamId } == true
+                            if (teamExists) {
+                                return league
+                            }
+                        }
+                    } catch (e: Exception) {
+                        continue
+                    }
+                }
+                popularLeagues.firstOrNull() // Fallback
+            }
+        }
+    }
+
     // Utility methods
     fun getTeamsCacheSize(): Int = teamsCache.size
 
@@ -917,183 +1018,4 @@ class FootballRepository @Inject constructor(
     fun getPopularLeagues(): List<LeagueInfo> = popularLeagues.toList()
 
     fun isTeamCached(teamId: Long): Boolean = teamsCache.containsKey(teamId)
-
-    // Test method for debugging
-    fun testFavoriteTeamMatches() {
-        Log.d("FootballRepository", "Testing favorite team matches with IDs: $favoriteTeamIds")
-        if (favoriteTeamIds.isNotEmpty()) {
-            loadFavoriteTeamMatches()
-        } else {
-            Log.d("FootballRepository", "No favorite teams to test")
-        }
-    }
-
-    // Method to manually add test favorite teams (for debugging)
-    fun addTestFavoriteTeams() {
-        favoriteTeamIds.addAll(listOf(42L, 529L, 559L)) // Arsenal, Barcelona, Galatasaray
-        Log.d("FootballRepository", "Added test favorite teams: $favoriteTeamIds")
-    }
-
-    // Get current matches by status
-    fun getCurrentLiveMatches(): List<Match> {
-        return emptyList() // Bu method gerçek implementation gerektirir
-    }
-
-    fun getCurrentUpcomingMatches(): List<Match> {
-        return emptyList() // Bu method gerçek implementation gerektirir
-    }
-
-    fun getCurrentFavoriteMatches(): List<Match> {
-        return emptyList() // Bu method gerçek implementation gerektirir
-    }
-
-    fun getCurrentTodayMatches(): List<Match> {
-        return emptyList() // Bu method gerçek implementation gerektirir
-    }
-
-    // Force refresh all data
-    fun forceRefreshAll() {
-        Log.d("FootballRepository", "Force refreshing all data")
-        clearAllCaches()
-    }
-
-    // Additional utility methods
-    fun hasAnyFavoriteTeams(): Boolean {
-        return favoriteTeamIds.isNotEmpty()
-    }
-
-    fun getFavoriteTeamsCount(): Int {
-        return favoriteTeamIds.size
-    }
-
-    fun getAllMatchesCount(): Int {
-        return 0 // Bu method gerçek implementation gerektirir
-    }
-
-    fun getFilteredMatchesCount(): Int {
-        return 0 // Bu method gerçek implementation gerektirir
-    }
-
-    // Get matches filtered by current tab selection
-    fun getMatchesForTab(tabType: String, date: String): Result<List<Match>> {
-        return when (tabType.lowercase()) {
-            "upcoming" -> getMatchesByDate(date)
-            "score", "live" -> getLiveMatches()
-            "favorites" -> getFavoriteTeamsMatches(setOf()) // Empty set for now
-            else -> getMatchesByDate(date)
-        }
-    }
-
-    private val favoriteTeamIds = mutableSetOf<Long>()
-
-    private fun loadFavoriteTeamMatches() {
-        // Bu method implementation gerektirir
-        Log.d("FootballRepository", "Loading favorite team matches")
-    }
-
-    override fun onCleared() {
-        Log.d("FootballRepository", "FootballRepository onCleared called")
-        // Repository cleared
-    }
 }
-return league
-}
-}
-} catch (e: Exception) {
-    continue
-}
-}
-null
-}
-}
-}
-
-// Favori takımların maçlarını getir (geçmiş, live, gelecek)
-suspend fun getFavoriteTeamsMatches(favoriteTeamIds: Set<Long>): Result<List<Match>> {
-    return withContext(Dispatchers.IO) {
-        try {
-            Log.d("FootballRepository", "Getting matches for ${favoriteTeamIds.size} favorite teams")
-
-            if (favoriteTeamIds.isEmpty()) {
-                return@withContext Result.success(emptyList())
-            }
-
-            val allMatches = mutableListOf<Match>()
-
-            // Her favori takım için maçları getir
-            for (teamId in favoriteTeamIds) {
-                try {
-                    // Takımın ligini bul
-                    val teamLeague = findTeamLeagueById(teamId)
-
-                    if (teamLeague != null) {
-                        // Bu ligdeki tüm maçları getir
-                        val leagueMatches = getMatchesByLeague(teamLeague.id, teamLeague.season)
-
-                        leagueMatches.onSuccess { matches ->
-                            // Sadece bu takımın maçlarını filtrele
-                            val teamMatches = matches.filter { match ->
-                                match.homeTeam.id == teamId || match.awayTeam.id == teamId
-                            }
-                            allMatches.addAll(teamMatches)
-                            Log.d("FootballRepository", "Found ${teamMatches.size} matches for team $teamId")
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.w("FootballRepository", "Error getting matches for team $teamId", e)
-                    continue
-                }
-            }
-
-            // Maçları tarihe göre sırala (son maçlar önce)
-            val sortedMatches = allMatches
-                .distinctBy { it.id }
-                .sortedWith(compareByDescending<Match> { match ->
-                    try {
-                        val inputFormat = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", java.util.Locale.getDefault())
-                        match.kickoffTime?.let { inputFormat.parse(it)?.time } ?: 0L
-                    } catch (e: Exception) {
-                        0L
-                    }
-                })
-
-            Log.d("FootballRepository", "Total favorite team matches: ${sortedMatches.size}")
-            Result.success(sortedMatches)
-
-        } catch (e: Exception) {
-            Log.e("FootballRepository", "Exception in getFavoriteTeamsMatches", e)
-            Result.failure(e)
-        }
-    }
-}
-
-// Takım ID'sine göre lige bul
-private suspend fun findTeamLeagueById(teamId: Long): LeagueInfo? {
-    // Önce manuel mapping
-    return when (teamId.toInt()) {
-        // Premier League
-        in listOf(42, 49, 33, 50, 40, 47, 66, 34, 51, 48) -> LeagueInfo(39, "Premier League", "England", 2024)
-        // La Liga
-        in listOf(529, 541, 530, 536, 532, 533, 531, 548) -> LeagueInfo(140, "La Liga", "Spain", 2024)
-        // Bundesliga
-        in listOf(157, 165, 173, 168, 161, 169) -> LeagueInfo(78, "Bundesliga", "Germany", 2024)
-        // Serie A
-        in listOf(496, 505, 489, 497, 492, 487, 499) -> LeagueInfo(135, "Serie A", "Italy", 2024)
-        // Ligue 1
-        in listOf(85, 79, 80, 82, 94) -> LeagueInfo(61, "Ligue 1", "France", 2024)
-        // Türkiye Super Lig
-        in listOf(559, 562, 558, 564, 612, 565, 567, 563, 579, 566, 568, 570, 571, 572, 573) -> LeagueInfo(203, "Super Lig", "Turkey", 2024)
-        // Azerbaycan Premier League
-        in listOf(553, 554, 555, 556, 557, 558, 559) -> LeagueInfo(342, "Premier League", "Azerbaijan", 2024)
-        // Eredivisie
-        in listOf(194, 195, 196) -> LeagueInfo(88, "Eredivisie", "Netherlands", 2024)
-        // Primeira Liga
-        in listOf(211, 212, 213) -> LeagueInfo(94, "Primeira Liga", "Portugal", 2024)
-        else -> {
-            // API'den kontrol et
-            for (league in popularLeagues) {
-                try {
-                    val response = apiService.getTeamsByLeague(leagueId = league.id, season = league.season)
-                    if (response.isSuccessful) {
-                        val teamExists = response.body()?.response?.any { it.team.id == teamId } == true
-                        if (teamExists) {

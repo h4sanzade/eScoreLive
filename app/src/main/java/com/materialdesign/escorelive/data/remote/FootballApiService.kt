@@ -15,7 +15,6 @@ interface FootballApiService {
         const val API_HOST = "v3.football.api-sports.io"
     }
 
-    // Mevcut endpoint'ler...
     @GET("fixtures")
     suspend fun getLiveFixtures(
         @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
@@ -83,7 +82,6 @@ interface FootballApiService {
         @Query("season") season: Int
     ): Response<StandingsResponse>
 
-    // YENİ: Takım arama endpoint'i
     @GET("teams")
     suspend fun searchTeams(
         @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
@@ -91,7 +89,6 @@ interface FootballApiService {
         @Query("search") searchQuery: String
     ): Response<TeamsSearchResponse>
 
-    // YENİ: Lige göre takımları getir
     @GET("teams")
     suspend fun getTeamsByLeague(
         @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
@@ -101,7 +98,6 @@ interface FootballApiService {
     ): Response<TeamsSearchResponse>
 }
 
-// YENİ: Takım arama için response data class'ları
 data class TeamsSearchResponse(
     val response: List<TeamSearchData>
 )
@@ -121,7 +117,6 @@ data class VenueData(
     val image: String?
 )
 
-// Mevcut response data class'ları...
 data class StandingsResponse(
     val response: List<StandingsData>
 )

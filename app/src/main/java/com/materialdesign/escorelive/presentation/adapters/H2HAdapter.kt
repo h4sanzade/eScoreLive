@@ -2,11 +2,14 @@ package com.materialdesign.escorelive.presentation.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.ItemH2hMatchBinding
 import com.materialdesign.escorelive.domain.model.Match
@@ -28,6 +31,28 @@ class H2HAdapter : ListAdapter<Match, H2HAdapter.H2HViewHolder>(H2HDiffCallback(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(match: Match) = with(binding) {
+            // Format and display match date
+            displayMatchDate(match)
+
+            // Team names and logos
+            homeTeamName.text = match.homeTeam.name
+            awayTeamName.text = match.awayTeam.name
+
+            loadImage(homeTeamLogo, match.homeTeam.logo)
+            loadImage(awayTeamLogo, match.awayTeam.logo)
+
+            // Scores
+            homeScore.text = match.homeScore.toString()
+            awayScore.text = match.awayScore.toString()
+
+            // League name
+            leagueName.text = match.league.name
+
+            // Highlight winner with animation
+            highlightWinner(match)
+        }
+
+        private fun displayMatchDate(match: Match) = with(binding) {
             val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
             val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
 
@@ -41,41 +66,78 @@ class H2HAdapter : ListAdapter<Match, H2HAdapter.H2HViewHolder>(H2HDiffCallback(
             } catch (e: Exception) {
                 matchDate.text = "Date N/A"
             }
+        }
 
-            homeTeamName.text = match.homeTeam.name
-            awayTeamName.text = match.awayTeam.name
-
-            homeScore.text = match.homeScore.toString()
-            awayScore.text = match.awayScore.toString()
-
-            leagueName.text = match.league.name
-
-            // Load logos
-            Glide.with(root.context)
-                .load(match.homeTeam.logo)
-                .placeholder(R.drawable.ic_placeholder)
-                .into(homeTeamLogo)
-
-            Glide.with(root.context)
-                .load(match.awayTeam.logo)
-                .placeholder(R.drawable.ic_placeholder)
-                .into(awayTeamLogo)
-
-            // Highlight winner
+        private fun highlightWinner(match: Match) = with(binding) {
             when {
                 match.homeScore > match.awayScore -> {
+                    // Home team won
                     homeScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_green_dark))
                     awayScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
+
+                    // Add winner badge
+                    homeTeamName.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_green_dark))
+                    awayTeamName.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
+
+                    // Subtle animation for winner
+                    homeScore.animate()
+                        .scaleX(1.15f)
+                        .scaleY(1.15f)
+                        .setDuration(200)
+                        .withEndAction {
+                            homeScore.animate()
+                                .scaleX(1.0f)
+                                .scaleY(1.0f)
+                                .setDuration(200)
+                                .start()
+                        }
+                        .start()
                 }
                 match.awayScore > match.homeScore -> {
+                    // Away team won
                     awayScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_green_dark))
                     homeScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
+
+                    // Add winner badge
+                    awayTeamName.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_green_dark))
+                    homeTeamName.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
+
+                    // Subtle animation for winner
+                    awayScore.animate()
+                        .scaleX(1.15f)
+                        .scaleY(1.15f)
+                        .setDuration(200)
+                        .withEndAction {
+                            awayScore.animate()
+                                .scaleX(1.0f)
+                                .scaleY(1.0f)
+                                .setDuration(200)
+                                .start()
+                        }
+                        .start()
                 }
                 else -> {
+                    // Draw
                     homeScore.setTextColor(ContextCompat.getColor(root.context, R.color.white))
                     awayScore.setTextColor(ContextCompat.getColor(root.context, R.color.white))
+                    homeTeamName.setTextColor(ContextCompat.getColor(root.context, R.color.white))
+                    awayTeamName.setTextColor(ContextCompat.getColor(root.context, R.color.white))
                 }
             }
+        }
+
+        private fun loadImage(imageView: ImageView, url: String?) {
+            val requestOptions = RequestOptions()
+                .placeholder(R.drawable.ic_placeholder)
+                .error(R.drawable.ic_error)
+                .centerCrop()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .timeout(10000)
+
+            Glide.with(imageView.context)
+                .load(url)
+                .apply(requestOptions)
+                .into(imageView)
         }
     }
 
