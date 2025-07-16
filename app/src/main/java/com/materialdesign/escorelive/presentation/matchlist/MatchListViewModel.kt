@@ -89,6 +89,10 @@ class MatchListViewModel @Inject constructor(
                         allMatchesList = matches.filter { it.isUpcoming }
                         Log.d("MatchListViewModel", "Loaded ${allMatchesList.size} upcoming matches for future date: $date")
                     }
+                    else -> {
+                        // FAVORITES ve diğer durumlar için
+                        Log.d("MatchListViewModel", "Other display type: $displayType")
+                    }
                 }
 
                 allMatchesList = sortMatchesByPriority(allMatchesList)
@@ -177,7 +181,7 @@ class MatchListViewModel @Inject constructor(
                 DisplayType.PAST -> {
                     allMatchesList // All are finished already
                 }
-                DisplayType.TODAY -> {
+                DisplayType.TODAY, DisplayType.FAVORITES -> {
                     when (filter) {
                         MatchFilter.ALL -> allMatchesList
                         MatchFilter.LIVE -> allMatchesList.filter { it.isLive }

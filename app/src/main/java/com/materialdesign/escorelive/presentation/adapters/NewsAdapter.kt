@@ -3,19 +3,20 @@ package com.materialdesign.escorelive.presentation.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.ItemNewsBinding
 import com.materialdesign.escorelive.presentation.ui.news.NewsItem
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.abs
 
 class NewsAdapter(
     private val onNewsClick: (NewsItem) -> Unit
@@ -39,7 +40,7 @@ class NewsAdapter(
             newsSummary.text = newsItem.summary
             newsCategory.text = newsItem.category
 
-            // Load image
+            // Load image with fallback
             loadNewsImage(newsItem.imageUrl)
 
             // Set publish date with relative time
@@ -57,41 +58,61 @@ class NewsAdapter(
             // Handle trending indicator
             handleTrendingIndicator(newsItem)
 
-            // Click listener
-            root.setOnClickListener { onNewsClick(newsItem) }
+            // Click listener with ripple effect
+            root.setOnClickListener {
+                addClickAnimation()
+                onNewsClick(newsItem)
+            }
         }
 
         private fun loadNewsImage(imageUrl: String) = with(binding) {
-            Glide.with(root.context)
-                .load(imageUrl)
+            val requestOptions = RequestOptions()
                 .placeholder(R.drawable.ic_placeholder)
                 .error(R.drawable.ic_news)
-                .transition(DrawableTransitionOptions.withCrossFade())
+                .centerCrop()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .timeout(10000)
+
+            Glide.with(root.context)
+                .load(imageUrl)
+                .apply(requestOptions)
                 .into(newsImage)
         }
 
         private fun setupCategoryStyle(category: String) = with(binding) {
-            when (category.lowercase()) {
+            val (backgroundRes, textColorRes) = when (category.lowercase()) {
                 "transfer news", "transfers" -> {
-                    newsCategory.setBackgroundResource(R.drawable.indicator_background)
-                    newsCategory.setTextColor(ContextCompat.getColor(root.context, R.color.accent_color))
+                    Pair(R.drawable.indicator_background, R.color.accent_color)
                 }
                 "match reports", "matches" -> {
-                    newsCategory.setBackgroundResource(R.drawable.live_indicator_bg)
-                    newsCategory.setTextColor(ContextCompat.getColor(root.context, R.color.white))
+                    Pair(R.drawable.live_indicator_bg, R.color.white)
                 }
                 "injury news", "injuries" -> {
-                    newsCategory.setBackgroundResource(R.drawable.upcoming_indicator_bg)
-                    newsCategory.setTextColor(ContextCompat.getColor(root.context, R.color.white))
+                    Pair(R.drawable.upcoming_indicator_bg, R.color.white)
                 }
                 "breaking news" -> {
-                    newsCategory.setBackgroundResource(R.drawable.live_indicator_bg)
-                    newsCategory.setTextColor(ContextCompat.getColor(root.context, R.color.white))
+                    Pair(R.drawable.live_indicator_bg, R.color.white)
                 }
                 else -> {
-                    newsCategory.setBackgroundResource(R.drawable.filter_unselected_bg)
-                    newsCategory.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
+                    Pair(R.drawable.filter_unselected_bg, android.R.color.darker_gray)
                 }
+            }
+
+            newsCategory.setBackgroundResource(backgroundRes)
+            newsCategory.setTextColor(ContextCompat.getColor(root.context, textColorRes))
+
+            // Add pulse animation for breaking news
+            if (category.contains("breaking", ignoreCase = true)) {
+                newsCategory.animate()
+                    .alpha(0.7f)
+                    .setDuration(1000)
+                    .withEndAction {
+                        newsCategory.animate()
+                            .alpha(1.0f)
+                            .setDuration(1000)
+                            .start()
+                    }
+                    .start()
             }
         }
 
@@ -101,15 +122,40 @@ class NewsAdapter(
                     isRecentNews(newsItem.publishDate, 2) // Last 2 hours
 
             breakingOverlay.visibility = if (isBreaking) View.VISIBLE else View.GONE
+
+            // Add urgent animation for breaking news
+            if (isBreaking) {
+                breakingOverlay.animate()
+                    .scaleX(1.05f)
+                    .scaleY(1.05f)
+                    .setDuration(500)
+                    .withEndAction {
+                        breakingOverlay.animate()
+                            .scaleX(1.0f)
+                            .scaleY(1.0f)
+                            .setDuration(500)
+                            .start()
+                    }
+                    .start()
+            }
         }
 
         private fun handleTrendingIndicator(newsItem: NewsItem) = with(binding) {
             // Show trending for transfer news or recent popular news
             val isTrending = newsItem.category.contains("transfer", ignoreCase = true) ||
                     newsItem.title.contains("major", ignoreCase = true) ||
-                    newsItem.title.contains("exclusive", ignoreCase = true)
+                    newsItem.title.contains("exclusive", ignoreCase = true) ||
+                    newsItem.title.contains("confirmed", ignoreCase = true)
 
             trendingIndicator.visibility = if (isTrending) View.VISIBLE else View.GONE
+
+            // Add trending animation
+            if (isTrending) {
+                trendingIndicator.animate()
+                    .rotationBy(360f)
+                    .setDuration(2000)
+                    .start()
+            }
         }
 
         private fun getRelativeTime(publishDate: String): String {
@@ -126,11 +172,13 @@ class NewsAdapter(
                 } ?: return publishDate
 
                 val diffInMillis = now.time - date.time
+                val diffInMinutes = diffInMillis / (1000 * 60)
                 val diffInHours = diffInMillis / (1000 * 60 * 60)
                 val diffInDays = diffInMillis / (1000 * 60 * 60 * 24)
 
                 when {
-                    diffInHours < 1 -> "Just now"
+                    diffInMinutes < 1 -> "Just now"
+                    diffInMinutes < 60 -> "${diffInMinutes}m ago"
                     diffInHours < 24 -> "${diffInHours}h ago"
                     diffInDays < 7 -> "${diffInDays}d ago"
                     else -> SimpleDateFormat("dd MMM", Locale.getDefault()).format(date)
@@ -157,6 +205,21 @@ class NewsAdapter(
             val wordsPerMinute = 200 // Average reading speed
             val readTimeMinutes = kotlin.math.max(1, wordCount / wordsPerMinute)
             return "${readTimeMinutes} min read"
+        }
+
+        private fun addClickAnimation() = with(binding) {
+            root.animate()
+                .scaleX(0.95f)
+                .scaleY(0.95f)
+                .setDuration(100)
+                .withEndAction {
+                    root.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .setDuration(100)
+                        .start()
+                }
+                .start()
         }
     }
 

@@ -2,12 +2,14 @@ package com.materialdesign.escorelive.presentation.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.materialdesign.escorelive.domain.model.Match
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.ItemAllMatchesBinding
@@ -31,78 +33,165 @@ class MatchListAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(match: Match) = with(binding) {
+            // League info
             leagueName.text = match.league.name
             loadImage(leagueLogo, match.league.logo)
 
+            // Team info
             homeTeamName.text = match.homeTeam.name
             awayTeamName.text = match.awayTeam.name
             loadImage(homeTeamLogo, match.homeTeam.logo)
             loadImage(awayTeamLogo, match.awayTeam.logo)
 
+            // Match time display
             matchTime.text = match.matchMinute
 
-            when {
-                match.isLive -> {
-                    liveIndicator.visibility = android.view.View.VISIBLE
-                    liveIndicator.setBackgroundResource(R.drawable.live_indicator_bg)
-                    liveText.text = "LIVE"
-                    liveText.setTextColor(ContextCompat.getColor(root.context, android.R.color.white))
+            // Setup match status and appearance
+            setupMatchStatus(match)
 
-                    homeScore.visibility = android.view.View.VISIBLE
-                    awayScore.visibility = android.view.View.VISIBLE
-                    homeScore.text = match.homeScore.toString()
-                    awayScore.text = match.awayScore.toString()
-
-                    matchTime.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_red_light))
-                    statusCard.setCardBackgroundColor(ContextCompat.getColor(root.context, R.color.live_match_bg))
-                }
-                match.isFinished -> {
-                    liveIndicator.visibility = android.view.View.VISIBLE
-                    liveIndicator.setBackgroundResource(R.drawable.finished_indicator_bg)
-                    liveText.text = "FT"
-                    liveText.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
-
-                    homeScore.visibility = android.view.View.VISIBLE
-                    awayScore.visibility = android.view.View.VISIBLE
-                    homeScore.text = match.homeScore.toString()
-                    awayScore.text = match.awayScore.toString()
-
-                    matchTime.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
-                    statusCard.setCardBackgroundColor(ContextCompat.getColor(root.context, R.color.finished_match_bg))
-                }
-                match.isUpcoming -> {
-                    liveIndicator.visibility = android.view.View.VISIBLE
-                    liveIndicator.setBackgroundResource(R.drawable.upcoming_indicator_bg)
-                    liveText.text = "VS"
-                    liveText.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_blue_light))
-
-                    homeScore.visibility = android.view.View.GONE
-                    awayScore.visibility = android.view.View.GONE
-
-                    matchTime.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_blue_light))
-                    statusCard.setCardBackgroundColor(ContextCompat.getColor(root.context, R.color.upcoming_match_bg))
-                }
-                else -> {
-                    liveIndicator.visibility = android.view.View.GONE
-                    homeScore.visibility = android.view.View.VISIBLE
-                    awayScore.visibility = android.view.View.VISIBLE
-
-                    if (match.homeScore > 0 || match.awayScore > 0) {
-                        homeScore.text = match.homeScore.toString()
-                        awayScore.text = match.awayScore.toString()
-                    } else {
-                        homeScore.visibility = android.view.View.GONE
-                        awayScore.visibility = android.view.View.GONE
-                    }
-
-                    matchTime.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
-                    statusCard.setCardBackgroundColor(ContextCompat.getColor(root.context, R.color.card_background))
-                }
-            }
-
+            // Display match date
             displayMatchDate(match)
 
+            // Click listener
             root.setOnClickListener { onMatchClick(match) }
+        }
+
+        private fun setupMatchStatus(match: Match) = with(binding) {
+            when {
+                match.isLive -> {
+                    setupLiveStatus(match)
+                }
+                match.isFinished -> {
+                    setupFinishedStatus(match)
+                }
+                match.isUpcoming -> {
+                    setupUpcomingStatus(match)
+                }
+                else -> {
+                    setupDefaultStatus(match)
+                }
+            }
+        }
+
+        private fun setupLiveStatus(match: Match) = with(binding) {
+            liveIndicator.visibility = android.view.View.VISIBLE
+            liveIndicator.setBackgroundResource(R.drawable.live_indicator_bg)
+            liveText.text = "LIVE"
+            liveText.setTextColor(ContextCompat.getColor(root.context, android.R.color.white))
+
+            homeScore.visibility = android.view.View.VISIBLE
+            awayScore.visibility = android.view.View.VISIBLE
+            homeScore.text = match.homeScore.toString()
+            awayScore.text = match.awayScore.toString()
+
+            matchTime.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_red_light))
+            statusCard.setCardBackgroundColor(ContextCompat.getColor(root.context, R.color.live_match_bg))
+
+            // Add pulsing effect for live matches
+            liveIndicator.animate()
+                .alpha(0.5f)
+                .setDuration(1000)
+                .withEndAction {
+                    liveIndicator.animate()
+                        .alpha(1.0f)
+                        .setDuration(1000)
+                        .start()
+                }
+                .start()
+        }
+
+        private fun setupFinishedStatus(match: Match) = with(binding) {
+            liveIndicator.visibility = android.view.View.VISIBLE
+            liveIndicator.setBackgroundResource(R.drawable.finished_indicator_bg)
+            liveText.text = "FT"
+            liveText.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
+
+            homeScore.visibility = android.view.View.VISIBLE
+            awayScore.visibility = android.view.View.VISIBLE
+            homeScore.text = match.homeScore.toString()
+            awayScore.text = match.awayScore.toString()
+
+            matchTime.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
+            statusCard.setCardBackgroundColor(ContextCompat.getColor(root.context, R.color.finished_match_bg))
+
+            // Highlight winner
+            highlightWinner(match)
+        }
+
+        private fun setupUpcomingStatus(match: Match) = with(binding) {
+            liveIndicator.visibility = android.view.View.VISIBLE
+            liveIndicator.setBackgroundResource(R.drawable.upcoming_indicator_bg)
+            liveText.text = "VS"
+            liveText.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_blue_light))
+
+            homeScore.visibility = android.view.View.GONE
+            awayScore.visibility = android.view.View.GONE
+
+            matchTime.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_blue_light))
+            statusCard.setCardBackgroundColor(ContextCompat.getColor(root.context, R.color.upcoming_match_bg))
+        }
+
+        private fun setupDefaultStatus(match: Match) = with(binding) {
+            liveIndicator.visibility = android.view.View.GONE
+            homeScore.visibility = android.view.View.VISIBLE
+            awayScore.visibility = android.view.View.VISIBLE
+
+            if (match.homeScore > 0 || match.awayScore > 0) {
+                homeScore.text = match.homeScore.toString()
+                awayScore.text = match.awayScore.toString()
+                highlightWinner(match)
+            } else {
+                homeScore.visibility = android.view.View.GONE
+                awayScore.visibility = android.view.View.GONE
+            }
+
+            matchTime.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
+            statusCard.setCardBackgroundColor(ContextCompat.getColor(root.context, R.color.card_background))
+        }
+
+        private fun highlightWinner(match: Match) = with(binding) {
+            when {
+                match.homeScore > match.awayScore -> {
+                    homeScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_green_dark))
+                    awayScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
+
+                    // Add subtle glow effect for winner
+                    homeScore.animate()
+                        .scaleX(1.1f)
+                        .scaleY(1.1f)
+                        .setDuration(300)
+                        .withEndAction {
+                            homeScore.animate()
+                                .scaleX(1.0f)
+                                .scaleY(1.0f)
+                                .setDuration(300)
+                                .start()
+                        }
+                        .start()
+                }
+                match.awayScore > match.homeScore -> {
+                    awayScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_green_dark))
+                    homeScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
+
+                    // Add subtle glow effect for winner
+                    awayScore.animate()
+                        .scaleX(1.1f)
+                        .scaleY(1.1f)
+                        .setDuration(300)
+                        .withEndAction {
+                            awayScore.animate()
+                                .scaleX(1.0f)
+                                .scaleY(1.0f)
+                                .setDuration(300)
+                                .start()
+                        }
+                        .start()
+                }
+                else -> {
+                    homeScore.setTextColor(ContextCompat.getColor(root.context, R.color.white))
+                    awayScore.setTextColor(ContextCompat.getColor(root.context, R.color.white))
+                }
+            }
         }
 
         private fun displayMatchDate(match: Match) = with(binding) {
@@ -129,7 +218,7 @@ class MatchListAdapter(
                         binding.matchDate.text = "$dateText, ${timeFormat.format(it)}"
                     }
                 } catch (e: Exception) {
-                    matchDate.text = match.kickoffTimeFormatted ?: "TBD"
+                    binding.matchDate.text = match.kickoffTimeFormatted ?: "TBD"
                 }
             } ?: run {
                 binding.matchDate.text = "TBD"
@@ -153,12 +242,17 @@ class MatchListAdapter(
             return isSameDay(tomorrow, date)
         }
 
-        private fun loadImage(imageView: android.widget.ImageView, url: String) {
-            Glide.with(imageView.context)
-                .load(url)
+        private fun loadImage(imageView: ImageView, url: String?) {
+            val requestOptions = RequestOptions()
                 .placeholder(R.drawable.ic_placeholder)
                 .error(R.drawable.ic_error)
-                .transition(DrawableTransitionOptions.withCrossFade())
+                .centerCrop()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .timeout(10000)
+
+            Glide.with(imageView.context)
+                .load(url)
+                .apply(requestOptions)
                 .into(imageView)
         }
     }
