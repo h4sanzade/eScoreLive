@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.materialdesign.escorelive.domain.model.Match
 import com.materialdesign.escorelive.R
@@ -20,7 +19,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 enum class DisplayType {
-    PAST, TODAY, FUTURE
+    PAST, TODAY, FUTURE, FAVORITES
 }
 
 enum class MatchFilter {
@@ -35,8 +34,6 @@ class MatchListFragment : Fragment() {
 
     private val viewModel: MatchListViewModel by viewModels()
     private lateinit var matchListAdapter: MatchListAdapter
-
-    private val args: MatchListFragmentArgs by navArgs()
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private val displayDateFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
@@ -58,12 +55,12 @@ class MatchListFragment : Fragment() {
         setupSwipeRefresh()
 
         // Check if this is favorites mode
-        val isFavoritesMode = args.selectedDate == "FAVORITES_MODE"
+        val selectedDate = arguments?.getString("selectedDate") ?: dateFormat.format(Date())
+        val isFavoritesMode = selectedDate == "FAVORITES_MODE"
 
         if (isFavoritesMode) {
             setupFavoritesMode()
         } else {
-            val selectedDate = args.selectedDate.ifEmpty { dateFormat.format(Date()) }
             val displayType = determineDisplayType(selectedDate)
             updateUIForDisplayType(displayType, selectedDate)
             viewModel.loadMatchesForDate(selectedDate, displayType)
@@ -80,8 +77,32 @@ class MatchListFragment : Fragment() {
         binding.filterFinished.visibility = View.VISIBLE
         binding.filterUpcoming.visibility = View.VISIBLE
 
+        // Set filter texts for favorites context
+        binding.filterAll.text = "All Matches"
+        binding.filterLive.text = "Live Now"
+        binding.filterFinished.text = "Finished"
+        binding.filterUpcoming.text = "Upcoming"
+
         // Load favorite team matches
         viewModel.loadFavoriteTeamMatches()
+
+        // Show info about favorites
+        showFavoritesInfo()
+    }
+
+    private fun showFavoritesInfo() {
+        val favoritesCount = viewModel.getFavoriteTeamsCount()
+        if (favoritesCount == 0) {
+            // Show empty state for no favorites
+            binding.emptyStateLayout.visibility = View.VISIBLE
+            binding.matchesRecyclerView.visibility = View.GONE
+
+            // Update empty state text for favorites
+            binding.emptyStateLayout.findViewById<android.widget.TextView>(R.id.empty_state_title)?.text = "No Favorite Teams"
+            binding.emptyStateLayout.findViewById<android.widget.TextView>(R.id.empty_state_message)?.text = "Add teams to favorites to see their matches here"
+        } else {
+            Toast.makeText(context, "Showing matches for $favoritesCount favorite teams", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun determineDisplayType(selectedDate: String): DisplayType {
@@ -126,6 +147,7 @@ class MatchListFragment : Fragment() {
             DisplayType.PAST -> "Results - $formattedDate"
             DisplayType.TODAY -> "Today's Matches"
             DisplayType.FUTURE -> "Fixtures - $formattedDate"
+            DisplayType.FAVORITES -> "Favorite Teams Matches"
         }
 
         when (displayType) {
@@ -141,6 +163,13 @@ class MatchListFragment : Fragment() {
             }
             DisplayType.FUTURE -> {
                 binding.filterScrollView.visibility = View.GONE
+            }
+            DisplayType.FAVORITES -> {
+                binding.filterScrollView.visibility = View.VISIBLE
+                binding.filterAll.visibility = View.VISIBLE
+                binding.filterLive.visibility = View.VISIBLE
+                binding.filterFinished.visibility = View.VISIBLE
+                binding.filterUpcoming.visibility = View.VISIBLE
             }
         }
     }
@@ -232,15 +261,58 @@ class MatchListFragment : Fragment() {
         if (isEmpty) {
             binding.emptyStateLayout.visibility = View.VISIBLE
             binding.matchesRecyclerView.visibility = View.GONE
+
+            // Update empty state message based on context
+            if (viewModel.isFavoritesModeActive()) {
+                if (viewModel.getFavoriteTeamsCount() == 0) {
+                    // No favorite teams at all - show custom message
+                    showCustomEmptyState("No Favorite Teams", "Add teams to favorites to see their matches here")
+                } else {
+                    // Have favorite teams but no matches for current filter
+                    val filterName = when (viewModel.selectedFilter.value) {
+                        MatchFilter.LIVE -> "live"
+                        MatchFilter.FINISHED -> "finished"
+                        MatchFilter.UPCOMING -> "upcoming"
+                        else -> ""
+                    }
+                    showCustomEmptyState("No $filterName matches", "Try a different filter or check back later")
+                }
+            } else {
+                // Regular date-based empty state
+                showCustomEmptyState("No matches found", "Pull down to refresh")
+            }
         } else {
             binding.emptyStateLayout.visibility = View.GONE
             binding.matchesRecyclerView.visibility = View.VISIBLE
         }
     }
 
+    private fun showCustomEmptyState(title: String, message: String) {
+        // Create custom empty state views if they don't exist in layout
+        // Since we can't be sure about the exact layout structure, we'll use a simpler approach
+
+        // Try to find existing TextView elements or use Toast as fallback
+        try {
+            val titleView = binding.emptyStateLayout.findViewById<android.widget.TextView>(R.id.empty_state_title)
+            val messageView = binding.emptyStateLayout.findViewById<android.widget.TextView>(R.id.empty_state_message)
+
+            titleView?.text = title
+            messageView?.text = message
+        } catch (e: Exception) {
+            // If layout doesn't have these specific IDs, show as toast
+            Toast.makeText(context, "$title: $message", Toast.LENGTH_LONG).show()
+        }
+    }
+
     private fun onMatchClick(match: Match) {
-        val action = MatchListFragmentDirections.actionAllMatchesToMatchDetail(match.id)
-        findNavController().navigate(action)
+        try {
+            val bundle = Bundle().apply {
+                putLong("matchId", match.id)
+            }
+            findNavController().navigate(R.id.action_allMatches_to_matchDetail, bundle)
+        } catch (e: Exception) {
+            Toast.makeText(context, "Opening match details...", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroyView() {

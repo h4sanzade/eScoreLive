@@ -91,20 +91,6 @@
                 android:layout_marginEnd="8dp" />
 
             <TextView
-                android:id="@+id/filter_today"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/today"
-                android:textSize="14sp"
-                android:textColor="@color/white"
-                android:fontFamily="@font/mulish_bold"
-                android:background="@drawable/filter_unselected_bg"
-                android:padding="12dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_marginEnd="8dp" />
-
-            <TextView
                 android:id="@+id/filter_finished"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -159,7 +145,7 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <!-- Empty State -->
+    <!-- Empty State Layout -->
     <LinearLayout
         android:id="@+id/empty_state_layout"
         android:layout_width="wrap_content"
@@ -180,6 +166,7 @@
             android:alpha="0.5" />
 
         <TextView
+            android:id="@+id/empty_state_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/no_matches_found"
@@ -189,12 +176,15 @@
             android:layout_marginBottom="8dp" />
 
         <TextView
+            android:id="@+id/empty_state_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pull_down_to_refresh"
             android:textSize="14sp"
             android:textColor="@android:color/darker_gray"
-            android:fontFamily="@font/mulish_regular" />
+            android:fontFamily="@font/mulish_regular"
+            android:textAlignment="center"
+            android:gravity="center" />
 
     </LinearLayout>
 
