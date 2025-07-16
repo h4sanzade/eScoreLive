@@ -475,10 +475,14 @@ class HomeFragment : Fragment() {
 
             when (currentTab) {
                 MatchTab.FAVORITES -> {
+                    // Navigate to favorites matches - pass special parameter
                     try {
-                        findNavController().navigate(R.id.teamSearchFragment)
+                        val bundle = Bundle().apply {
+                            putString("selectedDate", "FAVORITES_MODE")
+                        }
+                        findNavController().navigate(R.id.allMatchesFragment, bundle)
                     } catch (e: Exception) {
-                        Toast.makeText(context, "Opening favorites...", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Opening favorite team matches...", Toast.LENGTH_SHORT).show()
                     }
                 }
                 else -> {
