@@ -220,35 +220,59 @@ class TeamSearchViewModel @Inject constructor(
             .take(6)
     }
 
-    // HIZLI ARAMA - Suggestion'a tıklandığında
+    // HIZLI ARAMA - Suggestion'a tıklandığında - TAMAMEN DÜZELTİLDİ
     fun searchTeamByExactName(teamName: String) {
-        Log.d("TeamSearchViewModel", "Enhanced searchTeamByExactName called with: '$teamName'")
+        Log.d("TeamSearchViewModel", "searchTeamByExactName called with: '$teamName'")
 
         viewModelScope.launch(Dispatchers.Main) {
             try {
                 _isLoading.value = true
                 _error.value = null
 
-                Log.d("TeamSearchViewModel", "Enhanced searching exact name: '$teamName'")
+                Log.d("TeamSearchViewModel", "Searching exact name: '$teamName'")
 
-                val result = repository.searchTeamByExactName(teamName)
+                // Repository'den direkt searchTeamsAdvanced kullan (çünkü searchTeamByExactName'e bağımlılık yok)
+                val result = repository.searchTeamsAdvanced(teamName)
 
                 result.fold(
-                    onSuccess = { results ->
-                        Log.d("TeamSearchViewModel", "Enhanced exact search successful: ${results.size} results")
-                        _searchResults.value = results
+                    onSuccess = { allResults ->
+                        // Exact match araması
+                        val exactMatches = allResults.filter {
+                            it.team.name.equals(teamName, ignoreCase = true)
+                        }
+
+                        if (exactMatches.isNotEmpty()) {
+                            Log.d("TeamSearchViewModel", "Found exact matches: ${exactMatches.size}")
+                            _searchResults.value = exactMatches
+                        } else {
+                            // Exact match bulunamazsa benzer olanları göster
+                            val similarMatches = allResults.filter {
+                                it.team.name.contains(teamName, ignoreCase = true)
+                            }.take(5)
+
+                            if (similarMatches.isNotEmpty()) {
+                                Log.d("TeamSearchViewModel", "Found similar matches: ${similarMatches.size}")
+                                _searchResults.value = similarMatches
+                                _error.value = "Exact match not found, showing similar teams"
+                            } else {
+                                Log.d("TeamSearchViewModel", "No matches found")
+                                _searchResults.value = emptyList()
+                                _error.value = "No teams found matching '$teamName'"
+                            }
+                        }
+
                         currentSearchQuery = teamName
                         addToSearchHistory(teamName)
                     },
                     onFailure = { exception ->
-                        Log.e("TeamSearchViewModel", "Enhanced exact search failed for '$teamName'", exception)
-                        _error.value = "Team not found: ${exception.message}"
+                        Log.e("TeamSearchViewModel", "Search failed for '$teamName'", exception)
+                        _error.value = "Search failed: ${exception.message}"
                         _searchResults.value = emptyList()
                     }
                 )
 
             } catch (e: Exception) {
-                Log.e("TeamSearchViewModel", "Exception in enhanced searchTeamByExactName", e)
+                Log.e("TeamSearchViewModel", "Exception in searchTeamByExactName", e)
                 _error.value = "Search error: ${e.message}"
                 _searchResults.value = emptyList()
             } finally {
@@ -457,65 +481,9 @@ class TeamSearchViewModel @Inject constructor(
             "Qarabag", "Neftchi", "Sabah", "Zira", "Sumqayit", "Kapaz", "Sabail", "Turan Tovuz",
             "Shamakhi", "Gabala", "Keşla", "Mil-Muğan",
 
-            // Hollandalı takımlar
-            "Ajax", "PSV", "Feyenoord", "AZ Alkmaar", "Vitesse", "Utrecht", "Twente", "Groningen",
-            "Heerenveen", "Willem II", "Sparta Rotterdam", "Heracles", "Go Ahead Eagles", "Cambuur",
-
-            // Portekizli takımlar
-            "Benfica", "Porto", "Sporting", "Braga", "Vitoria Guimaraes", "Boavista", "Pacos Ferreira",
-            "Santa Clara", "Maritimo", "Moreirense", "Tondela", "Famalicao", "Gil Vicente", "Arouca",
-
-            // Belçika takımlar
-            "Anderlecht", "Club Brugge", "Genk", "Standard Liege", "Gent", "Antwerp", "Mechelen",
-            "Oostende", "Charleroi", "Kortrijk", "Eupen", "Cercle Brugge", "Sint-Truiden", "Seraing",
-
-            // İsviçre takımlar
-            "Young Boys", "Basel", "Zurich", "St. Gallen", "Servette", "Lugano", "Lucerne", "Sion",
-            "Grasshoppers", "Lausanne", "Vaduz",
-
-            // Avusturya takımlar
-            "Red Bull Salzburg", "Rapid Wien", "Austria Wien", "Sturm Graz", "LASK", "Wolfsberg",
-            "Altach", "Hartberg", "Admira", "Ried", "St. Polten", "Tirol",
-
-            // Çek takımlar
-            "Sparta Prague", "Slavia Prague", "Viktoria Plzen", "Banik Ostrava", "Jablonec", "Liberec",
-            "Slovacko", "Bohemians", "Hradec Kralove", "Pardubice", "Teplice", "Ceske Budejovice",
-
-            // Rus takımlar
-            "Zenit", "Spartak Moscow", "CSKA Moscow", "Dynamo Moscow", "Lokomotiv Moscow", "Krasnodar",
-            "Rostov", "Akhmat Grozny", "Ufa", "Sochi", "Arsenal Tula", "Rubin Kazan",
-
-            // Ukrayna takımlar
-            "Shakhtar Donetsk", "Dynamo Kiev", "Zorya", "Desna", "Kolos", "Vorskla", "Olimpik",
-            "Rukh Lviv", "Mynai", "Chornomorets", "Lviv", "Mariupol",
-
-            // Yunan takımlar
-            "Olympiacos", "Panathinaikos", "AEK Athens", "PAOK", "Aris", "Atromitos", "Volos",
-            "Lamia", "Apollon Smyrnis", "Ionikos", "Asteras", "PAS Giannina",
-
-            // Sırp takımlar
-            "Red Star Belgrade", "Partizan", "Vojvodina", "Cukaricki", "Radnicki Nis", "Spartak Subotica",
-            "Kolubara", "Novi Pazar", "Metalac", "Vozdovac", "Javor", "Radnik Surdulica",
-
-            // Hırvat takımlar
-            "Dinamo Zagreb", "Hajduk Split", "Rijeka", "Osijek", "Lokomotiva", "Varazdin", "Istra",
-            "Gorica", "Slaven Belupo", "Sibenik",
-
-            // Slovakya takımlar
-            "Slovan Bratislava", "Spartak Trnava", "Zilina", "Dunajska Streda", "Ruzomberok", "Senica",
-            "Michalovce", "Nitra", "Skalica", "Podbrezova",
-
-            // Romanya takımlar
-            "CFR Cluj", "FCSB", "Craiova", "Sepsi", "Rapid Bucharest", "Botosani", "Chindia",
-            "Farul Constanta", "Arges", "Voluntari", "Mioveni", "Clinceni",
-
-            // Bulgar takımlar
-            "Ludogorets", "CSKA Sofia", "Levski Sofia", "Cherno More", "Beroe", "Arda", "Botev Plovdiv",
-            "Lokomotiv Plovdiv", "Botev Vratsa", "Pirin", "Tsarsko Selo", "Slavija Sofia",
-
             // Diğer popüler takımlar
-            "Celtic", "Rangers", "Olympiacos", "Panathinaikos", "Rosenborg", "Molde", "Brann",
-            "Stromsgodset", "Bodo/Glimt", "Valerenga", "Lillestrom", "Haugesund"
+            "Celtic", "Rangers", "Olympiacos", "Panathinaikos", "Ajax", "PSV", "Feyenoord",
+            "Benfica", "Porto", "Sporting"
         )
     }
 

@@ -58,6 +58,12 @@ class NewsAdapter(
             // Handle trending indicator
             handleTrendingIndicator(newsItem)
 
+            // Set source info
+            if (!newsItem.source.isNullOrEmpty()) {
+                // You can add a source text view to the layout or use existing elements
+                newsSummary.text = "${newsItem.summary}\n\nSource: ${newsItem.source}"
+            }
+
             // Click listener with ripple effect
             root.setOnClickListener {
                 addClickAnimation()
@@ -80,17 +86,18 @@ class NewsAdapter(
         }
 
         private fun setupCategoryStyle(category: String) = with(binding) {
-            val (backgroundRes, textColorRes) = when (category.lowercase()) {
-                "transfer news", "transfers" -> {
-                    Pair(R.drawable.indicator_background, R.color.accent_color)
+            val categoryLower = category.lowercase()
+            val (backgroundRes, textColorRes) = when {
+                categoryLower.contains("transfer") -> {
+                    Pair(R.drawable.indicator_background, R.color.white)
                 }
-                "match reports", "matches" -> {
+                categoryLower.contains("match") -> {
                     Pair(R.drawable.live_indicator_bg, R.color.white)
                 }
-                "injury news", "injuries" -> {
+                categoryLower.contains("injur") -> {
                     Pair(R.drawable.upcoming_indicator_bg, R.color.white)
                 }
-                "breaking news" -> {
+                categoryLower.contains("breaking") -> {
                     Pair(R.drawable.live_indicator_bg, R.color.white)
                 }
                 else -> {
@@ -102,7 +109,7 @@ class NewsAdapter(
             newsCategory.setTextColor(ContextCompat.getColor(root.context, textColorRes))
 
             // Add pulse animation for breaking news
-            if (category.contains("breaking", ignoreCase = true)) {
+            if (categoryLower.contains("breaking")) {
                 newsCategory.animate()
                     .alpha(0.7f)
                     .setDuration(1000)
@@ -117,8 +124,11 @@ class NewsAdapter(
         }
 
         private fun handleBreakingNews(newsItem: NewsItem) = with(binding) {
-            val isBreaking = newsItem.category.contains("breaking", ignoreCase = true) ||
-                    newsItem.title.contains("breaking", ignoreCase = true) ||
+            val categoryLower = newsItem.category.lowercase()
+            val titleLower = newsItem.title.lowercase()
+
+            val isBreaking = categoryLower.contains("breaking") ||
+                    titleLower.contains("breaking") ||
                     isRecentNews(newsItem.publishDate, 2) // Last 2 hours
 
             breakingOverlay.visibility = if (isBreaking) View.VISIBLE else View.GONE
@@ -142,10 +152,15 @@ class NewsAdapter(
 
         private fun handleTrendingIndicator(newsItem: NewsItem) = with(binding) {
             // Show trending for transfer news or recent popular news
-            val isTrending = newsItem.category.contains("transfer", ignoreCase = true) ||
-                    newsItem.title.contains("major", ignoreCase = true) ||
-                    newsItem.title.contains("exclusive", ignoreCase = true) ||
-                    newsItem.title.contains("confirmed", ignoreCase = true)
+            val categoryLower = newsItem.category.lowercase()
+            val titleLower = newsItem.title.lowercase()
+
+            val isTrending = categoryLower.contains("transfer") ||
+                    titleLower.contains("major") ||
+                    titleLower.contains("exclusive") ||
+                    titleLower.contains("confirmed") ||
+                    titleLower.contains("deal") ||
+                    titleLower.contains("signing")
 
             trendingIndicator.visibility = if (isTrending) View.VISIBLE else View.GONE
 
@@ -160,17 +175,33 @@ class NewsAdapter(
 
         private fun getRelativeTime(publishDate: String): String {
             return try {
-                val dateFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-                val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                val possiblePatterns = listOf(
+                    "dd MMM yyyy HH:mm",
+                    "yyyy-MM-dd'T'HH:mm:ss'Z'",
+                    "yyyy-MM-dd'T'HH:mm:ssX",
+                    "dd MMM yyyy"
+                )
+
+                var date: Date? = null
+
+                for (pattern in possiblePatterns) {
+                    try {
+                        val format = SimpleDateFormat(pattern, Locale.getDefault())
+                        if (pattern.contains("'Z'")) {
+                            format.timeZone = TimeZone.getTimeZone("UTC")
+                        }
+                        date = format.parse(publishDate)
+                        if (date != null) break
+                    } catch (e: ParseException) {
+                        continue
+                    }
+                }
+
+                if (date == null) {
+                    return publishDate
+                }
+
                 val now = Date()
-
-                // If the date string contains time info, parse differently
-                val date = if (publishDate.contains(":")) {
-                    SimpleDateFormat("dd MMM yyyy HH:mm", Locale.getDefault()).parse(publishDate)
-                } else {
-                    dateFormat.parse(publishDate)
-                } ?: return publishDate
-
                 val diffInMillis = now.time - date.time
                 val diffInMinutes = diffInMillis / (1000 * 60)
                 val diffInHours = diffInMillis / (1000 * 60 * 60)
@@ -183,14 +214,15 @@ class NewsAdapter(
                     diffInDays < 7 -> "${diffInDays}d ago"
                     else -> SimpleDateFormat("dd MMM", Locale.getDefault()).format(date)
                 }
-            } catch (e: ParseException) {
+            } catch (e: Exception) {
                 publishDate
             }
         }
 
+
         private fun isRecentNews(publishDate: String, hoursThreshold: Int): Boolean {
             return try {
-                val dateFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+                val dateFormat = SimpleDateFormat("dd MMM yyyy HH:mm", Locale.getDefault())
                 val date = dateFormat.parse(publishDate) ?: return false
                 val now = Date()
                 val diffInHours = (now.time - date.time) / (1000 * 60 * 60)
