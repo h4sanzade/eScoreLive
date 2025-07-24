@@ -33,6 +33,11 @@
             android:id="@+id/action_home_to_teamSearch"
             app:destination="@id/teamSearchFragment" />
 
+        <!-- Add news navigation action -->
+        <action
+            android:id="@+id/action_home_to_news"
+            app:destination="@id/newsFragment" />
+
     </fragment>
 
     <!-- Competition Fragment -->
@@ -104,15 +109,41 @@
         android:label="Team Search"
         tools:layout="@layout/fragment_team_search" />
 
-    <!-- News Detail Fragment (placeholder) -->
+    <!-- News Detail Fragment -->
     <fragment
         android:id="@+id/newsDetailFragment"
-        android:name="com.materialdesign.escorelive.presentation.ui.news.NewsFragment"
-        android:label="News Detail">
+        android:name="com.materialdesign.escorelive.presentation.news.NewsDetailFragment"
+        android:label="News Detail"
+        tools:layout="@layout/fragment_news_detail">
 
         <argument
             android:name="newsId"
             app:argType="long" />
+        <argument
+            android:name="newsTitle"
+            app:argType="string" />
+        <argument
+            android:name="newsContent"
+            app:argType="string" />
+        <argument
+            android:name="newsImageUrl"
+            app:argType="string" />
+        <argument
+            android:name="newsDate"
+            app:argType="string" />
+        <argument
+            android:name="newsSource"
+            app:argType="string" />
+        <argument
+            android:name="newsAuthor"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="newsUrl"
+            app:argType="string" />
+        <argument
+            android:name="newsCategory"
+            app:argType="string" />
     </fragment>
 
 </navigation>

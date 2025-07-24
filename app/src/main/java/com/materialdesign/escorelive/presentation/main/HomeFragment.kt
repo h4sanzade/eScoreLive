@@ -83,8 +83,8 @@ class HomeFragment : Fragment() {
                     true
                 }
                 R.id.newsFragment -> {
-                    showNewsContent()
-                    currentNavigationTab = NavigationTab.NEWS
+                    // Navigate to actual NewsFragment instead of showing placeholder
+                    navigateToNewsFragment()
                     true
                 }
                 R.id.accountFragment -> {
@@ -94,6 +94,16 @@ class HomeFragment : Fragment() {
                 }
                 else -> false
             }
+        }
+    }
+
+    private fun navigateToNewsFragment() {
+        try {
+            findNavController().navigate(R.id.action_home_to_news)
+        } catch (e: Exception) {
+            // Fallback: Show placeholder if navigation fails
+            showNewsContent()
+            currentNavigationTab = NavigationTab.NEWS
         }
     }
 
@@ -384,6 +394,16 @@ class HomeFragment : Fragment() {
 
             selectedCalendar.time = dateFormat.parse(selectedDate) ?: Date()
             todayCalendar.time = dateFormat.parse(today) ?: Date()
+
+            selectedCalendar.set(Calendar.HOUR_OF_DAY, 0)
+            selectedCalendar.set(Calendar.MINUTE, 0)
+            selectedCalendar.set(Calendar.SECOND, 0)
+            selectedCalendar.set(Calendar.MILLISECOND, 0)
+
+            todayCalendar.set(Calendar.HOUR_OF_DAY, 0)
+            todayCalendar.set(Calendar.MINUTE, 0)
+            todayCalendar.set(Calendar.SECOND, 0)
+            todayCalendar.set(Calendar.MILLISECOND, 0)
 
             when {
                 selectedDate == today -> {
