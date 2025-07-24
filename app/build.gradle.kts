@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.materialdesign.escorelive"
-    compileSdk = 34
+    compileSdk = 35
 
     buildFeatures {
         viewBinding = true
@@ -17,7 +17,7 @@ android {
     defaultConfig {
         applicationId = "com.materialdesign.escorelive"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -64,6 +64,7 @@ dependencies {
 
     // Hilt
     implementation("com.google.dagger:hilt-android:2.51")
+    implementation(libs.androidx.activity)
     ksp("com.google.dagger:hilt-android-compiler:2.51")
     implementation("androidx.hilt:hilt-navigation-fragment:1.1.0")
 
