@@ -8,18 +8,23 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.materialdesign.escorelive.databinding.ActivitySplashBinding
 import com.materialdesign.escorelive.presentation.auth.LoginActivity
 import com.materialdesign.escorelive.presentation.main.MainActivity
-import com.materialdesign.escorelive.presentation.auth.AuthViewModel
+import com.materialdesign.escorelive.data.remote.AuthDataStore
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySplashBinding
-    private val authViewModel: AuthViewModel by viewModels()
+
+    @Inject
+    lateinit var authDataStore: AuthDataStore
 
     private val splashTimeOut: Long = 2500 // 2.5 seconds
 
@@ -105,17 +110,27 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun checkAuthenticationAndNavigate() {
-        when {
-            authViewModel.isUserLoggedIn() -> {
-                // User is logged in, go to main activity
-                navigateToMain()
-            }
-            authViewModel.isGuestMode() -> {
-                // User is in guest mode, go to main activity
-                navigateToMain()
-            }
-            else -> {
-                // User is not logged in, go to login activity
+        lifecycleScope.launch {
+            try {
+                val isLoggedIn = authDataStore.isLoggedIn.first()
+                val isGuest = authDataStore.isGuestMode.first()
+
+                when {
+                    isLoggedIn -> {
+                        // User is logged in, go to main activity
+                        navigateToMain()
+                    }
+                    isGuest -> {
+                        // User is in guest mode, go to main activity
+                        navigateToMain()
+                    }
+                    else -> {
+                        // User is not logged in, go to login activity
+                        navigateToLogin()
+                    }
+                }
+            } catch (e: Exception) {
+                // If there's an error, go to login
                 navigateToLogin()
             }
         }

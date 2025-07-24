@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "735236924955",
+    "project_id": "escorelive-42d3b",
+    "storage_bucket": "escorelive-42d3b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:735236924955:android:553fa616ccdec3d929fabe",
+        "android_client_info": {
+          "package_name": "com.hasanzade.eScoreLive"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDaQml_WDgkhGroM_dsIMHrK-DI4W7ZsuY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

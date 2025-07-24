@@ -9,7 +9,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import com.materialdesign.escorelive.databinding.ActivityRegisterBinding
-import com.materialdesign.escorelive.presentation.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -41,23 +40,24 @@ class RegisterActivity : AppCompatActivity() {
         binding.lastNameEditText.hint = "Enter your last name"
         binding.usernameEditText.hint = "Choose a username"
         binding.emailEditText.hint = "Enter your email"
-        binding.passwordEditText.hint = "Create a password"
+        binding.passwordEditText.hint = "Create a password (min 6 chars)"
         binding.confirmPasswordEditText.hint = "Confirm your password"
     }
 
     private fun observeViewModel() {
         viewModel.registerResult.observe(this, Observer { result ->
             when (result) {
-                is AuthResult.Success -> {
+                is RegisterResult.Success -> {
                     hideLoading()
-                    showToast("Registration successful! Welcome ${result.user.firstName}")
-                    navigateToMain()
+                    showToast("Registration successful! Please login with your credentials.")
+                    // Navigate back to login
+                    navigateToLogin()
                 }
-                is AuthResult.Error -> {
+                is RegisterResult.Error -> {
                     hideLoading()
                     showToast("Registration failed: ${result.message}")
                 }
-                is AuthResult.Loading -> {
+                is RegisterResult.Loading -> {
                     showLoading()
                 }
             }
@@ -170,12 +170,13 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    private fun navigateToMain() {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    private fun navigateToLogin() {
+        // Navigate back to login activity
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivity(intent)
         finish()
     }

@@ -8,15 +8,24 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import com.google.firebase.auth.AuthResult
 import com.materialdesign.escorelive.databinding.ActivityLoginBinding
 import com.materialdesign.escorelive.presentation.main.MainActivity
+import com.materialdesign.escorelive.data.remote.AuthDataStore
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private val viewModel: AuthViewModel by viewModels()
+
+    @Inject
+    lateinit var authDataStore: AuthDataStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,17 +42,29 @@ class LoginActivity : AppCompatActivity() {
         setupUI()
         observeViewModel()
         setupClickListeners()
+        checkIfAlreadyLoggedIn()
+    }
 
-        // Check if user is already logged in
-        if (viewModel.isUserLoggedIn()) {
-            navigateToMain()
+    private fun checkIfAlreadyLoggedIn() {
+        lifecycleScope.launch {
+            try {
+                val isLoggedIn = authDataStore.isLoggedIn.first()
+                if (isLoggedIn) {
+                    navigateToMain()
+                }
+            } catch (e: Exception) {
+                // Continue with login screen
+            }
         }
     }
 
     private fun setupUI() {
-        // Set demo credentials hint
-        binding.usernameEditText.hint = "Try: emilys"
-        binding.passwordEditText.hint = "Try: emilyspass"
+        // Set hint for better UX
+        binding.usernameEditText.hint = "Username or Email"
+        binding.passwordEditText.hint = "Password"
+
+        // Add info about trying demo or registered credentials
+        // You can add this to the layout or show as toast
     }
 
     private fun observeViewModel() {
@@ -67,7 +88,7 @@ class LoginActivity : AppCompatActivity() {
         viewModel.validationError.observe(this, Observer { error ->
             when (error) {
                 is ValidationError.EmptyUsername -> {
-                    binding.usernameTextInputLayout.error = "Username is required"
+                    binding.usernameTextInputLayout.error = "Username or email is required"
                 }
                 is ValidationError.EmptyPassword -> {
                     binding.passwordTextInputLayout.error = "Password is required"
@@ -98,6 +119,13 @@ class LoginActivity : AppCompatActivity() {
             navigateToMain()
         }
 
+        // Demo credentials button (optional)
+        binding.root.setOnLongClickListener {
+            // Long press to fill demo credentials
+            fillDemoCredentials()
+            true
+        }
+
         // Clear errors when user starts typing
         binding.usernameEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) binding.usernameTextInputLayout.error = null
@@ -106,6 +134,12 @@ class LoginActivity : AppCompatActivity() {
         binding.passwordEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) binding.passwordTextInputLayout.error = null
         }
+    }
+
+    private fun fillDemoCredentials() {
+        binding.usernameEditText.setText("demo_user")
+        binding.passwordEditText.setText("demo123")
+        showToast("Demo credentials filled. Register first or use your own credentials!")
     }
 
     private fun clearErrors() {
