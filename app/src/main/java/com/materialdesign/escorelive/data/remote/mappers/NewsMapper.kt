@@ -46,17 +46,17 @@ object NewsMapper {
     private fun cleanTitle(title: String): String {
         // Remove common suffixes from news titles
         return title
-            .replace(Regex(" - .*$"), "") // Remove " - Source Name" suffixes
-            .replace(Regex(" \\| .*$"), "") // Remove " | Source Name" suffixes
+            .replace(Regex(" - .*$"), "")
+            .replace(Regex(" \\| .*$"), "")
             .trim()
     }
 
     private fun cleanSummary(description: String): String {
         return description
-            .replace(Regex("\\[\\+\\d+ chars\\]"), "") // Remove "[+123 chars]" from content
-            .replace(Regex("….*"), "...") // Clean up truncated content
+            .replace(Regex("\\[\\+\\d+ chars\\]"), "")
+            .replace(Regex("….*"), "...")
             .trim()
-            .take(200) // Limit summary length
+            .take(200)
     }
 
     private fun determineCategoryName(article: NewsArticle, requestedCategory: NewsCategory): String {
@@ -73,16 +73,13 @@ object NewsMapper {
                     content.contains("joins") ||
                     content.contains("signs") -> "Transfer News"
 
-            // Injury related keywords
-            content.contains("injury") ||
+                content.contains("injury") ||
                     content.contains("injured") ||
                     content.contains("fitness") ||
                     content.contains("recovery") ||
                     content.contains("surgery") ||
                     content.contains("sidelined") -> "Injury News"
-
-            // Match related keywords
-            content.contains("match") ||
+           content.contains("match") ||
                     content.contains("game") ||
                     content.contains("result") ||
                     content.contains("score") ||
@@ -92,12 +89,10 @@ object NewsMapper {
                     content.contains("vs") ||
                     content.contains("against") -> "Match Reports"
 
-            // Breaking news indicators
             content.contains("breaking") ||
                     content.contains("urgent") ||
                     content.contains("exclusive") -> "Breaking News"
 
-            // Default based on requested category
             else -> when (requestedCategory) {
                 NewsCategory.TRANSFERS -> "Transfer News"
                 NewsCategory.MATCHES -> "Match Reports"

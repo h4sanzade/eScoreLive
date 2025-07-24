@@ -1,4 +1,4 @@
-package com.materialdesign.escorelive.presentation.ui.news
+package com.materialdesign.escorelive.presentation.news
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -16,6 +16,9 @@ import com.materialdesign.escorelive.databinding.FragmentNewsBinding
 import com.materialdesign.escorelive.presentation.adapters.NewsAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import android.util.Log
+import com.materialdesign.escorelive.presentation.ui.news.NewsCategory
+import com.materialdesign.escorelive.presentation.ui.news.NewsItem
+import com.materialdesign.escorelive.presentation.ui.news.NewsViewModel
 
 @AndroidEntryPoint
 class NewsFragment : Fragment() {

@@ -24,12 +24,10 @@ class FootballRepository @Inject constructor(
     private val apiService: FootballApiService
 ) {
 
-    // Cache for teams to avoid repeated API calls
     private val teamsCache = mutableMapOf<Long, Team>()
     private val leagueTeamsCache = mutableMapOf<Int, List<Team>>()
     private val searchCache = mutableMapOf<String, List<TeamSearchResult>>()
 
-    // Popüler ligler ve bilgileri
     private val popularLeagues = listOf(
         LeagueInfo(39, "Premier League", "England", 2024),
         LeagueInfo(140, "La Liga", "Spain", 2024),
@@ -49,7 +47,6 @@ class FootballRepository @Inject constructor(
         val season: Int
     )
 
-    // API TABANLI TAKIM ARAMA FONKSİYONU
     suspend fun searchTeamsAdvanced(query: String): Result<List<TeamSearchResult>> {
         return withContext(Dispatchers.IO) {
             try {
@@ -60,7 +57,6 @@ class FootballRepository @Inject constructor(
                     return@withContext Result.success(emptyList())
                 }
 
-                // Önce cache'den kontrol et
                 val cacheKey = query.lowercase()
                 searchCache[cacheKey]?.let { cachedResults ->
                     if (cachedResults.isNotEmpty()) {
@@ -71,7 +67,6 @@ class FootballRepository @Inject constructor(
 
                 val allResults = mutableSetOf<TeamSearchResult>()
 
-                // API'den gerçek arama yap
                 try {
                     Log.d("FootballRepository", "Calling API search for: '$query'")
                     val response = apiService.searchTeams(searchQuery = query)
@@ -100,14 +95,12 @@ class FootballRepository @Inject constructor(
                     Log.w("FootballRepository", "API search failed, using fallback", e)
                 }
 
-                // Eğer API'den yeterli sonuç yoksa manuel takımları ekle
                 if (allResults.size < 5) {
                     val manualResults = searchManualTeams(query)
                     allResults.addAll(manualResults)
                     Log.d("FootballRepository", "Added ${manualResults.size} manual results")
                 }
 
-                // Sonuçları filtrele ve sırala
                 val filteredResults = allResults
                     .filter { result ->
                         result.team.name.contains(query, ignoreCase = true)
@@ -122,7 +115,6 @@ class FootballRepository @Inject constructor(
                     }.thenBy { it.team.name })
                     .take(15)
 
-                // Cache'e kaydet
                 searchCache[cacheKey] = filteredResults
 
                 Log.d("FootballRepository", "Final result: ${filteredResults.size} teams for '$query'")
@@ -135,7 +127,6 @@ class FootballRepository @Inject constructor(
         }
     }
 
-    // API TABANLI ÖNERİ FONKSİYONU
     suspend fun getTeamSuggestions(query: String): Result<List<String>> {
         return withContext(Dispatchers.IO) {
             try {
@@ -147,21 +138,17 @@ class FootballRepository @Inject constructor(
 
                 val suggestions = mutableSetOf<String>()
 
-                // ÖNCE API'DEN GERÇEK ARAMA YAP
                 try {
                     val searchResult = searchTeamsAdvanced(query)
 
                     searchResult.onSuccess { results ->
-                        // Arama sonuçlarından takım isimlerini al
                         results.forEach { teamSearchResult ->
                             val teamName = teamSearchResult.team.name
 
-                            // Query ile başlayan veya içeren takımları öneriye ekle
                             if (teamName.contains(query, ignoreCase = true)) {
                                 suggestions.add(teamName)
                             }
 
-                            // Takım adının kelimelerini kontrol et
                             teamName.split(" ").forEach { word ->
                                 if (word.startsWith(query, ignoreCase = true) && word.length > query.length) {
                                     suggestions.add(word)
@@ -175,14 +162,12 @@ class FootballRepository @Inject constructor(
                     Log.w("FootballRepository", "API search for suggestions failed", e)
                 }
 
-                // Eğer API'den yeterli öneri yoksa cache'den ekle
                 if (suggestions.size < 3) {
                     teamsCache.values.forEach { team ->
                         if (team.name.contains(query, ignoreCase = true)) {
                             suggestions.add(team.name)
                         }
 
-                        // Takım adının kelimelerini kontrol et
                         team.name.split(" ").forEach { word ->
                             if (word.startsWith(query, ignoreCase = true) && word.length > query.length) {
                                 suggestions.add(word)
@@ -192,9 +177,9 @@ class FootballRepository @Inject constructor(
                     Log.d("FootballRepository", "Cache added suggestions, total: ${suggestions.size}")
                 }
 
-                // Önerileri sırala ve sınırla
+
                 val sortedSuggestions = suggestions
-                    .filter { it.length >= query.length } // En az query kadar uzun olmalı
+                    .filter { it.length >= query.length }
                     .sortedWith(compareBy<String> { suggestion ->
                         when {
                             suggestion.equals(query, ignoreCase = true) -> 0
@@ -203,7 +188,7 @@ class FootballRepository @Inject constructor(
                             else -> 3
                         }
                     }.thenBy { it.length }.thenBy { it })
-                    .take(8) // Maksimum 8 öneri
+                    .take(8)
 
                 Log.d("FootballRepository", "Final API-based suggestions (${sortedSuggestions.size}): $sortedSuggestions")
                 Result.success(sortedSuggestions)
@@ -215,7 +200,6 @@ class FootballRepository @Inject constructor(
         }
     }
 
-    // Manuel takım listesi (gerçek logo URL'leri ile)
     private fun searchManualTeams(query: String): List<TeamSearchResult> {
         val manualTeams = listOf(
             ManualTeam(42, "Arsenal", 39, "Premier League", "https://media.api-sports.io/football/teams/42.png"),
@@ -268,7 +252,6 @@ class FootballRepository @Inject constructor(
     )
 
     private suspend fun findTeamLeague(teamId: Long): LeagueInfo? {
-        // Manuel takımlar için ID tabanlı mapping
         return when (teamId.toInt()) {
             in listOf(42, 49, 33, 50, 40, 47) -> LeagueInfo(39, "Premier League", "England", 2024)
             in listOf(529, 541, 530) -> LeagueInfo(140, "La Liga", "Spain", 2024)
@@ -277,7 +260,6 @@ class FootballRepository @Inject constructor(
             85 -> LeagueInfo(61, "Ligue 1", "France", 2024)
             in listOf(559, 562, 558, 564) -> LeagueInfo(203, "Super Lig", "Turkey", 2024)
             else -> {
-                // API'den kontrol et
                 for (league in popularLeagues) {
                     try {
                         val response = apiService.getTeamsByLeague(leagueId = league.id, season = league.season)
@@ -296,7 +278,6 @@ class FootballRepository @Inject constructor(
         }
     }
 
-    // Favori takımların maçlarını getir (geçmiş, live, gelecek)
     suspend fun getFavoriteTeamsMatches(favoriteTeamIds: Set<Long>): Result<List<Match>> {
         return withContext(Dispatchers.IO) {
             try {
@@ -308,18 +289,14 @@ class FootballRepository @Inject constructor(
 
                 val allMatches = mutableListOf<Match>()
 
-                // Her favori takım için maçları getir
                 for (teamId in favoriteTeamIds) {
                     try {
-                        // Takımın ligini bul
                         val teamLeague = findTeamLeagueById(teamId)
 
                         if (teamLeague != null) {
-                            // Bu ligdeki tüm maçları getir
                             val leagueMatches = getMatchesByLeague(teamLeague.id, teamLeague.season)
 
                             leagueMatches.onSuccess { matches ->
-                                // Sadece bu takımın maçlarını filtrele
                                 val teamMatches = matches.filter { match ->
                                     match.homeTeam.id == teamId || match.awayTeam.id == teamId
                                 }
@@ -333,7 +310,6 @@ class FootballRepository @Inject constructor(
                     }
                 }
 
-                // Maçları tarihe göre sırala (son maçlar önce)
                 val sortedMatches = allMatches
                     .distinctBy { it.id }
                     .sortedWith(compareByDescending<Match> { match ->
@@ -355,9 +331,7 @@ class FootballRepository @Inject constructor(
         }
     }
 
-    // Takım ID'sine göre lige bul
     private suspend fun findTeamLeagueById(teamId: Long): LeagueInfo? {
-        // Önce manuel mapping
         return when (teamId.toInt()) {
             in listOf(42, 49, 33, 50, 40, 47) -> LeagueInfo(39, "Premier League", "England", 2024)
             in listOf(529, 541, 530) -> LeagueInfo(140, "La Liga", "Spain", 2024)
@@ -366,7 +340,6 @@ class FootballRepository @Inject constructor(
             85 -> LeagueInfo(61, "Ligue 1", "France", 2024)
             in listOf(559, 562, 558, 564) -> LeagueInfo(203, "Super Lig", "Turkey", 2024)
             else -> {
-                // API'den kontrol et
                 for (league in popularLeagues) {
                     try {
                         val response = apiService.getTeamsByLeague(leagueId = league.id, season = league.season)
@@ -385,14 +358,12 @@ class FootballRepository @Inject constructor(
         }
     }
 
-    // Mevcut fonksiyonları güncelle
     suspend fun searchTeams(query: String): Result<List<Team>> {
         return searchTeamsAdvanced(query).map { results ->
             results.map { it.team }
         }
     }
 
-    // Cache temizleme fonksiyonu
     fun clearSearchCache() {
         searchCache.clear()
         Log.d("FootballRepository", "Search cache cleared")
@@ -406,7 +377,6 @@ class FootballRepository @Inject constructor(
         return teamsCache[teamId]
     }
 
-    // Diğer metodlar - Basitleştirilmiş hata yönetimi ile
     suspend fun getLiveMatches(): Result<List<Match>> {
         return withContext(Dispatchers.IO) {
             try {
@@ -689,7 +659,6 @@ class FootballRepository @Inject constructor(
         return statistics.find { it.type == type }?.value
     }
 
-    // Utility methods
     fun getTeamsCacheSize(): Int = teamsCache.size
 
     fun getSearchCacheSize(): Int = searchCache.size
@@ -701,7 +670,6 @@ class FootballRepository @Inject constructor(
         Log.d("FootballRepository", "All caches cleared")
     }
 
-    // For debugging
     fun getPopularLeagues(): List<LeagueInfo> = popularLeagues.toList()
 
     fun isTeamCached(teamId: Long): Boolean = teamsCache.containsKey(teamId)

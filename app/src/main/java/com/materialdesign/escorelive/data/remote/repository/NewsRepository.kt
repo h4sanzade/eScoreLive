@@ -24,7 +24,6 @@ class NewsRepository @Inject constructor(
             try {
                 Log.d("NewsRepository", "Getting news for category: $category, refresh: $refresh")
 
-                // Return cached data if available and not refreshing
                 if (!refresh && newsCache.containsKey(category)) {
                     val cachedNews = newsCache[category] ?: emptyList()
                     if (cachedNews.isNotEmpty()) {
@@ -63,7 +62,6 @@ class NewsRepository @Inject constructor(
                             }
                         }
 
-                        // Filter out articles without images or with poor quality
                         val filteredNews = newsItems.filter { newsItem ->
                             newsItem.imageUrl.isNotEmpty() &&
                                     newsItem.title.length > 10 &&

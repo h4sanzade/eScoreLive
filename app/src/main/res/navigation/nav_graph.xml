@@ -50,7 +50,7 @@
     <!-- News Fragment -->
     <fragment
         android:id="@+id/newsFragment"
-        android:name="com.materialdesign.escorelive.presentation.ui.news.NewsFragment"
+        android:name="com.materialdesign.escorelive.presentation.news.NewsFragment"
         android:label="News"
         tools:layout="@layout/fragment_news">
 
