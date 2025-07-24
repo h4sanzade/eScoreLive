@@ -9,7 +9,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
-import com.google.firebase.auth.AuthResult
 import com.materialdesign.escorelive.databinding.ActivityLoginBinding
 import com.materialdesign.escorelive.presentation.main.MainActivity
 import com.materialdesign.escorelive.data.remote.AuthDataStore
@@ -32,7 +31,6 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Handle window insets
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -53,18 +51,12 @@ class LoginActivity : AppCompatActivity() {
                     navigateToMain()
                 }
             } catch (e: Exception) {
-                // Continue with login screen
             }
         }
     }
 
     private fun setupUI() {
-        // Set hint for better UX
-        binding.usernameEditText.hint = "Username or Email"
-        binding.passwordEditText.hint = "Password"
 
-        // Add info about trying demo or registered credentials
-        // You can add this to the layout or show as toast
     }
 
     private fun observeViewModel() {
@@ -114,19 +106,15 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.skipLoginTextView.setOnClickListener {
-            // Allow users to skip login and use app as guest
             viewModel.setGuestMode(true)
             navigateToMain()
         }
 
-        // Demo credentials button (optional)
         binding.root.setOnLongClickListener {
-            // Long press to fill demo credentials
             fillDemoCredentials()
             true
         }
 
-        // Clear errors when user starts typing
         binding.usernameEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) binding.usernameTextInputLayout.error = null
         }

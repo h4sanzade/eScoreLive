@@ -43,7 +43,6 @@ class NewsDetailFragment : Fragment() {
     }
 
     private fun setupUI() {
-        // Setup initial UI state
         binding.progressBar.visibility = View.VISIBLE
         binding.contentScrollView.visibility = View.GONE
     }
@@ -63,10 +62,8 @@ class NewsDetailFragment : Fragment() {
 
                 Log.d("NewsDetailFragment", "Loading news: $newsTitle")
 
-                // Set title
                 binding.newsTitle.text = newsTitle
 
-                // Set content
                 val displayContent = if (newsContent.isNotEmpty()) {
                     formatNewsContent(newsContent)
                 } else {
@@ -74,13 +71,12 @@ class NewsDetailFragment : Fragment() {
                 }
                 binding.newsContent.text = displayContent
 
-                // Load image
+
                 loadNewsImage(newsImageUrl)
 
-                // Set publish date with formatting
                 binding.publishDate.text = formatPublishDate(newsDate)
 
-                // Set source info
+
                 val sourceText = if (!newsAuthor.isNullOrEmpty()) {
                     "By $newsAuthor • $newsSource"
                 } else {
@@ -88,15 +84,12 @@ class NewsDetailFragment : Fragment() {
                 }
                 binding.sourceInfo.text = sourceText
 
-                // Set category
                 binding.categoryBadge.text = newsCategory
                 setupCategoryBadge(newsCategory)
 
-                // Store URL for sharing
                 binding.readFullArticleBtn.tag = newsUrl
                 binding.shareButton.tag = newsUrl
 
-                // Show content
                 binding.progressBar.visibility = View.GONE
                 binding.contentScrollView.visibility = View.VISIBLE
 
@@ -140,7 +133,6 @@ class NewsDetailFragment : Fragment() {
 
     private fun formatPublishDate(dateString: String): String {
         return try {
-            // Try to parse the date and format it nicely
             val inputFormat = SimpleDateFormat("dd MMM yyyy HH:mm", Locale.getDefault())
             val date = inputFormat.parse(dateString)
 

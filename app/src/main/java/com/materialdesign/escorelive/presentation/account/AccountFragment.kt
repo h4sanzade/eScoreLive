@@ -38,15 +38,12 @@ class AccountFragment : Fragment() {
     }
 
     private fun setupUI() {
-        // Setup user profile and account settings
         binding.accountTitle.text = "My Account"
         binding.accountDescription.text = "Manage your profile and app preferences"
     }
 
     private fun observeViewModel() {
-        // Observe user data when implemented
         viewModel.userProfile.observe(viewLifecycleOwner, Observer { profile ->
-            // Update UI with user profile
         })
 
         viewModel.favoriteTeamsCount.observe(viewLifecycleOwner, Observer { count ->
@@ -71,7 +68,6 @@ class AccountFragment : Fragment() {
         }
 
         binding.favoritesButton.setOnClickListener {
-            // Navigate to team search where users can manage favorites
             try {
                 findNavController().navigate(R.id.teamSearchFragment)
             } catch (e: Exception) {

@@ -90,7 +90,6 @@ class MatchListViewModel @Inject constructor(
                         Log.d("MatchListViewModel", "Loaded ${allMatchesList.size} upcoming matches for future date: $date")
                     }
                     else -> {
-                        // FAVORITES ve diğer durumlar için
                         Log.d("MatchListViewModel", "Other display type: $displayType")
                     }
                 }
@@ -168,7 +167,6 @@ class MatchListViewModel @Inject constructor(
         val filter = _selectedFilter.value ?: MatchFilter.ALL
 
         val filteredMatches = if (isFavoritesMode) {
-            // For favorites mode, apply filters to all favorite team matches
             when (filter) {
                 MatchFilter.ALL -> allMatchesList
                 MatchFilter.LIVE -> allMatchesList.filter { it.isLive }
@@ -176,10 +174,9 @@ class MatchListViewModel @Inject constructor(
                 MatchFilter.UPCOMING -> allMatchesList.filter { it.isUpcoming }
             }
         } else {
-            // For date-based mode
             when (currentDisplayType) {
                 DisplayType.PAST -> {
-                    allMatchesList // All are finished already
+                    allMatchesList
                 }
                 DisplayType.TODAY, DisplayType.FAVORITES -> {
                     when (filter) {
@@ -190,7 +187,7 @@ class MatchListViewModel @Inject constructor(
                     }
                 }
                 DisplayType.FUTURE -> {
-                    allMatchesList // All are upcoming already
+                    allMatchesList
                 }
             }
         }
@@ -202,13 +199,12 @@ class MatchListViewModel @Inject constructor(
     private fun sortMatchesByPriority(matches: List<Match>): List<Match> {
         return matches.sortedWith(compareBy<Match> { match ->
             when {
-                match.isLive -> 0 // Live matches first
-                match.isUpcoming -> 1 // Upcoming matches second
-                match.isFinished -> 2 // Finished matches last
+                match.isLive -> 0
+                match.isUpcoming -> 1
+                match.isFinished -> 2
                 else -> 3
             }
         }.thenBy { match ->
-            // Sort by kickoff time within each category
             try {
                 val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
                 match.kickoffTime?.let { inputFormat.parse(it)?.time } ?: Long.MAX_VALUE
@@ -216,7 +212,6 @@ class MatchListViewModel @Inject constructor(
                 Long.MAX_VALUE
             }
         }.thenBy { match ->
-            // Sort by league importance
             when (match.league.id.toInt()) {
                 2 -> 0   // Champions League
                 3 -> 1   // Europa League
@@ -237,7 +232,6 @@ class MatchListViewModel @Inject constructor(
         _error.value = null
     }
 
-    // Utility methods
     fun getCurrentDisplayType(): DisplayType {
         return currentDisplayType
     }
@@ -266,7 +260,6 @@ class MatchListViewModel @Inject constructor(
         return favoriteTeamIds.isNotEmpty()
     }
 
-    // For debugging
     fun getMatchesByStatus(): Map<String, Int> {
         return mapOf(
             "live" to allMatchesList.count { it.isLive },

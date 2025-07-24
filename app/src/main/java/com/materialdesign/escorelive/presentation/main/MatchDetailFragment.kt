@@ -261,14 +261,12 @@ class MatchDetailFragment : Fragment() {
     }
 
     private fun updateTabSelection(selectedTab: View) {
-        // Clear all tab backgrounds
         binding.eventsTab.background = null
         binding.lineupTab.background = null
         binding.statisticsTab.background = null
         binding.h2hTab.background = null
         binding.standingsTab.background = null
 
-        // Set selected tab background
         selectedTab.setBackgroundResource(R.drawable.selected_day)
     }
 

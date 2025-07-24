@@ -36,25 +36,20 @@ class TeamSearchAdapter(
         fun bind(searchResult: TeamSearchResult) = with(binding) {
             val team = searchResult.team
 
-            // Team basic info
             teamName.text = team.name
             teamShortName.text = team.shortName ?: team.name.take(3).uppercase()
             leagueName.text = searchResult.leagueName
             seasonYear.text = searchResult.season.toString()
 
-            // Load team logo with improved Glide configuration
             loadTeamLogo(teamLogo, team.logo)
 
-            // Set favorite status
             val isFavorite = isTeamFavorite(team.id)
             updateFavoriteButton(isFavorite)
 
-            // Set click listeners
             root.setOnClickListener { onTeamClick(searchResult) }
 
             favoriteButton.setOnClickListener {
                 onFavoriteClick(searchResult)
-                // Update favorite button immediately with new state
                 val newFavoriteState = !isFavorite
                 updateFavoriteButton(newFavoriteState)
             }
@@ -81,7 +76,6 @@ class TeamSearchAdapter(
                 favoriteButton.setImageResource(R.drawable.ic_favorite_filled)
                 favoriteButton.setColorFilter(ContextCompat.getColor(root.context, R.color.accent_color))
 
-                // Add subtle animation for better UX
                 favoriteButton.animate()
                     .scaleX(1.2f)
                     .scaleY(1.2f)

@@ -10,10 +10,4 @@ data class User(
     val image: String,
     val accessToken: String,
     val refreshToken: String
-) {
-    val fullName: String
-        get() = "$firstName $lastName"
-
-    val initials: String
-        get() = "${firstName.firstOrNull()?.uppercase()}${lastName.firstOrNull()?.uppercase()}"
-}
+)

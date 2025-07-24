@@ -51,7 +51,6 @@ class TeamSearchViewModel @Inject constructor(
     private var searchJob: Job? = null
     private var suggestionJob: Job? = null
 
-    // Debugging için arama geçmişi
     private val searchHistory = mutableListOf<String>()
 
     init {
@@ -71,7 +70,6 @@ class TeamSearchViewModel @Inject constructor(
         }
     }
 
-    // GELİŞTİRİLMİŞ API TABANLI ARAMA FONKSİYONU
     fun searchTeams(query: String) {
         Log.d("TeamSearchViewModel", "Enhanced searchTeams called with: '$query'")
 
@@ -85,7 +83,6 @@ class TeamSearchViewModel @Inject constructor(
 
         currentSearchQuery = query
 
-        // Önceki işi iptal et
         searchJob?.cancel()
 
         searchJob = viewModelScope.launch(Dispatchers.Main) {
@@ -95,7 +92,7 @@ class TeamSearchViewModel @Inject constructor(
                 _error.value = null
 
                 // Debounce
-                delay(300) // Daha hızlı response için kısaltıldı
+                delay(300)
 
                 if (!isActive) {
                     Log.d("TeamSearchViewModel", "Job cancelled during delay")
@@ -116,12 +113,10 @@ class TeamSearchViewModel @Inject constructor(
                         Log.d("TeamSearchViewModel", "Enhanced search successful: ${results.size} results")
                         _searchResults.value = results
 
-                        // Debug: İlk birkaç sonucu logla
                         results.take(5).forEach { result ->
                             Log.d("TeamSearchViewModel", "Result: ${result.team.name} (${result.leagueName})")
                         }
 
-                        // Search history'e ekle
                         addToSearchHistory(query)
                     },
                     onFailure = { exception ->
@@ -147,7 +142,6 @@ class TeamSearchViewModel @Inject constructor(
         }
     }
 
-    // GELİŞTİRİLMİŞ API TABANLI ÖNERİ FONKSİYONU
     fun getSuggestions(query: String) {
         Log.d("TeamSearchViewModel", "Enhanced getSuggestions called with: '$query'")
 
@@ -156,14 +150,12 @@ class TeamSearchViewModel @Inject constructor(
             return
         }
 
-        // Önceki işi iptal et
         suggestionJob?.cancel()
 
         suggestionJob = viewModelScope.launch(Dispatchers.Main) {
             try {
                 Log.d("TeamSearchViewModel", "Starting enhanced API-based suggestion job for: '$query'")
 
-                // Kısa debounce
                 delay(200)
 
                 if (!isActive) {
@@ -171,7 +163,6 @@ class TeamSearchViewModel @Inject constructor(
                     return@launch
                 }
 
-                // API'den gerçek öneriler al
                 val result = repository.getTeamSuggestions(query)
 
                 if (!isActive) {
@@ -187,7 +178,6 @@ class TeamSearchViewModel @Inject constructor(
                     onFailure = { exception ->
                         Log.w("TeamSearchViewModel", "Failed to get enhanced API suggestions for '$query'", exception)
 
-                        // API başarısız olursa fallback öneriler
                         val fallbackSuggestions = getFallbackSuggestions(query)
                         _suggestions.value = fallbackSuggestions
                         Log.d("TeamSearchViewModel", "Using fallback suggestions: $fallbackSuggestions")
@@ -206,7 +196,6 @@ class TeamSearchViewModel @Inject constructor(
         }
     }
 
-    // Fallback öneriler (API başarısız olursa)
     private fun getFallbackSuggestions(query: String): List<String> {
         return getPopularTeams()
             .filter { it.contains(query, ignoreCase = true) }
@@ -220,7 +209,6 @@ class TeamSearchViewModel @Inject constructor(
             .take(6)
     }
 
-    // HIZLI ARAMA - Suggestion'a tıklandığında - TAMAMEN DÜZELTİLDİ
     fun searchTeamByExactName(teamName: String) {
         Log.d("TeamSearchViewModel", "searchTeamByExactName called with: '$teamName'")
 
@@ -231,12 +219,10 @@ class TeamSearchViewModel @Inject constructor(
 
                 Log.d("TeamSearchViewModel", "Searching exact name: '$teamName'")
 
-                // Repository'den direkt searchTeamsAdvanced kullan (çünkü searchTeamByExactName'e bağımlılık yok)
                 val result = repository.searchTeamsAdvanced(teamName)
 
                 result.fold(
                     onSuccess = { allResults ->
-                        // Exact match araması
                         val exactMatches = allResults.filter {
                             it.team.name.equals(teamName, ignoreCase = true)
                         }
@@ -245,7 +231,6 @@ class TeamSearchViewModel @Inject constructor(
                             Log.d("TeamSearchViewModel", "Found exact matches: ${exactMatches.size}")
                             _searchResults.value = exactMatches
                         } else {
-                            // Exact match bulunamazsa benzer olanları göster
                             val similarMatches = allResults.filter {
                                 it.team.name.contains(teamName, ignoreCase = true)
                             }.take(5)
@@ -297,7 +282,6 @@ class TeamSearchViewModel @Inject constructor(
                         _selectedTeamStandings.value = standings
                     },
                     onFailure = { exception ->
-                        // Try previous season if current season fails
                         Log.w("TeamSearchViewModel", "Current season failed, trying previous season")
 
                         val prevResult = repository.getStandings(teamSearchResult.leagueId, teamSearchResult.season - 1)
@@ -421,13 +405,11 @@ class TeamSearchViewModel @Inject constructor(
         _selectedTeamStandings.value = emptyList()
         _suggestions.value = emptyList()
 
-        // Cancel ongoing jobs
         searchJob?.cancel()
         suggestionJob?.cancel()
         searchJob = null
         suggestionJob = null
 
-        // Clear repository cache
         repository.clearSearchCache()
     }
 
@@ -443,51 +425,41 @@ class TeamSearchViewModel @Inject constructor(
         return favoriteTeamIds.size
     }
 
-    // GELİŞTİRİLMİŞ POPÜLER TAKIMLAR - Daha fazla ülke ve takım
     fun getPopularTeams(): List<String> {
         return listOf(
-            // İngilizce takımlar
             "Arsenal", "Chelsea", "Manchester United", "Manchester City", "Liverpool", "Tottenham",
             "Leicester City", "West Ham", "Newcastle", "Brighton", "Aston Villa", "Crystal Palace",
             "Everton", "Leeds United", "Wolverhampton", "Southampton", "Burnley", "Norwich City",
 
-            // İspanyol takımlar
             "Barcelona", "Real Madrid", "Atletico Madrid", "Sevilla", "Valencia", "Villarreal",
             "Athletic Bilbao", "Real Sociedad", "Betis", "Espanyol", "Celta Vigo", "Granada",
             "Getafe", "Cadiz", "Osasuna", "Mallorca", "Alaves", "Elche",
 
-            // Alman takımlar
             "Bayern Munich", "Borussia Dortmund", "RB Leipzig", "Bayer Leverkusen", "Borussia Monchengladbach",
             "Eintracht Frankfurt", "Wolfsburg", "Schalke", "Werder Bremen", "Hamburg", "Stuttgart",
             "Hertha Berlin", "Hoffenheim", "Mainz", "Augsburg", "Freiburg", "Cologne",
 
-            // İtalyan takımlar
             "Juventus", "Inter Milan", "AC Milan", "Roma", "Napoli", "Lazio", "Atalanta", "Fiorentina",
             "Torino", "Genoa", "Sampdoria", "Bologna", "Sassuolo", "Udinese", "Cagliari", "Verona",
             "Spezia", "Empoli", "Salernitana", "Venezia",
 
-            // Fransız takımlar
             "Paris Saint-Germain", "Marseille", "Lyon", "Monaco", "Lille", "Nice", "Rennes", "Nantes",
             "Bordeaux", "Saint-Etienne", "Strasbourg", "Montpellier", "Angers", "Lens", "Reims",
             "Brest", "Troyes", "Clermont", "Lorient", "Metz",
 
-            // Türk takımlar
             "Galatasaray", "Fenerbahce", "Besiktas", "Trabzonspor", "Basaksehir", "Antalyaspor",
             "Konyaspor", "Sivasspor", "Alanyaspor", "Rizespor", "Kayserispor", "Samsunspor",
             "Gaziantepspor", "Denizlispor", "Goztepe", "Kasimpasa", "Yeni Malatyaspor", "Hatayspor",
             "Adana Demirspor", "Giresunspor", "Altay", "Bandirmaspor", "Umraniyespor", "Istanbulspor",
 
-            // Azerbaycan takımlar
             "Qarabag", "Neftchi", "Sabah", "Zira", "Sumqayit", "Kapaz", "Sabail", "Turan Tovuz",
             "Shamakhi", "Gabala", "Keşla", "Mil-Muğan",
 
-            // Diğer popüler takımlar
             "Celtic", "Rangers", "Olympiacos", "Panathinaikos", "Ajax", "PSV", "Feyenoord",
             "Benfica", "Porto", "Sporting"
         )
     }
 
-    // TEST FONKSİYONU - Debug için
     fun testSearch() {
         Log.d("TeamSearchViewModel", "Enhanced testSearch called - using API search")
         searchTeams("Arsenal")
@@ -527,7 +499,6 @@ class TeamSearchViewModel @Inject constructor(
     }
 }
 
-// Data class for search results with league information
 data class TeamSearchResult(
     val team: Team,
     val leagueId: Int,

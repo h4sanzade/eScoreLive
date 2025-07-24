@@ -1,4 +1,4 @@
-package com.materialdesign.escorelive.data.remote
+package com.materialdesign.escorelive.di
 
 
 import android.content.Context

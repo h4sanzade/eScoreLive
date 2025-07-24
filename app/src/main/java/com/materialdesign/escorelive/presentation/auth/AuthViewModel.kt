@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import android.util.Log
 import android.util.Patterns
-import com.google.firebase.auth.AuthResult
 import com.materialdesign.escorelive.data.remote.repository.AuthRepository
 
 @HiltViewModel
@@ -98,8 +97,6 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    // ... rest of validation methods remain the same ...
-
     private fun validateLogin(username: String, password: String): Boolean {
         when {
             username.isEmpty() -> {
@@ -177,13 +174,11 @@ class AuthViewModel @Inject constructor(
     }
 
     fun isUserLoggedIn(): Boolean {
-        // This should be called from a suspend function or coroutine
-        return false // Will be handled in splash screen
+        return false
     }
 
     fun getCurrentUser(): User? {
-        // This should be called from a suspend function or coroutine
-        return null // Will be handled properly with coroutines
+        return null
     }
 
     fun setGuestMode(isGuest: Boolean) {
@@ -193,8 +188,7 @@ class AuthViewModel @Inject constructor(
     }
 
     fun isGuestMode(): Boolean {
-        // This should be called from a suspend function or coroutine
-        return false // Will be handled in splash screen
+        return false
     }
 
     fun clearError() {
@@ -202,7 +196,6 @@ class AuthViewModel @Inject constructor(
     }
 }
 
-// Updated result classes
 sealed class RegisterResult {
     object Loading : RegisterResult()
     data class Success(val message: String) : RegisterResult()

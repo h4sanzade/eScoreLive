@@ -31,15 +31,12 @@ class StandingsAdapter : ListAdapter<TeamStanding, StandingsAdapter.StandingView
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(standing: TeamStanding) = with(binding) {
-            // Position with appropriate background
             positionText.text = standing.rank.toString()
             setupPositionBackground(standing.rank)
 
-            // Team logo and name
             loadImage(teamLogo, standing.team.logo)
             teamName.text = standing.team.name
 
-            // Match statistics
             playedText.text = standing.all.played.toString()
             wonText.text = standing.all.win.toString()
             drawnText.text = standing.all.draw.toString()
@@ -48,36 +45,30 @@ class StandingsAdapter : ListAdapter<TeamStanding, StandingsAdapter.StandingView
             gaText.text = standing.all.goals.against.toString()
             pointsText.text = standing.points.toString()
 
-            // Goal difference with color coding
             setupGoalDifference(standing.goalsDiff)
 
-            // Team form if available
             setupTeamForm(standing.form)
         }
 
         private fun setupPositionBackground(rank: Int) = with(binding) {
             val backgroundRes = when (rank) {
                 in 1..4 -> {
-                    // Champions League positions
                     R.drawable.position_champions_bg
                 }
                 in 5..6 -> {
-                    // Europa League positions
                     R.drawable.position_europa_bg
                 }
                 in 18..20 -> {
-                    // Relegation positions
                     R.drawable.position_relegation_bg
                 }
                 else -> {
-                    // Normal positions
+
                     R.drawable.position_normal_bg
                 }
             }
 
             positionText.setBackgroundResource(backgroundRes)
 
-            // Add subtle animation for top 3
             if (rank <= 3) {
                 positionText.animate()
                     .scaleX(1.1f)
@@ -112,11 +103,10 @@ class StandingsAdapter : ListAdapter<TeamStanding, StandingsAdapter.StandingView
 
         private fun setupTeamForm(form: String) = with(binding) {
             if (form.isNotEmpty()) {
-                val recentForm = form.takeLast(5) // Show last 5 games
+                val recentForm = form.takeLast(5)
                 formText.text = recentForm
                 formText.visibility = android.view.View.VISIBLE
 
-                // Color code the form based on recent results
                 val formColor = calculateFormColor(recentForm)
                 formText.setTextColor(ContextCompat.getColor(root.context, formColor))
             } else {

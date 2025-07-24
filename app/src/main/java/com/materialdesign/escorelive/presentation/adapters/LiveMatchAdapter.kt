@@ -31,22 +31,17 @@ class LiveMatchAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(match: Match) = with(binding) {
-            // League info
             leagueName.text = match.league.name
             loadImage(leagueLogo, match.league.logo)
 
-            // Team names
             homeTeamName.text = match.homeTeam.name
             awayTeamName.text = match.awayTeam.name
 
-            // Team logos
             loadImage(homeTeamLogo, match.homeTeam.logo)
             loadImage(awayTeamLogo, match.awayTeam.logo)
 
-            // Match status and appearance
             setupMatchDisplay(match)
 
-            // Click listeners
             root.setOnClickListener { onMatchClick(match) }
             detailsBtn.setOnClickListener { onMatchClick(match) }
         }
@@ -82,7 +77,6 @@ class LiveMatchAdapter(
             detailsBtn.text = "Live Details"
             detailsBtn.setBackgroundColor(ContextCompat.getColor(root.context, android.R.color.holo_red_dark))
 
-            // Simple pulsing animation for live indicator (non-recursive)
             liveIndicator.animate()
                 .alpha(0.3f)
                 .setDuration(1000)
@@ -107,7 +101,6 @@ class LiveMatchAdapter(
             detailsBtn.text = "Match Report"
             detailsBtn.setBackgroundColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
 
-            // Highlight winner
             highlightWinner(match)
         }
 

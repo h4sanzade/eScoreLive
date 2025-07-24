@@ -1,8 +1,5 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Selected/Checked state -->
     <item android:color="#F63D68" android:state_checked="true" />
-    <!-- Default/Unselected state -->
     <item android:color="@android:color/darker_gray" android:state_checked="false" />
-    <!-- Fallback default state -->
     <item android:color="@android:color/darker_gray" />
 </selector>

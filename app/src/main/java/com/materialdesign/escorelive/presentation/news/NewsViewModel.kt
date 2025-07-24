@@ -57,7 +57,6 @@ class NewsViewModel @Inject constructor(
                     Log.e("NewsViewModel", "Failed to load news", exception)
                     _error.value = "Failed to load news: ${exception.message}"
 
-                    // Show cached data if available
                     val cachedNews = newsRepository.getCachedNews(category)
                     if (cachedNews.isNotEmpty()) {
                         _news.value = cachedNews
@@ -124,7 +123,6 @@ class NewsViewModel @Inject constructor(
     }
 }
 
-// Data classes
 data class NewsItem(
     val id: Long,
     val title: String,

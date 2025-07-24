@@ -22,7 +22,6 @@ class RegisterActivity : AppCompatActivity() {
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Handle window insets
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -35,13 +34,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        // Set hints for better UX
-        binding.firstNameEditText.hint = "Enter your first name"
-        binding.lastNameEditText.hint = "Enter your last name"
-        binding.usernameEditText.hint = "Choose a username"
-        binding.emailEditText.hint = "Enter your email"
-        binding.passwordEditText.hint = "Create a password (min 6 chars)"
-        binding.confirmPasswordEditText.hint = "Confirm your password"
+
     }
 
     private fun observeViewModel() {
@@ -50,7 +43,6 @@ class RegisterActivity : AppCompatActivity() {
                 is RegisterResult.Success -> {
                     hideLoading()
                     showToast("Registration successful! Please login with your credentials.")
-                    // Navigate back to login
                     navigateToLogin()
                 }
                 is RegisterResult.Error -> {
@@ -91,7 +83,6 @@ class RegisterActivity : AppCompatActivity() {
                     binding.confirmPasswordTextInputLayout.error = "Passwords do not match"
                 }
                 else -> {
-                    // No error, clear all
                 }
             }
         })
@@ -111,14 +102,13 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         binding.loginTextView.setOnClickListener {
-            finish() // Go back to login activity
+            finish()
         }
 
         binding.backButton.setOnClickListener {
             finish()
         }
 
-        // Clear errors when user starts typing
         setupErrorClearingListeners()
     }
 
@@ -174,7 +164,6 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun navigateToLogin() {
-        // Navigate back to login activity
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivity(intent)

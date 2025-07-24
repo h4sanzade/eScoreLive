@@ -123,6 +123,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
                             android:layout_weight="1"
+                            android:hint="First Name"
                             android:textColorHint="@android:color/darker_gray"
                             app:boxBackgroundColor="@color/background_color"
                             app:boxCornerRadiusBottomEnd="8dp"
@@ -130,14 +131,14 @@
                             app:boxCornerRadiusTopEnd="8dp"
                             app:boxCornerRadiusTopStart="8dp"
                             app:boxStrokeColor="@color/accent_color"
-                            app:errorTextColor="@android:color/holo_red_light">
+                            app:errorTextColor="@android:color/holo_red_light"
+                            app:hintTextColor="@android:color/darker_gray">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/first_name_edit_text"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/mulish_regular"
-                                android:hint="First Name"
                                 android:inputType="textPersonName"
                                 android:textColor="@color/white"
                                 android:textColorHint="@android:color/darker_gray" />

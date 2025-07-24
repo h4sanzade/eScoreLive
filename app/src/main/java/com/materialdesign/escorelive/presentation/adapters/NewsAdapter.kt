@@ -35,36 +35,26 @@ class NewsAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(newsItem: NewsItem) = with(binding) {
-            // Basic info
             newsTitle.text = newsItem.title
             newsSummary.text = newsItem.summary
             newsCategory.text = newsItem.category
 
-            // Load image with fallback
             loadNewsImage(newsItem.imageUrl)
 
-            // Set publish date with relative time
             newsDate.text = getRelativeTime(newsItem.publishDate)
 
-            // Calculate and set read time
             readTime.text = calculateReadTime(newsItem.summary)
 
-            // Handle category-specific styling
             setupCategoryStyle(newsItem.category)
 
-            // Handle breaking news
             handleBreakingNews(newsItem)
 
-            // Handle trending indicator
             handleTrendingIndicator(newsItem)
 
-            // Set source info
             if (!newsItem.source.isNullOrEmpty()) {
-                // You can add a source text view to the layout or use existing elements
                 newsSummary.text = "${newsItem.summary}\n\nSource: ${newsItem.source}"
             }
 
-            // Click listener with ripple effect
             root.setOnClickListener {
                 addClickAnimation()
                 onNewsClick(newsItem)
@@ -108,7 +98,6 @@ class NewsAdapter(
             newsCategory.setBackgroundResource(backgroundRes)
             newsCategory.setTextColor(ContextCompat.getColor(root.context, textColorRes))
 
-            // Add pulse animation for breaking news
             if (categoryLower.contains("breaking")) {
                 newsCategory.animate()
                     .alpha(0.7f)
@@ -133,7 +122,6 @@ class NewsAdapter(
 
             breakingOverlay.visibility = if (isBreaking) View.VISIBLE else View.GONE
 
-            // Add urgent animation for breaking news
             if (isBreaking) {
                 breakingOverlay.animate()
                     .scaleX(1.05f)
@@ -151,7 +139,6 @@ class NewsAdapter(
         }
 
         private fun handleTrendingIndicator(newsItem: NewsItem) = with(binding) {
-            // Show trending for transfer news or recent popular news
             val categoryLower = newsItem.category.lowercase()
             val titleLower = newsItem.title.lowercase()
 
@@ -164,7 +151,6 @@ class NewsAdapter(
 
             trendingIndicator.visibility = if (isTrending) View.VISIBLE else View.GONE
 
-            // Add trending animation
             if (isTrending) {
                 trendingIndicator.animate()
                     .rotationBy(360f)

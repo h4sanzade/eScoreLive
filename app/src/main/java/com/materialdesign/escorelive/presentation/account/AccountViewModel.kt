@@ -13,7 +13,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     @ApplicationContext private val context: Context
-    // private val repository: UserRepository
 ) : ViewModel() {
 
     private val _userProfile = MutableLiveData<UserProfile?>()
@@ -39,7 +38,6 @@ class AccountViewModel @Inject constructor(
             _error.value = null
 
             try {
-                // Mock user profile for now
                 val mockProfile = UserProfile(
                     id = 1,
                     username = "Football Fan",
@@ -79,7 +77,6 @@ class AccountViewModel @Inject constructor(
             _error.value = null
 
             try {
-                // Update profile logic here
                 _userProfile.value = profile
             } catch (e: Exception) {
                 _error.value = "Failed to update profile: ${e.message}"

@@ -3,7 +3,6 @@ package com.materialdesign.escorelive.di
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.materialdesign.escorelive.R
-import com.materialdesign.escorelive.data.remote.AuthApiService
 import com.materialdesign.escorelive.data.remote.FootballApiService
 import com.materialdesign.escorelive.data.remote.NewsApiService
 import dagger.Module
@@ -21,7 +20,6 @@ object NetworkModule {
 
     private const val FOOTBALL_BASE_URL = "https://v3.football.api-sports.io/"
     private const val NEWS_BASE_URL = "https://newsapi.org/v2/"
-    private const val AUTH_BASE_URL = "https://dummyjson.com/"
 
     @Provides
     @Singleton
@@ -43,15 +41,6 @@ object NetworkModule {
             .build()
     }
 
-    @Provides
-    @Singleton
-    @Named("auth")
-    fun provideAuthRetrofit(): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(AUTH_BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
 
     @Provides
     @Singleton
@@ -65,11 +54,6 @@ object NetworkModule {
         return retrofit.create(NewsApiService::class.java)
     }
 
-    @Provides
-    @Singleton
-    fun provideAuthApiService(@Named("auth") retrofit: Retrofit): AuthApiService {
-        return retrofit.create(AuthApiService::class.java)
-    }
 
     @Module
     @InstallIn(SingletonComponent::class)

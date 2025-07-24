@@ -35,7 +35,6 @@ class HomeFragment : Fragment() {
     private var selectedDayIndex = -1
     private var currentTab = MatchTab.UPCOMING
 
-    // Bottom Navigation states
     private enum class NavigationTab {
         HOME, COMPETITION, NEWS, ACCOUNT
     }
@@ -63,7 +62,6 @@ class HomeFragment : Fragment() {
         observeViewModel()
         setupClickListeners()
 
-        // Load initial data
         loadDataForSelectedDate()
     }
 
@@ -83,7 +81,6 @@ class HomeFragment : Fragment() {
                     true
                 }
                 R.id.newsFragment -> {
-                    // Navigate to actual NewsFragment instead of showing placeholder
                     navigateToNewsFragment()
                     true
                 }
@@ -101,7 +98,6 @@ class HomeFragment : Fragment() {
         try {
             findNavController().navigate(R.id.action_home_to_news)
         } catch (e: Exception) {
-            // Fallback: Show placeholder if navigation fails
             showNewsContent()
             currentNavigationTab = NavigationTab.NEWS
         }
@@ -113,12 +109,10 @@ class HomeFragment : Fragment() {
         binding.newsContent.visibility = View.GONE
         binding.accountContent.visibility = View.GONE
 
-        // Show header items only for home
         binding.appTitle.visibility = View.VISIBLE
         binding.searchId.visibility = View.VISIBLE
         binding.notificationId.visibility = View.VISIBLE
 
-        // Reload data when switching back to home
         loadDataForSelectedDate()
     }
 
@@ -128,7 +122,6 @@ class HomeFragment : Fragment() {
         binding.newsContent.visibility = View.GONE
         binding.accountContent.visibility = View.GONE
 
-        // Hide header items for other tabs
         binding.appTitle.visibility = View.GONE
         binding.searchId.visibility = View.GONE
         binding.notificationId.visibility = View.GONE
@@ -140,7 +133,6 @@ class HomeFragment : Fragment() {
         binding.newsContent.visibility = View.VISIBLE
         binding.accountContent.visibility = View.GONE
 
-        // Hide header items for other tabs
         binding.appTitle.visibility = View.GONE
         binding.searchId.visibility = View.GONE
         binding.notificationId.visibility = View.GONE
@@ -152,7 +144,6 @@ class HomeFragment : Fragment() {
         binding.newsContent.visibility = View.GONE
         binding.accountContent.visibility = View.VISIBLE
 
-        // Hide header items for other tabs
         binding.appTitle.visibility = View.GONE
         binding.searchId.visibility = View.GONE
         binding.notificationId.visibility = View.GONE
@@ -244,7 +235,6 @@ class HomeFragment : Fragment() {
                 updateSelectedDay(index)
                 updateHeaderBasedOnSelectedDate(selectedDate)
 
-                // Favorites seçili değilse takvim değişikliğinde veriyi yükle
                 if (currentTab != MatchTab.FAVORITES) {
                     loadDataForSelectedDate()
                 }
@@ -253,7 +243,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadDataForSelectedDate() {
-        // Only load data if we're on the home tab
         if (currentNavigationTab != NavigationTab.HOME) return
 
         val selectedDate = viewModel.selectedDate.value ?: dateFormat.format(Date())
@@ -275,7 +264,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadFavoriteMatches() {
-        // Only load data if we're on the home tab
         if (currentNavigationTab != NavigationTab.HOME) return
 
         viewModel.loadFavoriteTeamMatches()
@@ -440,7 +428,6 @@ class HomeFragment : Fragment() {
         selectedDayIndex = -1
         updateWeekCalendar()
 
-        // Favorites seçili değilse takvim değişikliğinde veriyi yükle
         if (currentTab != MatchTab.FAVORITES) {
             loadDataForSelectedDate()
         }
@@ -466,7 +453,6 @@ class HomeFragment : Fragment() {
                     liveMatchesAdapter.submitList(liveAndFinished)
                 }
                 MatchTab.FAVORITES -> {
-                    // Favorites ayrı olarak handle edilir
                 }
             }
         })
@@ -478,7 +464,6 @@ class HomeFragment : Fragment() {
         })
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
-            // Handle loading state if needed
         })
 
         viewModel.error.observe(viewLifecycleOwner, Observer { error ->
@@ -495,7 +480,6 @@ class HomeFragment : Fragment() {
 
             when (currentTab) {
                 MatchTab.FAVORITES -> {
-                    // Navigate to favorites matches - pass special parameter
                     try {
                         val bundle = Bundle().apply {
                             putString("selectedDate", "FAVORITES_MODE")
@@ -506,7 +490,6 @@ class HomeFragment : Fragment() {
                     }
                 }
                 else -> {
-                    // Normal date-based navigation with arguments
                     val selectedDate = viewModel.selectedDate.value ?: dateFormat.format(Date())
                     try {
                         val bundle = Bundle().apply {

@@ -91,7 +91,6 @@ class MatchDetailViewModel @Inject constructor(
                     _h2hMatches.value = matches
                 }
                 .onFailure { exception ->
-                    // H2H is optional, don't show error
                 }
         }
     }

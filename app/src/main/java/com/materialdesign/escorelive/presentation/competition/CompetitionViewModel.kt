@@ -10,7 +10,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CompetitionViewModel @Inject constructor(
-    // private val repository: CompetitionRepository
 ) : ViewModel() {
 
     private val _competitions = MutableLiveData<List<Competition>>()
@@ -32,7 +31,6 @@ class CompetitionViewModel @Inject constructor(
             _error.value = null
 
             try {
-                // Mock data for now
                 val mockCompetitions = listOf(
                     Competition(1, "Premier League", "England", "https://example.com/pl.png"),
                     Competition(2, "La Liga", "Spain", "https://example.com/laliga.png"),
@@ -59,7 +57,6 @@ class CompetitionViewModel @Inject constructor(
     }
 }
 
-// Data class for Competition
 data class Competition(
     val id: Int,
     val name: String,

@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/background_color">
 
-    <!-- Background Image/Pattern -->
     <ImageView
         android:id="@+id/background_pattern"
         android:layout_width="match_parent"
@@ -29,7 +28,6 @@
             android:layout_height="wrap_content"
             android:padding="24dp">
 
-            <!-- App Logo and Title -->
             <LinearLayout
                 android:id="@+id/header_layout"
                 android:layout_width="wrap_content"
@@ -69,7 +67,6 @@
 
             </LinearLayout>
 
-            <!-- Login Form -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/login_card"
                 android:layout_width="match_parent"
@@ -97,12 +94,12 @@
                         android:textColor="@color/white"
                         android:textSize="24sp" />
 
-                    <!-- Username Input -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/username_text_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
+                        android:hint="Username or Email"
                         android:textColorHint="@android:color/darker_gray"
                         app:boxBackgroundColor="@color/background_color"
                         app:boxCornerRadiusBottomEnd="8dp"
@@ -111,6 +108,7 @@
                         app:boxCornerRadiusTopStart="8dp"
                         app:boxStrokeColor="@color/accent_color"
                         app:errorTextColor="@android:color/holo_red_light"
+                        app:hintTextColor="@android:color/darker_gray"
                         app:startIconDrawable="@drawable/ic_account"
                         app:startIconTint="@color/accent_color">
 
@@ -119,14 +117,12 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/mulish_regular"
-                            android:hint="Username"
                             android:inputType="text"
                             android:textColor="@color/white"
                             android:textColorHint="@android:color/darker_gray" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Password Input -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/password_text_input_layout"
                         android:layout_width="match_parent"
@@ -157,7 +153,6 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Login Button -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/login_button"
                         android:layout_width="match_parent"
@@ -179,7 +174,6 @@
                         android:layout_marginBottom="16dp"
                         android:visibility="gone" />
 
-                    <!-- Demo Credentials Info -->
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -234,7 +228,6 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- Register Link -->
             <LinearLayout
                 android:id="@+id/register_layout"
                 android:layout_width="wrap_content"
@@ -269,7 +262,6 @@
 
             </LinearLayout>
 
-            <!-- Skip Login -->
             <TextView
                 android:id="@+id/skip_login_text_view"
                 android:layout_width="wrap_content"

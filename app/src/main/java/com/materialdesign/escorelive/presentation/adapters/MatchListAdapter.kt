@@ -33,26 +33,20 @@ class MatchListAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(match: Match) = with(binding) {
-            // League info
             leagueName.text = match.league.name
             loadImage(leagueLogo, match.league.logo)
 
-            // Team info
             homeTeamName.text = match.homeTeam.name
             awayTeamName.text = match.awayTeam.name
             loadImage(homeTeamLogo, match.homeTeam.logo)
             loadImage(awayTeamLogo, match.awayTeam.logo)
 
-            // Match time display
             matchTime.text = match.matchMinute
 
-            // Setup match status and appearance
             setupMatchStatus(match)
 
-            // Display match date
             displayMatchDate(match)
 
-            // Click listener
             root.setOnClickListener { onMatchClick(match) }
         }
 
@@ -87,7 +81,6 @@ class MatchListAdapter(
             matchTime.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_red_light))
             statusCard.setCardBackgroundColor(ContextCompat.getColor(root.context, R.color.live_match_bg))
 
-            // Add pulsing effect for live matches
             liveIndicator.animate()
                 .alpha(0.5f)
                 .setDuration(1000)
@@ -114,7 +107,6 @@ class MatchListAdapter(
             matchTime.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
             statusCard.setCardBackgroundColor(ContextCompat.getColor(root.context, R.color.finished_match_bg))
 
-            // Highlight winner
             highlightWinner(match)
         }
 
@@ -155,7 +147,6 @@ class MatchListAdapter(
                     homeScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_green_dark))
                     awayScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
 
-                    // Add subtle glow effect for winner
                     homeScore.animate()
                         .scaleX(1.1f)
                         .scaleY(1.1f)
@@ -173,7 +164,6 @@ class MatchListAdapter(
                     awayScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_green_dark))
                     homeScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
 
-                    // Add subtle glow effect for winner
                     awayScore.animate()
                         .scaleX(1.1f)
                         .scaleY(1.1f)

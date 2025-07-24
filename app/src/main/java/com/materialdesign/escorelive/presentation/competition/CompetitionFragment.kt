@@ -39,15 +39,12 @@ class CompetitionFragment : Fragment() {
     }
 
     private fun setupUI() {
-        // Setup RecyclerViews and UI components
         binding.competitionTitle.text = "Competitions"
         binding.competitionDescription.text = "Explore leagues, tournaments and standings"
     }
 
     private fun observeViewModel() {
-        // Observe competition data when implemented
         viewModel.competitions.observe(viewLifecycleOwner, Observer { competitions ->
-            // Update UI with competitions
         })
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
@@ -67,8 +64,7 @@ class CompetitionFragment : Fragment() {
             Toast.makeText(context, "Competition exploration coming soon!", Toast.LENGTH_SHORT).show()
         }
 
-        // Add click listeners for competition cards when implemented
-        // For now, just show toast messages
+
     }
 
     override fun onDestroyView() {

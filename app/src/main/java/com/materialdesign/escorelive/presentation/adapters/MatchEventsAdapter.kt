@@ -27,7 +27,6 @@ class MatchEventsAdapter : ListAdapter<MatchEvent, MatchEventsAdapter.EventViewH
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(event: MatchEvent) = with(binding) {
-            // Event timing
             eventMinute.text = "${event.minute}'"
             playerName.text = event.player
             eventDetail.text = event.detail
@@ -102,16 +101,12 @@ class MatchEventsAdapter : ListAdapter<MatchEvent, MatchEventsAdapter.EventViewH
 
             teamIndicator.setBackgroundColor(ContextCompat.getColor(root.context, teamColor))
 
-            // Layout direction based on team
             if (event.isHomeTeam) {
-                // Home team events on the left
                 root.layoutDirection = android.view.View.LAYOUT_DIRECTION_LTR
             } else {
-                // Away team events on the right
                 root.layoutDirection = android.view.View.LAYOUT_DIRECTION_RTL
             }
 
-            // Add subtle slide animation based on team
             val slideDirection = if (event.isHomeTeam) -50f else 50f
             root.translationX = slideDirection
             root.animate()

@@ -31,24 +31,19 @@ class H2HAdapter : ListAdapter<Match, H2HAdapter.H2HViewHolder>(H2HDiffCallback(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(match: Match) = with(binding) {
-            // Format and display match date
             displayMatchDate(match)
 
-            // Team names and logos
             homeTeamName.text = match.homeTeam.name
             awayTeamName.text = match.awayTeam.name
 
             loadImage(homeTeamLogo, match.homeTeam.logo)
             loadImage(awayTeamLogo, match.awayTeam.logo)
 
-            // Scores
             homeScore.text = match.homeScore.toString()
             awayScore.text = match.awayScore.toString()
 
-            // League name
             leagueName.text = match.league.name
 
-            // Highlight winner with animation
             highlightWinner(match)
         }
 
@@ -71,15 +66,12 @@ class H2HAdapter : ListAdapter<Match, H2HAdapter.H2HViewHolder>(H2HDiffCallback(
         private fun highlightWinner(match: Match) = with(binding) {
             when {
                 match.homeScore > match.awayScore -> {
-                    // Home team won
                     homeScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_green_dark))
                     awayScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
 
-                    // Add winner badge
                     homeTeamName.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_green_dark))
                     awayTeamName.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
 
-                    // Subtle animation for winner
                     homeScore.animate()
                         .scaleX(1.15f)
                         .scaleY(1.15f)
@@ -94,15 +86,12 @@ class H2HAdapter : ListAdapter<Match, H2HAdapter.H2HViewHolder>(H2HDiffCallback(
                         .start()
                 }
                 match.awayScore > match.homeScore -> {
-                    // Away team won
                     awayScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_green_dark))
                     homeScore.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
 
-                    // Add winner badge
                     awayTeamName.setTextColor(ContextCompat.getColor(root.context, android.R.color.holo_green_dark))
                     homeTeamName.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
 
-                    // Subtle animation for winner
                     awayScore.animate()
                         .scaleX(1.15f)
                         .scaleY(1.15f)
@@ -117,7 +106,6 @@ class H2HAdapter : ListAdapter<Match, H2HAdapter.H2HViewHolder>(H2HDiffCallback(
                         .start()
                 }
                 else -> {
-                    // Draw
                     homeScore.setTextColor(ContextCompat.getColor(root.context, R.color.white))
                     awayScore.setTextColor(ContextCompat.getColor(root.context, R.color.white))
                     homeTeamName.setTextColor(ContextCompat.getColor(root.context, R.color.white))

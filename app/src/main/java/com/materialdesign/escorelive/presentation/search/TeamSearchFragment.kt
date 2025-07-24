@@ -49,10 +49,8 @@ class TeamSearchFragment : Fragment() {
         observeViewModel()
         setupClickListeners()
 
-        // Show initial state
         showInitialState()
 
-        // Test the search functionality
         Log.d("TeamSearchFragment", "Setup complete")
     }
 
@@ -143,7 +141,6 @@ class TeamSearchFragment : Fragment() {
             }
         })
 
-        // SearchView'a focus ver
         binding.searchView.requestFocus()
         binding.searchView.isIconified = false
     }
@@ -334,7 +331,6 @@ class TeamSearchFragment : Fragment() {
         setupPopularTeamsChips()
         updateFavoritesCounter()
 
-        // TEST BUTTON - Debug için
         binding.root.setOnLongClickListener {
             Log.d("TeamSearchFragment", "Long click detected, testing search")
             viewModel.testSearch()

@@ -70,34 +70,28 @@ class MatchListFragment : Fragment() {
     private fun setupFavoritesMode() {
         binding.headerTitle.text = "Favorite Teams Matches"
 
-        // Show all filter buttons for favorites
         binding.filterScrollView.visibility = View.VISIBLE
         binding.filterAll.visibility = View.VISIBLE
         binding.filterLive.visibility = View.VISIBLE
         binding.filterFinished.visibility = View.VISIBLE
         binding.filterUpcoming.visibility = View.VISIBLE
 
-        // Set filter texts for favorites context
         binding.filterAll.text = "All Matches"
         binding.filterLive.text = "Live Now"
         binding.filterFinished.text = "Finished"
         binding.filterUpcoming.text = "Upcoming"
 
-        // Load favorite team matches
         viewModel.loadFavoriteTeamMatches()
 
-        // Show info about favorites
         showFavoritesInfo()
     }
 
     private fun showFavoritesInfo() {
         val favoritesCount = viewModel.getFavoriteTeamsCount()
         if (favoritesCount == 0) {
-            // Show empty state for no favorites
             binding.emptyStateLayout.visibility = View.VISIBLE
             binding.matchesRecyclerView.visibility = View.GONE
 
-            // Update empty state text for favorites
             binding.emptyStateLayout.findViewById<android.widget.TextView>(R.id.empty_state_title)?.text = "No Favorite Teams"
             binding.emptyStateLayout.findViewById<android.widget.TextView>(R.id.empty_state_message)?.text = "Add teams to favorites to see their matches here"
         } else {
@@ -262,13 +256,10 @@ class MatchListFragment : Fragment() {
             binding.emptyStateLayout.visibility = View.VISIBLE
             binding.matchesRecyclerView.visibility = View.GONE
 
-            // Update empty state message based on context
             if (viewModel.isFavoritesModeActive()) {
                 if (viewModel.getFavoriteTeamsCount() == 0) {
-                    // No favorite teams at all - show custom message
                     showCustomEmptyState("No Favorite Teams", "Add teams to favorites to see their matches here")
                 } else {
-                    // Have favorite teams but no matches for current filter
                     val filterName = when (viewModel.selectedFilter.value) {
                         MatchFilter.LIVE -> "live"
                         MatchFilter.FINISHED -> "finished"
@@ -278,7 +269,6 @@ class MatchListFragment : Fragment() {
                     showCustomEmptyState("No $filterName matches", "Try a different filter or check back later")
                 }
             } else {
-                // Regular date-based empty state
                 showCustomEmptyState("No matches found", "Pull down to refresh")
             }
         } else {
@@ -288,10 +278,7 @@ class MatchListFragment : Fragment() {
     }
 
     private fun showCustomEmptyState(title: String, message: String) {
-        // Create custom empty state views if they don't exist in layout
-        // Since we can't be sure about the exact layout structure, we'll use a simpler approach
 
-        // Try to find existing TextView elements or use Toast as fallback
         try {
             val titleView = binding.emptyStateLayout.findViewById<android.widget.TextView>(R.id.empty_state_title)
             val messageView = binding.emptyStateLayout.findViewById<android.widget.TextView>(R.id.empty_state_message)
@@ -299,7 +286,6 @@ class MatchListFragment : Fragment() {
             titleView?.text = title
             messageView?.text = message
         } catch (e: Exception) {
-            // If layout doesn't have these specific IDs, show as toast
             Toast.makeText(context, "$title: $message", Toast.LENGTH_LONG).show()
         }
     }

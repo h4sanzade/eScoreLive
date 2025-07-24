@@ -26,7 +26,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- App Logo -->
         <androidx.cardview.widget.CardView
             android:layout_width="140dp"
             android:layout_height="140dp"

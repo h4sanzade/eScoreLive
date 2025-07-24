@@ -25,21 +25,16 @@ class LineupAdapter : ListAdapter<LineupPlayer, LineupAdapter.LineupViewHolder>(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(player: LineupPlayer) = with(binding) {
-            // Player basic info
             playerNumber.text = player.number.toString()
             playerName.text = player.name
             playerPosition.text = player.position
 
-            // Setup player rating
             setupPlayerRating(player)
 
-            // Setup starting/substitute status
             setupPlayerStatus(player)
 
-            // Setup team indicator
             setupTeamIndicator(player)
 
-            // Add entrance animation
             addEntranceAnimation()
         }
 
@@ -50,7 +45,6 @@ class LineupAdapter : ListAdapter<LineupPlayer, LineupAdapter.LineupViewHolder>(
 
                 val (ratingColor, ratingBackground) = when {
                     player.rating >= 8.5f -> {
-                        // Excellent performance
                         Pair(android.R.color.white, android.R.color.holo_green_dark)
                     }
                     player.rating >= 8.0f -> {
@@ -63,7 +57,6 @@ class LineupAdapter : ListAdapter<LineupPlayer, LineupAdapter.LineupViewHolder>(
                         Pair(android.R.color.white, android.R.color.holo_orange_dark)
                     }
                     else -> {
-                        // Poor performance
                         Pair(android.R.color.white, android.R.color.holo_red_light)
                     }
                 }
@@ -71,7 +64,6 @@ class LineupAdapter : ListAdapter<LineupPlayer, LineupAdapter.LineupViewHolder>(
                 playerRating.setTextColor(ContextCompat.getColor(root.context, ratingColor))
                 playerRating.setBackgroundResource(ratingBackground)
 
-                // Add pulse animation for high ratings
                 if (player.rating >= 8.0f) {
                     playerRating.animate()
                         .scaleX(1.2f)
@@ -106,7 +98,6 @@ class LineupAdapter : ListAdapter<LineupPlayer, LineupAdapter.LineupViewHolder>(
                 startingIndicator.setTextColor(ContextCompat.getColor(root.context, android.R.color.darker_gray))
             }
 
-            // Jersey number styling
             playerNumber.setBackgroundResource(R.drawable.jersey_number_bg)
 
             // Position-based styling
@@ -132,7 +123,6 @@ class LineupAdapter : ListAdapter<LineupPlayer, LineupAdapter.LineupViewHolder>(
         }
 
         private fun addEntranceAnimation() = with(binding) {
-            // Slide in animation based on team
             val position = adapterPosition
             if (position != RecyclerView.NO_POSITION) {
                 val slideDirection = if (position % 2 == 0) -100f else 100f
@@ -143,7 +133,7 @@ class LineupAdapter : ListAdapter<LineupPlayer, LineupAdapter.LineupViewHolder>(
                     .translationX(0f)
                     .alpha(1f)
                     .setDuration(300)
-                    .setStartDelay((position % 5) * 50L) // Staggered animation
+                    .setStartDelay((position % 5) * 50L)
                     .start()
             }
         }

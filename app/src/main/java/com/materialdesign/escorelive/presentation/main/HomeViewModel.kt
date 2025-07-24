@@ -157,9 +157,7 @@ class HomeViewModel @Inject constructor(
             try {
                 Log.d("HomeViewModel", "Loading live and finished matches for date: $date")
 
-                // Load live matches
                 val liveMatchesResult = repository.getLiveMatches()
-                // Load today's finished matches
                 val todayMatchesResult = repository.getMatchesByDate(date)
 
                 liveMatchesResult.onSuccess { liveMatches ->
@@ -175,7 +173,6 @@ class HomeViewModel @Inject constructor(
 
                         Log.d("HomeViewModel", "Loaded ${liveMatches.size} live and ${finishedMatches.size} finished matches")
 
-                        // Debug: Log live matches
                         liveMatches.filter { it.isLive }.take(3).forEach { match ->
                             Log.d("HomeViewModel", "Live: ${match.homeTeam.name} vs ${match.awayTeam.name} - ${match.matchMinute}")
                         }
@@ -206,14 +203,12 @@ class HomeViewModel @Inject constructor(
             try {
                 Log.d("HomeViewModel", "Loading matches for ${favoriteTeamIds.size} favorite teams")
 
-                // Repository'den favori takımların maçlarını getir
                 repository.getFavoriteTeamsMatches(favoriteTeamIds)
                     .onSuccess { matches ->
                         val sortedMatches = sortMatchesByStatus(matches)
                         _favoriteMatches.value = sortedMatches
                         Log.d("HomeViewModel", "Loaded ${sortedMatches.size} favorite team matches")
 
-                        // Debug: İlk birkaç maçı logla
                         sortedMatches.take(3).forEach { match ->
                             Log.d("HomeViewModel", "Favorite match: ${match.homeTeam.name} vs ${match.awayTeam.name} (${match.league.name})")
                         }
@@ -362,7 +357,6 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-        // Also refresh favorite matches
         if (favoriteTeamIds.isNotEmpty()) {
             loadFavoriteTeamMatches()
         }
@@ -433,7 +427,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // Additional utility methods for better functionality
     fun getFavoriteTeamIds(): Set<Long> {
         return favoriteTeamIds.toSet()
     }
@@ -446,7 +439,6 @@ class HomeViewModel @Inject constructor(
         return favoriteTeamIds.isNotEmpty()
     }
 
-    // Method to get matches filtered by current tab selection
     fun getMatchesForTab(tabType: String, date: String) {
         when (tabType.lowercase()) {
             "upcoming" -> loadUpcomingMatches(date)
@@ -456,7 +448,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // Test method for debugging
     fun testFavoriteTeamMatches() {
         Log.d("HomeViewModel", "Testing favorite team matches with IDs: $favoriteTeamIds")
         if (favoriteTeamIds.isNotEmpty()) {
@@ -466,7 +457,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    // Method to manually add test favorite teams (for debugging)
     fun addTestFavoriteTeams() {
         favoriteTeamIds.addAll(listOf(1L, 7L, 16L)) // Arsenal, Barcelona, Galatasaray
         saveFavoriteTeamIds()
@@ -474,7 +464,6 @@ class HomeViewModel @Inject constructor(
         loadFavoriteTeamMatches()
     }
 
-    // Get current matches by status
     fun getCurrentLiveMatches(): List<Match> {
         return _liveMatches.value ?: emptyList()
     }
@@ -491,7 +480,6 @@ class HomeViewModel @Inject constructor(
         return _todayMatches.value ?: emptyList()
     }
 
-    // Force refresh all data
     fun forceRefreshAll() {
         viewModelScope.launch {
             Log.d("HomeViewModel", "Force refreshing all data")
@@ -499,18 +487,14 @@ class HomeViewModel @Inject constructor(
             _isLoading.value = true
 
             try {
-                // Reload favorite team IDs
                 loadFavoriteTeamIds()
 
-                // Refresh current date matches
                 _selectedDate.value?.let { date ->
                     loadMatchesByDate(date)
                 }
 
-                // Refresh live matches
                 loadLiveMatches()
 
-                // Refresh favorite matches if any
                 if (favoriteTeamIds.isNotEmpty()) {
                     loadFavoriteTeamMatches()
                 }

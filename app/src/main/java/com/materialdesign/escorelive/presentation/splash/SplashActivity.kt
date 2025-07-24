@@ -33,7 +33,6 @@ class SplashActivity : AppCompatActivity() {
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Handle window insets
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -45,7 +44,6 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        // Start animations
         startLogoAnimation()
         startProgressAnimation()
     }
@@ -91,7 +89,6 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun startProgressAnimation() {
-        // Start progress bar animation
         Handler(Looper.getMainLooper()).postDelayed({
             binding.progressIndicator.apply {
                 alpha = 0f
@@ -117,20 +114,16 @@ class SplashActivity : AppCompatActivity() {
 
                 when {
                     isLoggedIn -> {
-                        // User is logged in, go to main activity
                         navigateToMain()
                     }
                     isGuest -> {
-                        // User is in guest mode, go to main activity
                         navigateToMain()
                     }
                     else -> {
-                        // User is not logged in, go to login activity
                         navigateToLogin()
                     }
                 }
             } catch (e: Exception) {
-                // If there's an error, go to login
                 navigateToLogin()
             }
         }

@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,17 +23,15 @@ class AuthDataStore @Inject constructor(
         private val EMAIL = stringPreferencesKey("email")
         private val FIRST_NAME = stringPreferencesKey("first_name")
         private val LAST_NAME = stringPreferencesKey("last_name")
-        private val PASSWORD = stringPreferencesKey("password") // For demo purposes only
+        private val PASSWORD = stringPreferencesKey("password")
         private val ACCESS_TOKEN = stringPreferencesKey("access_token")
         private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
     }
 
-    // Check if user is logged in
     val isLoggedIn: Flow<Boolean> = dataStore.data.map { preferences ->
         preferences[IS_LOGGED_IN] ?: false
     }
 
-    // Check if in guest mode
     val isGuestMode: Flow<Boolean> = dataStore.data.map { preferences ->
         preferences[IS_GUEST_MODE] ?: false
     }
@@ -45,13 +44,13 @@ class AuthDataStore @Inject constructor(
             email = preferences[EMAIL] ?: "",
             firstName = preferences[FIRST_NAME] ?: "",
             lastName = preferences[LAST_NAME] ?: "",
-            password = preferences[PASSWORD] ?: "", // For demo purposes
+            password = preferences[PASSWORD] ?: "",
             accessToken = preferences[ACCESS_TOKEN] ?: "",
             refreshToken = preferences[REFRESH_TOKEN] ?: ""
         )
     }
 
-    // Save user login data
+
     suspend fun saveUserLogin(userData: UserData) {
         dataStore.edit { preferences ->
             preferences[IS_LOGGED_IN] = true
@@ -67,7 +66,6 @@ class AuthDataStore @Inject constructor(
         }
     }
 
-    // Save user registration data
     suspend fun saveUserRegistration(
         firstName: String,
         lastName: String,
@@ -76,30 +74,31 @@ class AuthDataStore @Inject constructor(
         password: String
     ) {
         dataStore.edit { preferences ->
-            preferences[IS_LOGGED_IN] = false // Don't auto-login after registration
+            preferences[IS_LOGGED_IN] = false
             preferences[IS_GUEST_MODE] = false
-            preferences[USER_ID] = System.currentTimeMillis().toString() // Generate unique ID
+            preferences[USER_ID] = System.currentTimeMillis().toString()
             preferences[USERNAME] = username
             preferences[EMAIL] = email
             preferences[FIRST_NAME] = firstName
             preferences[LAST_NAME] = lastName
-            preferences[PASSWORD] = password // Store for demo purposes
+            preferences[PASSWORD] = password
         }
     }
 
-    // Validate login credentials
     suspend fun validateLogin(username: String, password: String): Boolean {
-        var isValid = false
-        dataStore.data.collect { preferences ->
+        return try {
+            val preferences = dataStore.data.first()
             val storedUsername = preferences[USERNAME] ?: ""
             val storedPassword = preferences[PASSWORD] ?: ""
-            isValid = (storedUsername == username && storedPassword == password) ||
+            val storedEmail = preferences[EMAIL] ?: ""
+
+            (storedUsername == username && storedPassword == password) ||
                     (storedEmail == username && storedPassword == password)
+        } catch (e: Exception) {
+            false
         }
-        return isValid
     }
 
-    // Set guest mode
     suspend fun setGuestMode(isGuest: Boolean) {
         dataStore.edit { preferences ->
             preferences[IS_GUEST_MODE] = isGuest
@@ -107,7 +106,6 @@ class AuthDataStore @Inject constructor(
         }
     }
 
-    // Logout user
     suspend fun logout() {
         dataStore.edit { preferences ->
             preferences[IS_LOGGED_IN] = false
@@ -116,31 +114,20 @@ class AuthDataStore @Inject constructor(
             preferences[REFRESH_TOKEN] = ""
         }
     }
-
-    // Clear all data
     suspend fun clearAllData() {
         dataStore.edit { preferences ->
             preferences.clear()
         }
     }
-
-    // Helper property for email validation
-    private val storedEmail: String
-        get() {
-            var email = ""
-            // This is a simplified approach for demo
-            return email
-        }
 }
 
-// Data class for user information
 data class UserData(
     val userId: String = "",
     val username: String = "",
     val email: String = "",
     val firstName: String = "",
     val lastName: String = "",
-    val password: String = "", // For demo purposes only
+    val password: String = "",
     val accessToken: String = "",
     val refreshToken: String = ""
 )

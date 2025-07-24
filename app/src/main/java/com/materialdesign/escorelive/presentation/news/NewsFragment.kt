@@ -62,7 +62,6 @@ class NewsFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             setHasFixedSize(true)
 
-            // Add scroll listener for pagination
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
@@ -71,7 +70,6 @@ class NewsFragment : Fragment() {
                     val totalItemCount = layoutManager.itemCount
                     val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
 
-                    // Load more when scrolled to bottom
                     if (!isLoadingMore &&
                         lastVisibleItemPosition >= totalItemCount - 5 &&
                         totalItemCount > 0) {
@@ -85,7 +83,6 @@ class NewsFragment : Fragment() {
     }
 
     private fun setupCategoryTabs() {
-        // Initially select "All News"
         updateCategorySelection(NewsCategory.ALL)
 
         binding.categoryAll.setOnClickListener {
@@ -125,7 +122,6 @@ class NewsFragment : Fragment() {
         viewModel.news.observe(viewLifecycleOwner, Observer { newsList ->
             Log.d("NewsFragment", "Received ${newsList.size} news articles")
             newsAdapter.submitList(newsList) {
-                // Scroll to top when new category is selected
                 if (binding.newsRecyclerView.canScrollVertically(-1)) {
                     binding.newsRecyclerView.scrollToPosition(0)
                 }
@@ -138,7 +134,6 @@ class NewsFragment : Fragment() {
             Log.d("NewsFragment", "Loading state: $isLoading")
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
 
-            // Hide empty state while loading
             if (isLoading) {
                 binding.emptyStateLayout.visibility = View.GONE
             }
@@ -168,7 +163,6 @@ class NewsFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        // Remove the old refresh button click listener since we're using swipe refresh
     }
 
     private fun selectCategory(category: NewsCategory) {
@@ -178,13 +172,11 @@ class NewsFragment : Fragment() {
     }
 
     private fun updateCategorySelection(category: NewsCategory) {
-        // Reset all backgrounds
         binding.categoryAll.setBackgroundResource(R.drawable.filter_unselected_bg)
         binding.categoryTransfers.setBackgroundResource(R.drawable.filter_unselected_bg)
         binding.categoryMatches.setBackgroundResource(R.drawable.filter_unselected_bg)
         binding.categoryInjuries.setBackgroundResource(R.drawable.filter_unselected_bg)
 
-        // Set selected background
         when (category) {
             NewsCategory.ALL -> binding.categoryAll.setBackgroundResource(R.drawable.bottom_line_selected)
             NewsCategory.TRANSFERS -> binding.categoryTransfers.setBackgroundResource(R.drawable.bottom_line_selected)
@@ -206,7 +198,6 @@ class NewsFragment : Fragment() {
             binding.emptyStateLayout.visibility = View.VISIBLE
             binding.newsRecyclerView.visibility = View.GONE
 
-            // Update empty state text based on category
             val categoryText = when (currentCategory) {
                 NewsCategory.TRANSFERS -> "transfer news"
                 NewsCategory.MATCHES -> "match reports"
@@ -252,7 +243,6 @@ class NewsFragment : Fragment() {
         super.onResume()
         Log.d("NewsFragment", "Fragment resumed")
 
-        // Refresh news if it's been a while
         val newsCount = viewModel.getNewsCount()
         if (newsCount == 0) {
             viewModel.refreshNews()
