@@ -13,7 +13,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.ItemLeagueFilterBinding
-import com.materialdesign.escorelive.domain.model.League
+import com.materialdesign.escorelive.presentation.filter.League
 
 class LeagueFilterAdapter(
     private val onLeagueClick: (League) -> Unit,
@@ -37,7 +37,7 @@ class LeagueFilterAdapter(
 
     fun updateSelectedLeagues(selected: Set<String>) {
         selectedLeagues = selected
-        notifyDataSetChanged() // Update all items to reflect selection changes
+        notifyDataSetChanged()
         onSelectionChanged(selected.size)
     }
 
@@ -50,11 +50,11 @@ class LeagueFilterAdapter(
             leagueName.text = league.name
             leagueCountry.text = league.country
 
-            // Load league flag/logo
-            loadLeagueImage(leagueFlagImage, league.flagUrl)
+            // Load league logo
+            loadLeagueImage(leagueFlagImage, league.logoUrl)
 
             // Set selection state
-            val isSelected = selectedLeagues.contains(league.id)
+            val isSelected = selectedLeagues.contains(league.name)
             leagueCheckbox.isChecked = isSelected
 
             // Update UI based on selection

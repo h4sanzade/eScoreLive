@@ -123,12 +123,10 @@ class FilterLeaguesFragment : Fragment() {
             viewModel.saveSelectedLeagues()
         }
 
-        // Select all button
         binding.selectAllButton.setOnClickListener {
             viewModel.selectAllLeagues()
         }
 
-        // Clear all button
         binding.clearAllButton.setOnClickListener {
             viewModel.clearAllSelections()
         }

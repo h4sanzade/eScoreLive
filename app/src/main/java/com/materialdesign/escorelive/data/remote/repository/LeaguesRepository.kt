@@ -1,7 +1,6 @@
 // LeaguesRepository.kt
 package com.materialdesign.escorelive.data.remote.repository
 
-import com.materialdesign.escorelive.data.remote.LeaguesApiService
 import com.materialdesign.escorelive.presentation.filter.League
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -26,7 +25,7 @@ class LeaguesRepository @Inject constructor(
                                 id = leagueDto.id.toString(),
                                 name = leagueDto.name,
                                 country = leagueDto.country,
-                                flagUrl = leagueDto.flag ?: leagueDto.logo
+                                logoUrl = leagueDto.flag ?: leagueDto.logo
                             )
                         }
                         Result.success(leagues)
@@ -55,7 +54,7 @@ class LeaguesRepository @Inject constructor(
                                 id = leagueDto.id.toString(),
                                 name = leagueDto.name,
                                 country = leagueDto.country,
-                                flagUrl = leagueDto.flag ?: leagueDto.logo
+                                logoUrl = leagueDto.flag ?: leagueDto.logo
                             )
                         }
                         Result.success(leagues)
@@ -84,7 +83,7 @@ class LeaguesRepository @Inject constructor(
                                 id = leagueDto.id.toString(),
                                 name = leagueDto.name,
                                 country = leagueDto.country,
-                                flagUrl = leagueDto.flag ?: leagueDto.logo
+                                logoUrl = leagueDto.flag ?: leagueDto.logo
                             )
                         }
                         Result.success(leagues)

@@ -6,14 +6,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.materialdesign.escorelive.data.local.AccountDataStore
-import com.materialdesign.escorelive.data.remote.repository.LeaguesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class FilterLeaguesViewModel @Inject constructor(
-    private val leaguesRepository: LeaguesRepository,
     private val accountDataStore: AccountDataStore
 ) : ViewModel() {
 
@@ -43,21 +41,10 @@ class FilterLeaguesViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // Load leagues from API
-                leaguesRepository.getAllLeagues()
-                    .onSuccess { leaguesList ->
-                        allLeagues = leaguesList
-                        filteredLeagues = leaguesList
-                        _leagues.value = leaguesList
-                    }
-                    .onFailure { exception ->
-                        _error.value = "Failed to load leagues: ${exception.message}"
-                        // Load mock data as fallback
-                        loadMockLeagues()
-                    }
-            } catch (e: Exception) {
-                _error.value = "Network error: ${e.message}"
+                // Load mock data for demo
                 loadMockLeagues()
+            } catch (e: Exception) {
+                _error.value = "Failed to load leagues: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
@@ -65,7 +52,7 @@ class FilterLeaguesViewModel @Inject constructor(
     }
 
     private fun loadMockLeagues() {
-        // Mock data for development/testing
+        // Mock data for demo
         allLeagues = listOf(
             League("1", "Premier League", "England", "https://media.api-sports.io/football/leagues/39.png"),
             League("2", "La Liga", "Spain", "https://media.api-sports.io/football/leagues/140.png"),
@@ -85,7 +72,7 @@ class FilterLeaguesViewModel @Inject constructor(
     private fun loadSelectedLeagues() {
         viewModelScope.launch {
             try {
-                val savedLeagues = accountDataStore.getSelectedLeagues()
+                val savedLeagues = accountDataStore.getAppSettings().selectedLeagues
                 _selectedLeagues.value = savedLeagues.toSet()
             } catch (e: Exception) {
                 _selectedLeagues.value = emptySet()
@@ -108,18 +95,18 @@ class FilterLeaguesViewModel @Inject constructor(
     fun toggleLeagueSelection(league: League) {
         val currentSelected = _selectedLeagues.value?.toMutableSet() ?: mutableSetOf()
 
-        if (currentSelected.contains(league.id)) {
-            currentSelected.remove(league.id)
+        if (currentSelected.contains(league.name)) {
+            currentSelected.remove(league.name)
         } else {
-            currentSelected.add(league.id)
+            currentSelected.add(league.name)
         }
 
         _selectedLeagues.value = currentSelected
     }
 
     fun selectAllLeagues() {
-        val allLeagueIds = filteredLeagues.map { it.id }.toSet()
-        _selectedLeagues.value = allLeagueIds
+        val allLeagueNames = filteredLeagues.map { it.name }.toSet()
+        _selectedLeagues.value = allLeagueNames
     }
 
     fun clearAllSelections() {
@@ -129,11 +116,7 @@ class FilterLeaguesViewModel @Inject constructor(
     fun saveSelectedLeagues() {
         viewModelScope.launch {
             try {
-                val selectedIds = _selectedLeagues.value ?: emptySet()
-                val selectedLeagueNames = allLeagues
-                    .filter { selectedIds.contains(it.id) }
-                    .map { it.name }
-
+                val selectedLeagueNames = _selectedLeagues.value?.toList() ?: emptyList()
                 accountDataStore.saveSelectedLeagues(selectedLeagueNames)
                 _saveCompleted.value = true
             } catch (e: Exception) {
@@ -152,6 +135,5 @@ data class League(
     val id: String,
     val name: String,
     val country: String,
-    val flagUrl: String,
-    val isSelected: Boolean = false
+    val logoUrl: String
 )
