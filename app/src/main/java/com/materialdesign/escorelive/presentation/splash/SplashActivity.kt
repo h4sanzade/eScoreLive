@@ -1,5 +1,6 @@
 package com.materialdesign.escorelive.presentation.splash
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@SuppressLint("CustomSplashScreen")
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 
@@ -26,7 +28,7 @@ class SplashActivity : AppCompatActivity() {
     @Inject
     lateinit var authDataStore: AuthDataStore
 
-    private val splashTimeOut: Long = 2500 // 2.5 seconds
+    private val splashTimeOut: Long = 3500
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

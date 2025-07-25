@@ -44,13 +44,10 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        // Initialize terms overlay view
         termsOverlayView = findViewById(R.id.terms_overlay)
 
-        // Initial state - register button disabled
         updateRegisterButtonState(false)
 
-        // Initial terms text
         updateTermsText()
     }
 
@@ -69,10 +66,8 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun showTermsDialog() {
-        // Show overlay
         termsOverlayView.visibility = View.VISIBLE
 
-        // Get overlay views from the included layout
         val termsScrollView = termsOverlayView.findViewById<ScrollView>(R.id.terms_scroll_view)
         val scrollInstruction = termsOverlayView.findViewById<TextView>(R.id.scroll_instruction)
         val closeButton = termsOverlayView.findViewById<Button>(R.id.close_button)
@@ -80,7 +75,6 @@ class RegisterActivity : AppCompatActivity() {
 
         var hasScrolledToBottom = false
 
-        // Setup scroll listener
         termsScrollView.viewTreeObserver.addOnScrollChangedListener(object : ViewTreeObserver.OnScrollChangedListener {
             override fun onScrollChanged() {
                 val view = termsScrollView.getChildAt(0)
@@ -88,11 +82,9 @@ class RegisterActivity : AppCompatActivity() {
                     val scrollY = termsScrollView.scrollY
                     val diff = (view.bottom - (termsScrollView.height + scrollY))
 
-                    // Check if scrolled to bottom (with small tolerance)
                     if (diff <= 10 && !hasScrolledToBottom) {
                         hasScrolledToBottom = true
                         enableAcceptButton(acceptButton, scrollInstruction)
-                        // Remove listener to prevent multiple calls
                         termsScrollView.viewTreeObserver.removeOnScrollChangedListener(this)
                     }
                 }
@@ -113,7 +105,6 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        // Set initial alpha and animate
         termsOverlayView.alpha = 0f
         termsOverlayView.animate().alpha(1f).setDuration(300).start()
     }
@@ -194,7 +185,6 @@ class RegisterActivity : AppCompatActivity() {
                     binding.confirmPasswordTextInputLayout.error = "Passwords do not match"
                 }
                 else -> {
-                    // No error
                 }
             }
         })
@@ -292,11 +282,9 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // No need to dismiss dialog anymore since we're using overlay
     }
 
     override fun onBackPressed() {
-        // Handle back press - close terms overlay if open
         if (termsOverlayView.visibility == View.VISIBLE) {
             hideTermsDialog()
         } else {

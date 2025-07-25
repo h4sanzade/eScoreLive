@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/background_color">
 
-    <!-- Header with Back Button -->
     <LinearLayout
         android:id="@+id/header_layout"
         android:layout_width="match_parent"
@@ -59,7 +58,6 @@
             android:layout_height="wrap_content"
             android:padding="24dp">
 
-            <!-- App Logo -->
             <ImageView
                 android:id="@+id/app_logo"
                 android:layout_width="100dp"
@@ -71,7 +69,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Registration Form -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/register_card"
                 android:layout_width="match_parent"
@@ -108,14 +105,12 @@
                         android:textColor="@android:color/darker_gray"
                         android:textSize="14sp" />
 
-                    <!-- Name Row -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:orientation="horizontal">
 
-                        <!-- First Name -->
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/first_name_text_input_layout"
                             android:layout_width="0dp"
@@ -144,7 +139,6 @@
 
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <!-- Last Name -->
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/last_name_text_input_layout"
                             android:layout_width="0dp"
@@ -174,7 +168,6 @@
 
                     </LinearLayout>
 
-                    <!-- Username Input -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/username_text_input_layout"
                         android:layout_width="match_parent"
@@ -203,7 +196,6 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Email Input -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/email_text_input_layout"
                         android:layout_width="match_parent"
@@ -232,7 +224,6 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Password Input -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/password_text_input_layout"
                         android:layout_width="match_parent"
@@ -263,7 +254,6 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Confirm Password Input -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/confirm_password_text_input_layout"
                         android:layout_width="match_parent"
@@ -294,7 +284,6 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Terms Acceptance -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -326,7 +315,6 @@
 
                     </LinearLayout>
 
-                    <!-- Register Button -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/register_button"
                         android:layout_width="match_parent"
@@ -340,7 +328,6 @@
                         android:textSize="16sp"
                         app:cornerRadius="12dp" />
 
-                    <!-- Progress Bar -->
                     <ProgressBar
                         android:id="@+id/progress_bar"
                         android:layout_width="wrap_content"
@@ -353,7 +340,6 @@
 
             </androidx.cardview.widget.CardView>
 
-            <!-- Login Link -->
             <LinearLayout
                 android:id="@+id/login_layout"
                 android:layout_width="wrap_content"
@@ -394,7 +380,6 @@
 
     </ScrollView>
 
-    <!-- Terms Overlay (Initially Hidden) -->
     <include
         android:id="@+id/terms_overlay"
         layout="@layout/dialog_terms"
