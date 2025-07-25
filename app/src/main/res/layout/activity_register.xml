@@ -294,13 +294,46 @@
 
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <!-- Terms Acceptance -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <CheckBox
+                            android:id="@+id/terms_checkbox"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:buttonTint="@color/accent_color"
+                            android:enabled="false" />
+
+                        <TextView
+                            android:id="@+id/terms_text"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/mulish_regular"
+                            android:text="Read and accept Terms and Conditions"
+                            android:textColor="@color/accent_color"
+                            android:textSize="12sp"
+                            android:background="?android:attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:padding="4dp" />
+
+                    </LinearLayout>
+
                     <!-- Register Button -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/register_button"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
                         android:layout_marginBottom="16dp"
-                        android:backgroundTint="@color/accent_color"
+                        android:backgroundTint="@android:color/darker_gray"
+                        android:enabled="false"
                         android:fontFamily="@font/mulish_bold"
                         android:text="Create Account"
                         android:textColor="@color/white"
@@ -360,5 +393,17 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ScrollView>
+
+    <!-- Terms Overlay (Initially Hidden) -->
+    <include
+        android:id="@+id/terms_overlay"
+        layout="@layout/dialog_terms"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

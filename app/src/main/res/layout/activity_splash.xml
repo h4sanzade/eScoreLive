@@ -67,6 +67,17 @@
             android:textColor="@android:color/darker_gray"
             android:textSize="16sp" />
 
+        <TextView
+            android:id="@+id/creator_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Developed by Hasanzade"
+            android:textSize="16sp"
+            android:textColor="#85273C"
+            android:fontFamily="@font/mulish_bold">
+
+        </TextView>
+
     </LinearLayout>
 
     <!-- Bottom Section -->

@@ -173,45 +173,7 @@
                         app:cardCornerRadius="8dp"
                         app:cardElevation="2dp">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="12dp">
 
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal">
-
-                                <ImageView
-                                    android:layout_width="16dp"
-                                    android:layout_height="16dp"
-                                    android:layout_marginEnd="8dp"
-                                    android:src="@drawable/ic_info"
-                                    android:tint="@color/accent_color" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/mulish_bold"
-                                    android:text="Demo Credentials"
-                                    android:textColor="@color/accent_color"
-                                    android:textSize="12sp" />
-
-                            </LinearLayout>
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:fontFamily="@font/mulish_regular"
-                                android:text="Username: emilys\nPassword: emilyspass"
-                                android:textColor="@android:color/darker_gray"
-                                android:textSize="11sp" />
-
-                        </LinearLayout>
 
                     </androidx.cardview.widget.CardView>
 

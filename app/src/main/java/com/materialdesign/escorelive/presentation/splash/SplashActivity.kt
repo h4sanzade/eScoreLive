@@ -86,6 +86,18 @@ class SplashActivity : AppCompatActivity() {
                 .setStartDelay(1000)
                 .start()
         }
+
+        binding.creatorName.apply {
+            alpha = 0f
+            translationY = 30f
+
+            animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(600)
+                .setStartDelay(1000)
+                .start()
+        }
     }
 
     private fun startProgressAnimation() {

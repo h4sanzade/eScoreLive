@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#DD000000"
+    android:clickable="true"
+    android:focusable="true">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="16dp"
+        app:cardBackgroundColor="@color/card_background"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/terms_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/mulish_bold"
+                android:text="Terms and Conditions"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:gravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ScrollView
+                android:id="@+id/terms_scroll_view"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintBottom_toTopOf="@+id/scroll_instruction"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/terms_title">
+
+                <TextView
+                    android:id="@+id/terms_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/mulish_regular"
+                    android:text="1. USE OF FOOTBALL APPLICATION\n\nBy using the EScore Live football application, you accept these terms of use. Our application provides live football results, news and statistics.\n\n2. ACCOUNT AND REGISTRATION\n\nYou are required to provide accurate information during registration. It is your responsibility to keep your password secure. Your account may be closed if false information is provided.\n\n3. APPLICATION SERVICES\n\n- Live football match results\n- Team and player statistics\n- Football news and transfers\n- Following your favorite teams\n- League tables and fixture information\n\n4. USAGE RULES\n\nUse the application for personal use only. Using data for commercial purposes is prohibited. Spam or malicious activity will result in account closure.\n\n5. DATA ACCURACY\n\nFootball results and statistics are obtained from third-party sources. We do our best for data accuracy, but cannot guarantee 100% precision.\n\n6. INTERNET CONNECTION\n\nThe application requires an internet connection. We are not responsible for data loss that may occur due to connection problems.\n\n7. NOTIFICATIONS\n\nWe may send match start, goal and result notifications. You can turn off these notifications from settings.\n\n8. PERSONAL DATA PROTECTION\n\nYour personal data is under security. We do not share your data with third parties. We use it only for application functionality.\n\n9. SERVICE CHANGES\n\nWe reserve the right to improve or discontinue application services. We will inform you in advance about major changes.\n\n10. ACCOUNT TERMINATION\n\nYou can delete your account at any time. We reserve the right to close your account if rules are violated.\n\n11. LIMITATION OF LIABILITY\n\nWe are not responsible for any damage that may arise from using the application. The application is provided as is.\n\n12. CHANGES TO TERMS\n\nWe may update these terms at any time. Changes take effect after being announced in the application. Continued use indicates acceptance of new terms.\n\n13. CONTACT\n\nFor your questions, you can contact us through the contact section within the application.\n\nLast updated: January 2025"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+            </ScrollView>
+
+            <TextView
+                android:id="@+id/scroll_instruction"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/mulish_regular"
+                android:gravity="center"
+                android:text="Please scroll to read all terms to continue"
+                android:textColor="#AAAAAA"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toTopOf="@+id/buttons_layout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/buttons_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <Button
+                    android:id="@+id/close_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:backgroundTint="@android:color/darker_gray"
+                    android:fontFamily="@font/mulish_regular"
+                    android:text="Close"
+                    android:textColor="@color/white"
+                    app:cornerRadius="12dp" />
+
+                <Button
+                    android:id="@+id/accept_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:backgroundTint="@android:color/darker_gray"
+                    android:enabled="false"
+                    android:fontFamily="@font/mulish_regular"
+                    android:text="Accept"
+                    android:textColor="@color/white"
+                    app:cornerRadius="12dp" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

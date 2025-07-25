@@ -10,12 +10,22 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import com.materialdesign.escorelive.databinding.ActivityRegisterBinding
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.core.content.ContextCompat
+import com.materialdesign.escorelive.R
+import android.widget.Button
+import android.widget.ScrollView
+import android.widget.TextView
+import android.view.View
+import android.view.ViewTreeObserver
 
 @AndroidEntryPoint
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
     private val viewModel: AuthViewModel by viewModels()
+
+    private lateinit var termsOverlayView: View
+    private var termsAccepted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +44,108 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
+        // Initialize terms overlay view
+        termsOverlayView = findViewById(R.id.terms_overlay)
 
+        // Initial state - register button disabled
+        updateRegisterButtonState(false)
+
+        // Initial terms text
+        updateTermsText()
+    }
+
+    private fun updateTermsText() {
+        if (termsAccepted) {
+            binding.termsText.text = "✓ Terms and Conditions accepted"
+            binding.termsText.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
+            binding.termsCheckbox.isChecked = true
+            binding.termsCheckbox.isEnabled = false
+        } else {
+            binding.termsText.text = "Read and accept Terms and Conditions"
+            binding.termsText.setTextColor(ContextCompat.getColor(this, R.color.accent_color))
+            binding.termsCheckbox.isChecked = false
+            binding.termsCheckbox.isEnabled = false
+        }
+    }
+
+    private fun showTermsDialog() {
+        // Show overlay
+        termsOverlayView.visibility = View.VISIBLE
+
+        // Get overlay views from the included layout
+        val termsScrollView = termsOverlayView.findViewById<ScrollView>(R.id.terms_scroll_view)
+        val scrollInstruction = termsOverlayView.findViewById<TextView>(R.id.scroll_instruction)
+        val closeButton = termsOverlayView.findViewById<Button>(R.id.close_button)
+        val acceptButton = termsOverlayView.findViewById<Button>(R.id.accept_button)
+
+        var hasScrolledToBottom = false
+
+        // Setup scroll listener
+        termsScrollView.viewTreeObserver.addOnScrollChangedListener(object : ViewTreeObserver.OnScrollChangedListener {
+            override fun onScrollChanged() {
+                val view = termsScrollView.getChildAt(0)
+                if (view != null) {
+                    val scrollY = termsScrollView.scrollY
+                    val diff = (view.bottom - (termsScrollView.height + scrollY))
+
+                    // Check if scrolled to bottom (with small tolerance)
+                    if (diff <= 10 && !hasScrolledToBottom) {
+                        hasScrolledToBottom = true
+                        enableAcceptButton(acceptButton, scrollInstruction)
+                        // Remove listener to prevent multiple calls
+                        termsScrollView.viewTreeObserver.removeOnScrollChangedListener(this)
+                    }
+                }
+            }
+        })
+
+        closeButton.setOnClickListener {
+            hideTermsDialog()
+        }
+
+        acceptButton.setOnClickListener {
+            if (hasScrolledToBottom) {
+                termsAccepted = true
+                updateTermsText()
+                updateRegisterButtonState(true)
+                hideTermsDialog()
+                Toast.makeText(this, "Terms accepted!", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Set initial alpha and animate
+        termsOverlayView.alpha = 0f
+        termsOverlayView.animate().alpha(1f).setDuration(300).start()
+    }
+
+    private fun hideTermsDialog() {
+        termsOverlayView.animate()
+            .alpha(0f)
+            .setDuration(200)
+            .withEndAction {
+                termsOverlayView.visibility = View.GONE
+            }
+            .start()
+    }
+
+    private fun enableAcceptButton(acceptButton: Button, scrollInstruction: TextView) {
+        acceptButton.isEnabled = true
+        acceptButton.backgroundTintList = ContextCompat.getColorStateList(this, R.color.accent_color)
+
+        scrollInstruction.text = "Now you can accept the terms"
+        scrollInstruction.setTextColor(ContextCompat.getColor(this, R.color.accent_color))
+    }
+
+    private fun updateRegisterButtonState(enabled: Boolean) {
+        binding.registerButton.isEnabled = enabled
+
+        if (enabled) {
+            binding.registerButton.backgroundTintList = ContextCompat.getColorStateList(this, R.color.accent_color)
+            binding.registerButton.text = "Create Account"
+        } else {
+            binding.registerButton.backgroundTintList = ContextCompat.getColorStateList(this, android.R.color.darker_gray)
+            binding.registerButton.text = "Accept Terms to Continue"
+        }
     }
 
     private fun observeViewModel() {
@@ -83,6 +194,7 @@ class RegisterActivity : AppCompatActivity() {
                     binding.confirmPasswordTextInputLayout.error = "Passwords do not match"
                 }
                 else -> {
+                    // No error
                 }
             }
         })
@@ -90,15 +202,19 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun setupClickListeners() {
         binding.registerButton.setOnClickListener {
-            val firstName = binding.firstNameEditText.text.toString().trim()
-            val lastName = binding.lastNameEditText.text.toString().trim()
-            val username = binding.usernameEditText.text.toString().trim()
-            val email = binding.emailEditText.text.toString().trim()
-            val password = binding.passwordEditText.text.toString().trim()
-            val confirmPassword = binding.confirmPasswordEditText.text.toString().trim()
+            if (termsAccepted) {
+                val firstName = binding.firstNameEditText.text.toString().trim()
+                val lastName = binding.lastNameEditText.text.toString().trim()
+                val username = binding.usernameEditText.text.toString().trim()
+                val email = binding.emailEditText.text.toString().trim()
+                val password = binding.passwordEditText.text.toString().trim()
+                val confirmPassword = binding.confirmPasswordEditText.text.toString().trim()
 
-            clearErrors()
-            viewModel.register(firstName, lastName, username, email, password, confirmPassword)
+                clearErrors()
+                viewModel.register(firstName, lastName, username, email, password, confirmPassword)
+            } else {
+                showTermsDialog()
+            }
         }
 
         binding.loginTextView.setOnClickListener {
@@ -107,6 +223,10 @@ class RegisterActivity : AppCompatActivity() {
 
         binding.backButton.setOnClickListener {
             finish()
+        }
+
+        binding.termsText.setOnClickListener {
+            showTermsDialog()
         }
 
         setupErrorClearingListeners()
@@ -150,13 +270,13 @@ class RegisterActivity : AppCompatActivity() {
     private fun showLoading() {
         binding.registerButton.isEnabled = false
         binding.registerButton.text = "Creating Account..."
-        binding.progressBar.visibility = android.view.View.VISIBLE
+        binding.progressBar.visibility = View.VISIBLE
     }
 
     private fun hideLoading() {
-        binding.registerButton.isEnabled = true
-        binding.registerButton.text = "Create Account"
-        binding.progressBar.visibility = android.view.View.GONE
+        binding.registerButton.isEnabled = termsAccepted
+        updateRegisterButtonState(termsAccepted)
+        binding.progressBar.visibility = View.GONE
     }
 
     private fun showToast(message: String) {
@@ -168,5 +288,19 @@ class RegisterActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivity(intent)
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // No need to dismiss dialog anymore since we're using overlay
+    }
+
+    override fun onBackPressed() {
+        // Handle back press - close terms overlay if open
+        if (termsOverlayView.visibility == View.VISIBLE) {
+            hideTermsDialog()
+        } else {
+            super.onBackPressed()
+        }
     }
 }
