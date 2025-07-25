@@ -170,4 +170,30 @@
     </string>
     <string name="terms_text">1. USE OF FOOTBALL APPLICATION\n\nBy using the EScore Live football application, you accept these terms of use. Our application provides live football results, news and statistics.\n\n2. ACCOUNT AND REGISTRATION\n\nYou are required to provide accurate information during registration. It is your responsibility to keep your password secure. Your account may be closed if false information is provided.\n\n3. APPLICATION SERVICES\n\n- Live football match results\n- Team and player statistics\n- Football news and transfers\n- Following your favorite teams\n- League tables and fixture information\n\n4. USAGE RULES\n\nUse the application for personal use only. Using data for commercial purposes is prohibited. Spam or malicious activity will result in account closure.\n\n5. DATA ACCURACY\n\nFootball results and statistics are obtained from third-party sources. We do our best for data accuracy, but cannot guarantee 100% precision.\n\n6. INTERNET CONNECTION\n\nThe application requires an internet connection. We are not responsible for data loss that may occur due to connection problems.\n\n7. NOTIFICATIONS\n\nWe may send match start, goal and result notifications. You can turn off these notifications from settings.\n\n8. PERSONAL DATA PROTECTION\n\nYour personal data is under security. We do not share your data with third parties. We use it only for application functionality.\n\n9. SERVICE CHANGES\n\nWe reserve the right to improve or discontinue application services. We will inform you in advance about major changes.\n\n10. ACCOUNT TERMINATION\n\nYou can delete your account at any time. We reserve the right to close your account if rules are violated.\n\n11. LIMITATION OF LIABILITY\n\nWe are not responsible for any damage that may arise from using the application. The application is provided as is.\n\n12. CHANGES TO TERMS\n\nWe may update these terms at any time. Changes take effect after being announced in the application. Continued use indicates acceptance of new terms.\n\n13. CONTACT\n\nFor your questions, you can contact us through the contact section within the application.\n\nLast updated: July 2025</string>
 
+
+    <string name="my_account">My Account</string>
+    <string name="my_favorites">My Favorites</string>
+    <string name="general_settings">General Settings</string>
+    <string name="other">Other</string>
+    <string name="tap_to_change_photo">Tap to change profile photo</string>
+    <string name="competitions">Competitions</string>
+    <string name="teams">Teams</string>
+    <string name="players">Players</string>
+    <string name="app_notifications">App Notifications</string>
+    <string name="dark_theme">Dark Theme</string>
+    <string name="filter_matches_by">Filter Matches By</string>
+    <string name="all_leagues">All Leagues</string>
+    <string name="language">Language</string>
+    <string name="english">English</string>
+    <string name="log_out">Log Out</string>
+
+    <string name="filter_matches_by_league">Filter Matches By League</string>
+    <string name="search_leagues">Search leagues...</string>
+    <string name="select_all">Select All</string>
+    <string name="clear_all">Clear All</string>
+    <string name="done">Done</string>
+    <string name="none_selected">None selected</string>
+    <string name="selected_count">%d selected</string>
+    <string name="no_leagues_found">No leagues found</string>
+    <string name="try_different_search">Try searching for a different league</string>
 </resources>

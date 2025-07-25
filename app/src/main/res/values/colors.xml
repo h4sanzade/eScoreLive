@@ -29,6 +29,7 @@
 
 
 
+    <color name="camera_overlay_bg">#80000000</color>
 
 
     <!-- Filter colors -->
@@ -40,6 +41,7 @@
     <color name="live_match_bg">#4CAF50</color>
     <color name="finished_match_bg">#757575</color>
     <color name="upcoming_match_bg">#2196F3</color>
+
 
     <!-- Team colors -->
     <color name="home_team_color">#2196F3</color>

@@ -1,25 +1,28 @@
-package com.materialdesign.escorelive.presentation.ui.account
+// AccountViewModel.kt
+package com.materialdesign.escorelive.presentation.account
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.materialdesign.escorelive.data.local.AccountDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import android.content.Context
-import dagger.hilt.android.qualifiers.ApplicationContext
 
 @HiltViewModel
 class AccountViewModel @Inject constructor(
-    @ApplicationContext private val context: Context
+    private val accountDataStore: AccountDataStore
 ) : ViewModel() {
 
-    private val _userProfile = MutableLiveData<UserProfile?>()
-    val userProfile: LiveData<UserProfile?> = _userProfile
+    private val _userData = MutableLiveData<UserData?>()
+    val userData: LiveData<UserData?> = _userData
 
-    private val _favoriteTeamsCount = MutableLiveData<Int>()
-    val favoriteTeamsCount: LiveData<Int> = _favoriteTeamsCount
+    private val _favoriteCounts = MutableLiveData<FavoriteCounts>()
+    val favoriteCounts: LiveData<FavoriteCounts> = _favoriteCounts
+
+    private val _appSettings = MutableLiveData<AppSettings>()
+    val appSettings: LiveData<AppSettings> = _appSettings
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -27,61 +30,105 @@ class AccountViewModel @Inject constructor(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
-    init {
-        loadUserProfile()
-        loadFavoriteTeamsCount()
-    }
+    private val _logoutEvent = MutableLiveData<Boolean>()
+    val logoutEvent: LiveData<Boolean> = _logoutEvent
 
-    private fun loadUserProfile() {
+    fun loadUserData() {
         viewModelScope.launch {
             _isLoading.value = true
-            _error.value = null
-
             try {
-                val mockProfile = UserProfile(
-                    id = 1,
-                    username = "Football Fan",
-                    email = "user@example.com",
-                    profileImageUrl = null,
-                    joinDate = "January 2024",
-                    preferredLeagues = listOf("Premier League", "Champions League")
-                )
+                // Load user data from DataStore
+                val userData = accountDataStore.getUserData()
+                _userData.value = userData
 
-                _userProfile.value = mockProfile
+                // Load favorite counts
+                val counts = accountDataStore.getFavoriteCounts()
+                _favoriteCounts.value = counts
+
+                // Load app settings
+                val settings = accountDataStore.getAppSettings()
+                _appSettings.value = settings
+
             } catch (e: Exception) {
-                _error.value = "Failed to load profile: ${e.message}"
+                _error.value = "Failed to load user data: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
         }
     }
 
-    private fun loadFavoriteTeamsCount() {
-        try {
-            val prefs = context.getSharedPreferences("favorites", Context.MODE_PRIVATE)
-            val favoriteIds = prefs.getStringSet("favorite_team_ids", emptySet()) ?: emptySet()
-            _favoriteTeamsCount.value = favoriteIds.size
-        } catch (e: Exception) {
-            _favoriteTeamsCount.value = 0
+    fun updateProfileImage(imageUri: String) {
+        viewModelScope.launch {
+            try {
+                accountDataStore.saveProfileImageUri(imageUri)
+
+                // Update current user data
+                _userData.value = _userData.value?.copy(profileImageUri = imageUri)
+            } catch (e: Exception) {
+                _error.value = "Failed to save profile image: ${e.message}"
+            }
         }
     }
 
-    fun refreshProfile() {
-        loadUserProfile()
-        loadFavoriteTeamsCount()
+    fun updateNotificationsSetting(enabled: Boolean) {
+        viewModelScope.launch {
+            try {
+                accountDataStore.saveNotificationsSetting(enabled)
+
+                // Update current settings
+                _appSettings.value = _appSettings.value?.copy(notificationsEnabled = enabled)
+            } catch (e: Exception) {
+                _error.value = "Failed to save notifications setting: ${e.message}"
+            }
+        }
     }
 
-    fun updateProfile(profile: UserProfile) {
+    fun updateDarkThemeSetting(enabled: Boolean) {
         viewModelScope.launch {
-            _isLoading.value = true
-            _error.value = null
-
             try {
-                _userProfile.value = profile
+                accountDataStore.saveDarkThemeSetting(enabled)
+
+                // Update current settings
+                _appSettings.value = _appSettings.value?.copy(darkThemeEnabled = enabled)
             } catch (e: Exception) {
-                _error.value = "Failed to update profile: ${e.message}"
-            } finally {
-                _isLoading.value = false
+                _error.value = "Failed to save dark theme setting: ${e.message}"
+            }
+        }
+    }
+
+    fun updateLanguageSetting(language: String) {
+        viewModelScope.launch {
+            try {
+                accountDataStore.saveLanguageSetting(language)
+
+                // Update current settings
+                _appSettings.value = _appSettings.value?.copy(selectedLanguage = language)
+            } catch (e: Exception) {
+                _error.value = "Failed to save language setting: ${e.message}"
+            }
+        }
+    }
+
+    fun updateSelectedLeagues(leagues: List<String>) {
+        viewModelScope.launch {
+            try {
+                accountDataStore.saveSelectedLeagues(leagues)
+
+                // Update current settings
+                _appSettings.value = _appSettings.value?.copy(selectedLeagues = leagues)
+            } catch (e: Exception) {
+                _error.value = "Failed to save league filters: ${e.message}"
+            }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            try {
+                accountDataStore.clearUserData()
+                _logoutEvent.value = true
+            } catch (e: Exception) {
+                _error.value = "Failed to logout: ${e.message}"
             }
         }
     }
@@ -91,12 +138,23 @@ class AccountViewModel @Inject constructor(
     }
 }
 
-// Data class for UserProfile
-data class UserProfile(
-    val id: Long,
-    val username: String,
-    val email: String,
-    val profileImageUrl: String?,
-    val joinDate: String,
-    val preferredLeagues: List<String>
+// Data classes
+data class UserData(
+    val firstName: String = "",
+    val lastName: String = "",
+    val email: String = "",
+    val profileImageUri: String = ""
+)
+
+data class FavoriteCounts(
+    val competitions: Int = 0,
+    val teams: Int = 0,
+    val players: Int = 0
+)
+
+data class AppSettings(
+    val notificationsEnabled: Boolean = true,
+    val darkThemeEnabled: Boolean = true,
+    val selectedLanguage: String = "English",
+    val selectedLeagues: List<String> = emptyList()
 )
