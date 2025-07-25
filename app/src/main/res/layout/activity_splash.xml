@@ -30,8 +30,8 @@
             android:layout_width="140dp"
             android:layout_height="140dp"
             android:layout_marginBottom="32dp"
-            app:cardBackgroundColor="@color/accent_color"
             app:cardCornerRadius="70dp"
+            android:background="@color/background_color"
             app:cardElevation="12dp">
 
             <ImageView
@@ -39,9 +39,7 @@
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_app_logo"
-                android:tint="@color/white"
-                tools:src="@drawable/ic_placeholder" />
+                android:src="@drawable/ic_app_logo" />
 
         </androidx.cardview.widget.CardView>
 
