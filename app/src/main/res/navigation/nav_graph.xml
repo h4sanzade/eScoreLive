@@ -5,15 +5,16 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/homeFragment">
 
-    <!-- Main Bottom Navigation Fragments -->
+    <!-- ========== MAIN BOTTOM NAVIGATION FRAGMENTS ========== -->
 
-    <!-- Home Fragment -->
+    <!-- Home Fragment - Ana sayfa -->
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.materialdesign.escorelive.presentation.main.HomeFragment"
+        android:name="com.materialdesign.escorelive.presentation.ui.main.HomeFragment"
         android:label="Home"
         tools:layout="@layout/fragment_main_menu">
 
+        <!-- Bottom Navigation Actions -->
         <action
             android:id="@+id/action_home_to_competition"
             app:destination="@id/competitionFragment" />
@@ -26,19 +27,41 @@
             android:id="@+id/action_home_to_account"
             app:destination="@id/accountFragment" />
 
+        <!-- Feature Actions -->
         <action
             android:id="@+id/action_home_to_teamSearch"
-            app:destination="@id/teamSearchFragment" />
+            app:destination="@id/teamSearchFragment"
+            />
+
+        <action
+            android:id="@+id/action_home_to_allMatches"
+            app:destination="@id/allMatchesFragment"
+           >
+            <argument
+                android:name="selectedDate"
+                app:argType="string"
+                app:nullable="true" />
+        </action>
+
+        <action
+            android:id="@+id/action_home_to_matchDetail"
+            app:destination="@id/matchDetailFragment"
+           >
+            <argument
+                android:name="matchId"
+                app:argType="long" />
+        </action>
 
     </fragment>
 
     <!-- Competition Fragment -->
     <fragment
         android:id="@+id/competitionFragment"
-        android:name="com.materialdesign.escorelive.presentation.competition.CompetitionFragment"
+        android:name="com.materialdesign.escorelive.presentation.ui.competition.CompetitionFragment"
         android:label="Competition"
         tools:layout="@layout/fragment_competition">
 
+        <!-- Bottom Navigation Actions -->
         <action
             android:id="@+id/action_competition_to_home"
             app:destination="@id/homeFragment" />
@@ -60,6 +83,7 @@
         android:label="News"
         tools:layout="@layout/fragment_news">
 
+        <!-- Bottom Navigation Actions -->
         <action
             android:id="@+id/action_news_to_home"
             app:destination="@id/homeFragment" />
@@ -72,6 +96,48 @@
             android:id="@+id/action_news_to_account"
             app:destination="@id/accountFragment" />
 
+        <!-- News Detail Action -->
+        <action
+            android:id="@+id/action_news_to_newsDetail"
+            app:destination="@id/newsDetailFragment"
+         >
+            <argument
+                android:name="newsId"
+                app:argType="long" />
+            <argument
+                android:name="newsTitle"
+                app:argType="string"
+                app:nullable="true" />
+            <argument
+                android:name="newsContent"
+                app:argType="string"
+                app:nullable="true" />
+            <argument
+                android:name="newsImageUrl"
+                app:argType="string"
+                app:nullable="true" />
+            <argument
+                android:name="newsDate"
+                app:argType="string"
+                app:nullable="true" />
+            <argument
+                android:name="newsSource"
+                app:argType="string"
+                app:nullable="true" />
+            <argument
+                android:name="newsAuthor"
+                app:argType="string"
+                app:nullable="true" />
+            <argument
+                android:name="newsUrl"
+                app:argType="string"
+                app:nullable="true" />
+            <argument
+                android:name="newsCategory"
+                app:argType="string"
+                app:nullable="true" />
+        </action>
+
     </fragment>
 
     <!-- Account Fragment -->
@@ -81,6 +147,7 @@
         android:label="Account"
         tools:layout="@layout/fragment_account">
 
+        <!-- Bottom Navigation Actions -->
         <action
             android:id="@+id/action_account_to_home"
             app:destination="@id/homeFragment" />
@@ -88,27 +155,64 @@
         <action
             android:id="@+id/action_account_to_competition"
             app:destination="@id/competitionFragment" />
-        <action android:id="@+id/action_account_to_login"
-            app:destination="@id/accountFragment"
-            >
-
-        </action>
 
         <action
             android:id="@+id/action_account_to_news"
             app:destination="@id/newsFragment" />
 
+        <!-- Account Feature Actions -->
         <action
             android:id="@+id/action_account_to_filterLeagues"
-            app:destination="@id/filterLeaguesFragment" />
+            app:destination="@id/filterLeaguesFragment"
+          />
 
+        <!-- Logout Action - Global Navigation -->
         <action
-            android:id="@+id/action_account_to_teamSearch"
-            app:destination="@id/teamSearchFragment" />
+            android:id="@+id/action_account_to_login"
+            app:destination="@id/loginActivity"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true"
+            app:launchSingleTop="true" />
 
     </fragment>
 
-    <!-- Additional Screens -->
+    <!-- ========== DETAIL & FEATURE FRAGMENTS ========== -->
+
+    <!-- All Matches Fragment -->
+    <fragment
+        android:id="@+id/allMatchesFragment"
+        android:name="com.materialdesign.escorelive.presentation.ui.matchlist.MatchListFragment"
+        android:label="All Matches"
+        tools:layout="@layout/fragment_all_matches">
+
+        <argument
+            android:name="selectedDate"
+            app:argType="string"
+            app:nullable="true" />
+
+        <action
+            android:id="@+id/action_allMatches_to_matchDetail"
+            app:destination="@id/matchDetailFragment"
+        >
+            <argument
+                android:name="matchId"
+                app:argType="long" />
+        </action>
+
+    </fragment>
+
+    <!-- Match Detail Fragment -->
+    <fragment
+        android:id="@+id/matchDetailFragment"
+        android:name="com.materialdesign.escorelive.ui.matchdetail.MatchDetailFragment"
+        android:label="Match Details"
+        tools:layout="@layout/fragment_match_detail">
+
+        <argument
+            android:name="matchId"
+            app:argType="long" />
+
+    </fragment>
 
     <!-- Team Search Fragment -->
     <fragment
@@ -123,5 +227,79 @@
         android:name="com.materialdesign.escorelive.presentation.filter.FilterLeaguesFragment"
         android:label="Filter Leagues"
         tools:layout="@layout/fragment_filter_leagues" />
+
+    <!-- News Detail Fragment -->
+    <fragment
+        android:id="@+id/newsDetailFragment"
+        android:name="com.materialdesign.escorelive.presentation.news.NewsDetailFragment"
+        android:label="News Detail"
+        tools:layout="@layout/fragment_news_detail">
+
+        <argument
+            android:name="newsId"
+            app:argType="long" />
+        <argument
+            android:name="newsTitle"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="newsContent"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="newsImageUrl"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="newsDate"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="newsSource"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="newsAuthor"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="newsUrl"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="newsCategory"
+            app:argType="string"
+            app:nullable="true" />
+
+    </fragment>
+
+    <!-- ========== GLOBAL ACTIONS & EXTERNAL ACTIVITIES ========== -->
+
+    <!-- Placeholder for Login Activity (External Activity Reference) -->
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="com.materialdesign.escorelive.presentation.auth.LoginActivity"
+        android:label="Login"
+        tools:layout="@layout/activity_login" />
+
+    <action
+        android:id="@+id/global_action_to_home"
+        app:destination="@id/homeFragment"
+        app:popUpTo="@id/homeFragment"
+        app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/global_action_to_teamSearch"
+        app:destination="@id/teamSearchFragment"
+         />
+
+    <action
+        android:id="@+id/global_action_to_matchDetail"
+        app:destination="@id/matchDetailFragment"
+       >
+        <argument
+            android:name="matchId"
+            app:argType="long" />
+    </action>
 
 </navigation>

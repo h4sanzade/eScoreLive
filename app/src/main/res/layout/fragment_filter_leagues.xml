@@ -149,7 +149,7 @@
             android:layout_height="wrap_content"
             android:text="Clear All"
             android:textSize="14sp"
-            android:textColor="@android:color/holo_red_light"
+            android:textColor="#FB0000"
             android:fontFamily="@font/mulish_bold"
             android:background="?android:attr/selectableItemBackground"
             android:padding="8dp"

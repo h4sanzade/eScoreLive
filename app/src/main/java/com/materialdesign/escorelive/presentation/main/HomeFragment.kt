@@ -35,11 +35,6 @@ class HomeFragment : Fragment() {
     private var selectedDayIndex = -1
     private var currentTab = MatchTab.UPCOMING
 
-    private enum class NavigationTab {
-        HOME, COMPETITION, NEWS, ACCOUNT
-    }
-    private var currentNavigationTab = NavigationTab.HOME
-
     enum class MatchTab {
         UPCOMING, SCORE, FAVORITES
     }
@@ -71,82 +66,36 @@ class HomeFragment : Fragment() {
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.homeFragment -> {
-                    showHomeContent()
-                    currentNavigationTab = NavigationTab.HOME
+                    // Already here, do nothing
                     true
                 }
                 R.id.competitionFragment -> {
-                    showCompetitionContent()
-                    currentNavigationTab = NavigationTab.COMPETITION
+                    try {
+                        findNavController().navigate(R.id.action_home_to_competition)
+                    } catch (e: Exception) {
+                        // Handle navigation error silently
+                    }
                     true
                 }
                 R.id.newsFragment -> {
-                    navigateToNewsFragment()
+                    try {
+                        findNavController().navigate(R.id.action_home_to_news)
+                    } catch (e: Exception) {
+                        // Handle navigation error silently
+                    }
                     true
                 }
                 R.id.accountFragment -> {
-                    showAccountContent()
-                    currentNavigationTab = NavigationTab.ACCOUNT
+                    try {
+                        findNavController().navigate(R.id.action_home_to_account)
+                    } catch (e: Exception) {
+                        // Handle navigation error silently
+                    }
                     true
                 }
                 else -> false
             }
         }
-    }
-
-    private fun navigateToNewsFragment() {
-        try {
-            findNavController().navigate(R.id.action_home_to_news)
-        } catch (e: Exception) {
-            showNewsContent()
-            currentNavigationTab = NavigationTab.NEWS
-        }
-    }
-
-    private fun showHomeContent() {
-        binding.homeContent.visibility = View.VISIBLE
-        binding.competitionContent.visibility = View.GONE
-        binding.newsContent.visibility = View.GONE
-        binding.accountContent.visibility = View.GONE
-
-        binding.appTitle.visibility = View.VISIBLE
-        binding.searchId.visibility = View.VISIBLE
-        binding.notificationId.visibility = View.VISIBLE
-
-        loadDataForSelectedDate()
-    }
-
-    private fun showCompetitionContent() {
-        binding.homeContent.visibility = View.GONE
-        binding.competitionContent.visibility = View.VISIBLE
-        binding.newsContent.visibility = View.GONE
-        binding.accountContent.visibility = View.GONE
-
-        binding.appTitle.visibility = View.GONE
-        binding.searchId.visibility = View.GONE
-        binding.notificationId.visibility = View.GONE
-    }
-
-    private fun showNewsContent() {
-        binding.homeContent.visibility = View.GONE
-        binding.competitionContent.visibility = View.GONE
-        binding.newsContent.visibility = View.VISIBLE
-        binding.accountContent.visibility = View.GONE
-
-        binding.appTitle.visibility = View.GONE
-        binding.searchId.visibility = View.GONE
-        binding.notificationId.visibility = View.GONE
-    }
-
-    private fun showAccountContent() {
-        binding.homeContent.visibility = View.GONE
-        binding.competitionContent.visibility = View.GONE
-        binding.newsContent.visibility = View.GONE
-        binding.accountContent.visibility = View.VISIBLE
-
-        binding.appTitle.visibility = View.GONE
-        binding.searchId.visibility = View.GONE
-        binding.notificationId.visibility = View.GONE
     }
 
     private fun setupRecyclerView() {
@@ -166,27 +115,21 @@ class HomeFragment : Fragment() {
         updateTabSelection(MatchTab.UPCOMING)
 
         binding.upcomingTab.setOnClickListener {
-            if (currentNavigationTab == NavigationTab.HOME) {
-                currentTab = MatchTab.UPCOMING
-                updateTabSelection(MatchTab.UPCOMING)
-                loadDataForSelectedDate()
-            }
+            currentTab = MatchTab.UPCOMING
+            updateTabSelection(MatchTab.UPCOMING)
+            loadDataForSelectedDate()
         }
 
         binding.scoreTab.setOnClickListener {
-            if (currentNavigationTab == NavigationTab.HOME) {
-                currentTab = MatchTab.SCORE
-                updateTabSelection(MatchTab.SCORE)
-                loadDataForSelectedDate()
-            }
+            currentTab = MatchTab.SCORE
+            updateTabSelection(MatchTab.SCORE)
+            loadDataForSelectedDate()
         }
 
         binding.favoritesTab.setOnClickListener {
-            if (currentNavigationTab == NavigationTab.HOME) {
-                currentTab = MatchTab.FAVORITES
-                updateTabSelection(MatchTab.FAVORITES)
-                loadFavoriteMatches()
-            }
+            currentTab = MatchTab.FAVORITES
+            updateTabSelection(MatchTab.FAVORITES)
+            loadFavoriteMatches()
         }
     }
 
@@ -207,15 +150,11 @@ class HomeFragment : Fragment() {
         setupDayClickListeners()
 
         binding.prevWeekBtn.setOnClickListener {
-            if (currentNavigationTab == NavigationTab.HOME) {
-                navigateWeek(-1)
-            }
+            navigateWeek(-1)
         }
 
         binding.nextWeekBtn.setOnClickListener {
-            if (currentNavigationTab == NavigationTab.HOME) {
-                navigateWeek(1)
-            }
+            navigateWeek(1)
         }
     }
 
@@ -227,8 +166,6 @@ class HomeFragment : Fragment() {
 
         dayLayouts.forEachIndexed { index, dayLayout ->
             dayLayout.setOnClickListener {
-                if (currentNavigationTab != NavigationTab.HOME) return@setOnClickListener
-
                 selectedDayIndex = index
                 val selectedDate = getDateForDayIndex(index)
                 viewModel.selectDate(selectedDate)
@@ -243,8 +180,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadDataForSelectedDate() {
-        if (currentNavigationTab != NavigationTab.HOME) return
-
         val selectedDate = viewModel.selectedDate.value ?: dateFormat.format(Date())
 
         when (currentTab) {
@@ -264,8 +199,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadFavoriteMatches() {
-        if (currentNavigationTab != NavigationTab.HOME) return
-
         viewModel.loadFavoriteTeamMatches()
         updateLiveHeaderText("Favorite Teams")
     }
@@ -422,8 +355,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun navigateWeek(weekOffset: Int) {
-        if (currentNavigationTab != NavigationTab.HOME) return
-
         currentWeekOffset += weekOffset
         selectedDayIndex = -1
         updateWeekCalendar()
@@ -435,14 +366,12 @@ class HomeFragment : Fragment() {
 
     private fun observeViewModel() {
         viewModel.liveMatches.observe(viewLifecycleOwner, Observer { matches ->
-            if (currentTab == MatchTab.SCORE && currentNavigationTab == NavigationTab.HOME) {
+            if (currentTab == MatchTab.SCORE) {
                 liveMatchesAdapter.submitList(matches)
             }
         })
 
         viewModel.todayMatches.observe(viewLifecycleOwner, Observer { matches ->
-            if (currentNavigationTab != NavigationTab.HOME) return@Observer
-
             when (currentTab) {
                 MatchTab.UPCOMING -> {
                     val upcomingMatches = matches.filter { it.isUpcoming }
@@ -453,17 +382,19 @@ class HomeFragment : Fragment() {
                     liveMatchesAdapter.submitList(liveAndFinished)
                 }
                 MatchTab.FAVORITES -> {
+                    // Handled separately
                 }
             }
         })
 
         viewModel.favoriteMatches.observe(viewLifecycleOwner, Observer { matches ->
-            if (currentTab == MatchTab.FAVORITES && currentNavigationTab == NavigationTab.HOME) {
+            if (currentTab == MatchTab.FAVORITES) {
                 liveMatchesAdapter.submitList(matches)
             }
         })
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
+            // Handle loading state if needed
         })
 
         viewModel.error.observe(viewLifecycleOwner, Observer { error ->
@@ -476,15 +407,13 @@ class HomeFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.seeMoreBtn.setOnClickListener {
-            if (currentNavigationTab != NavigationTab.HOME) return@setOnClickListener
-
             when (currentTab) {
                 MatchTab.FAVORITES -> {
                     try {
                         val bundle = Bundle().apply {
                             putString("selectedDate", "FAVORITES_MODE")
                         }
-                        findNavController().navigate(R.id.allMatchesFragment, bundle)
+                        findNavController().navigate(R.id.action_home_to_allMatches, bundle)
                     } catch (e: Exception) {
                         Toast.makeText(context, "Opening favorite team matches...", Toast.LENGTH_SHORT).show()
                     }
@@ -495,7 +424,7 @@ class HomeFragment : Fragment() {
                         val bundle = Bundle().apply {
                             putString("selectedDate", selectedDate)
                         }
-                        findNavController().navigate(R.id.allMatchesFragment, bundle)
+                        findNavController().navigate(R.id.action_home_to_allMatches, bundle)
                     } catch (e: Exception) {
                         Toast.makeText(context, "Opening matches...", Toast.LENGTH_SHORT).show()
                     }
@@ -504,40 +433,32 @@ class HomeFragment : Fragment() {
         }
 
         binding.searchId.setOnClickListener {
-            if (currentNavigationTab != NavigationTab.HOME) return@setOnClickListener
-
             try {
-                findNavController().navigate(R.id.teamSearchFragment)
+                findNavController().navigate(R.id.action_home_to_teamSearch)
             } catch (e: Exception) {
                 Toast.makeText(context, "Opening team search...", Toast.LENGTH_SHORT).show()
             }
         }
 
         binding.notificationId.setOnClickListener {
-            if (currentNavigationTab == NavigationTab.HOME) {
-                Toast.makeText(context, "Notifications clicked", Toast.LENGTH_SHORT).show()
-            }
+            Toast.makeText(context, "Notifications clicked", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun onMatchClick(match: Match) {
-        if (currentNavigationTab == NavigationTab.HOME) {
-            try {
-                val bundle = Bundle().apply {
-                    putLong("matchId", match.id)
-                }
-                findNavController().navigate(R.id.matchDetailFragment, bundle)
-            } catch (e: Exception) {
-                Toast.makeText(context, "Opening match details...", Toast.LENGTH_SHORT).show()
+        try {
+            val bundle = Bundle().apply {
+                putLong("matchId", match.id)
             }
+            findNavController().navigate(R.id.action_home_to_matchDetail, bundle)
+        } catch (e: Exception) {
+            Toast.makeText(context, "Opening match details...", Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        if (currentNavigationTab == NavigationTab.HOME) {
-            loadDataForSelectedDate()
-        }
+        loadDataForSelectedDate()
     }
 
     override fun onDestroyView() {

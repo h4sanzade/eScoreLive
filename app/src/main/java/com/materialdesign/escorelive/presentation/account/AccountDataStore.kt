@@ -21,25 +21,21 @@ class AccountDataStore @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
     companion object {
-        // User data keys
         private val FIRST_NAME = stringPreferencesKey("first_name")
         private val LAST_NAME = stringPreferencesKey("last_name")
         private val EMAIL = stringPreferencesKey("email")
         private val PROFILE_IMAGE_URI = stringPreferencesKey("profile_image_uri")
 
-        // Favorites count keys
         private val COMPETITIONS_COUNT = intPreferencesKey("competitions_count")
         private val TEAMS_COUNT = intPreferencesKey("teams_count")
         private val PLAYERS_COUNT = intPreferencesKey("players_count")
 
-        // App settings keys
         private val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
         private val DARK_THEME_ENABLED = booleanPreferencesKey("dark_theme_enabled")
         private val SELECTED_LANGUAGE = stringPreferencesKey("selected_language")
         private val SELECTED_LEAGUES = stringSetPreferencesKey("selected_leagues")
     }
 
-    // User data operations
     suspend fun getUserData(): UserData {
         return dataStore.data.map { preferences ->
             UserData(
@@ -69,7 +65,6 @@ class AccountDataStore @Inject constructor(
         }
     }
 
-    // Favorites count operations
     suspend fun getFavoriteCounts(): FavoriteCounts {
         return dataStore.data.map { preferences ->
             FavoriteCounts(
@@ -108,7 +103,6 @@ class AccountDataStore @Inject constructor(
         }
     }
 
-    // App settings operations
     suspend fun getAppSettings(): AppSettings {
         return dataStore.data.map { preferences ->
             AppSettings(
@@ -144,42 +138,36 @@ class AccountDataStore @Inject constructor(
         }
     }
 
-    // Notification settings
     suspend fun isNotificationsEnabled(): Boolean {
         return dataStore.data.map { preferences ->
             preferences[NOTIFICATIONS_ENABLED] ?: true
         }.first()
     }
 
-    // Theme settings
     suspend fun isDarkThemeEnabled(): Boolean {
         return dataStore.data.map { preferences ->
             preferences[DARK_THEME_ENABLED] ?: true
         }.first()
     }
 
-    // Language settings
     suspend fun getSelectedLanguage(): String {
         return dataStore.data.map { preferences ->
             preferences[SELECTED_LANGUAGE] ?: "English"
         }.first()
     }
 
-    // League filter settings
     suspend fun getSelectedLeagues(): List<String> {
         return dataStore.data.map { preferences ->
             preferences[SELECTED_LEAGUES]?.toList() ?: emptyList()
         }.first()
     }
 
-    // Clear all data (for logout)
     suspend fun clearUserData() {
         dataStore.edit { preferences ->
             preferences.clear()
         }
     }
 
-    // Clear only user personal data (keep settings)
     suspend fun clearPersonalData() {
         dataStore.edit { preferences ->
             preferences.remove(FIRST_NAME)

@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
@@ -76,8 +77,16 @@ class AccountFragment : Fragment() {
     }
 
     private fun setupUI() {
-        // Set bottom navigation selected item
+        // Set bottom navigation selected item to account
         binding.bottomNavigation.selectedItemId = R.id.accountFragment
+
+        // Ensure the account content is visible and others are hidden
+        showAccountContent()
+    }
+
+    private fun showAccountContent() {
+        // Account content is the main layout in fragment_account.xml
+        // No need to toggle visibility as this is the account fragment
     }
 
     private fun observeViewModel() {
@@ -161,14 +170,14 @@ class AccountFragment : Fragment() {
             viewModel.logout()
         }
 
-        // Bottom navigation
+        // Bottom navigation - Only handle navigation between main tabs
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.homeFragment -> {
                     try {
                         findNavController().navigate(R.id.action_account_to_home)
                     } catch (e: Exception) {
-                        // Handle navigation error
+                        // Handle navigation error silently
                     }
                     true
                 }
@@ -176,7 +185,7 @@ class AccountFragment : Fragment() {
                     try {
                         findNavController().navigate(R.id.action_account_to_competition)
                     } catch (e: Exception) {
-                        // Handle navigation error
+                        // Handle navigation error silently
                     }
                     true
                 }
@@ -184,12 +193,12 @@ class AccountFragment : Fragment() {
                     try {
                         findNavController().navigate(R.id.action_account_to_news)
                     } catch (e: Exception) {
-                        // Handle navigation error
+                        // Handle navigation error silently
                     }
                     true
                 }
                 R.id.accountFragment -> {
-                    // Already here
+                    // Already here, do nothing
                     true
                 }
                 else -> false
@@ -198,26 +207,30 @@ class AccountFragment : Fragment() {
     }
 
     private fun requestImagePermissionAndPick() {
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+
         when {
-            ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) == PackageManager.PERMISSION_GRANTED -> {
+            ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED -> {
                 openImagePicker()
             }
-            shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE) -> {
+            shouldShowRequestPermissionRationale(permission) -> {
                 Toast.makeText(
                     context,
-                    "Storage permission is needed to select profile photo",
+                    "Storage permission is needed to select a profile photo",
                     Toast.LENGTH_LONG
                 ).show()
-                permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                permissionLauncher.launch(permission)
             }
             else -> {
-                permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                permissionLauncher.launch(permission)
             }
         }
     }
+
 
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
@@ -305,7 +318,7 @@ class AccountFragment : Fragment() {
                 try {
                     findNavController().navigate(R.id.action_account_to_login)
                 } catch (e: Exception) {
-                    // Handle navigation error
+                    // Handle navigation error - close app or go to login activity
                     requireActivity().finish()
                 }
             }

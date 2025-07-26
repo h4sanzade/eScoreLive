@@ -37,15 +37,12 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // Load user data from DataStore
                 val userData = accountDataStore.getUserData()
                 _userData.value = userData
 
-                // Load favorite counts
                 val counts = accountDataStore.getFavoriteCounts()
                 _favoriteCounts.value = counts
 
-                // Load app settings
                 val settings = accountDataStore.getAppSettings()
                 _appSettings.value = settings
 
@@ -62,7 +59,6 @@ class AccountViewModel @Inject constructor(
             try {
                 accountDataStore.saveProfileImageUri(imageUri)
 
-                // Update current user data
                 _userData.value = _userData.value?.copy(profileImageUri = imageUri)
             } catch (e: Exception) {
                 _error.value = "Failed to save profile image: ${e.message}"
@@ -76,7 +72,6 @@ class AccountViewModel @Inject constructor(
                 accountDataStore.saveNotificationsSetting(enabled)
 
                 // Update current settings
-                _appSettings.value = _appSettings.value?.copy(notificationsEnabled = enabled)
             } catch (e: Exception) {
                 _error.value = "Failed to save notifications setting: ${e.message}"
             }
@@ -88,7 +83,6 @@ class AccountViewModel @Inject constructor(
             try {
                 accountDataStore.saveDarkThemeSetting(enabled)
 
-                // Update current settings
                 _appSettings.value = _appSettings.value?.copy(darkThemeEnabled = enabled)
             } catch (e: Exception) {
                 _error.value = "Failed to save dark theme setting: ${e.message}"
@@ -101,7 +95,6 @@ class AccountViewModel @Inject constructor(
             try {
                 accountDataStore.saveLanguageSetting(language)
 
-                // Update current settings
                 _appSettings.value = _appSettings.value?.copy(selectedLanguage = language)
             } catch (e: Exception) {
                 _error.value = "Failed to save language setting: ${e.message}"
@@ -114,7 +107,6 @@ class AccountViewModel @Inject constructor(
             try {
                 accountDataStore.saveSelectedLeagues(leagues)
 
-                // Update current settings
                 _appSettings.value = _appSettings.value?.copy(selectedLeagues = leagues)
             } catch (e: Exception) {
                 _error.value = "Failed to save league filters: ${e.message}"
@@ -138,7 +130,6 @@ class AccountViewModel @Inject constructor(
     }
 }
 
-// Data classes
 data class UserData(
     val firstName: String = "",
     val lastName: String = "",
