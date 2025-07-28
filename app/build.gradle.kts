@@ -4,7 +4,6 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
     id("androidx.navigation.safeargs.kotlin")
-    // Firebase plugin'ini kaldırdık: id("com.google.gms.google-services")
 }
 
 android {
@@ -82,6 +81,12 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
 
     // Testing
     testImplementation("junit:junit:4.13.2")

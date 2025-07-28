@@ -57,7 +57,7 @@
     <!-- Competition Fragment -->
     <fragment
         android:id="@+id/competitionFragment"
-        android:name="com.materialdesign.escorelive.presentation.ui.competition.CompetitionFragment"
+        android:name="com.materialdesign.escorelive.presentation.competition.CompetitionFragment"
         android:label="Competition"
         tools:layout="@layout/fragment_competition">
 

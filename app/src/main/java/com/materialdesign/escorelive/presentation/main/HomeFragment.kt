@@ -73,7 +73,6 @@ class HomeFragment : Fragment() {
                     try {
                         findNavController().navigate(R.id.action_home_to_competition)
                     } catch (e: Exception) {
-                        // Handle navigation error silently
                     }
                     true
                 }

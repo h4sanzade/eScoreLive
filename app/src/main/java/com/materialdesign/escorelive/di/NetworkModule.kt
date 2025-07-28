@@ -1,18 +1,20 @@
+// NetworkModule.kt - Updated to include CompetitionApiService
 package com.materialdesign.escorelive.di
 
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
-import com.materialdesign.escorelive.R
+import com.materialdesign.escorelive.data.remote.CompetitionApiService
 import com.materialdesign.escorelive.data.remote.FootballApiService
 import com.materialdesign.escorelive.data.remote.NewsApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Singleton
+import java.util.concurrent.TimeUnit
 import javax.inject.Named
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -20,13 +22,30 @@ object NetworkModule {
 
     private const val FOOTBALL_BASE_URL = "https://v3.football.api-sports.io/"
     private const val NEWS_BASE_URL = "https://newsapi.org/v2/"
+    private const val SOCCERS_API_BASE_URL = "https://api.soccersapi.com/v2.2/"
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        return OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
 
     @Provides
     @Singleton
     @Named("football")
-    fun provideFootballRetrofit(): Retrofit {
+    fun provideFootballRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(FOOTBALL_BASE_URL)
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
@@ -34,13 +53,24 @@ object NetworkModule {
     @Provides
     @Singleton
     @Named("news")
-    fun provideNewsRetrofit(): Retrofit {
+    fun provideNewsRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .baseUrl(NEWS_BASE_URL)
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 
+    @Provides
+    @Singleton
+    @Named("soccers")
+    fun provideSoccersApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(SOCCERS_API_BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 
     @Provides
     @Singleton
@@ -54,19 +84,9 @@ object NetworkModule {
         return retrofit.create(NewsApiService::class.java)
     }
 
-
-    @Module
-    @InstallIn(SingletonComponent::class)
-    object GlideModule {
-
-        @Provides
-        @Singleton
-        fun provideGlideRequestOptions(): RequestOptions {
-            return RequestOptions()
-                .placeholder(R.drawable.ic_placeholder)
-                .error(R.drawable.ic_error)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .timeout(10000)
-        }
+    @Provides
+    @Singleton
+    fun provideCompetitionApiService(@Named("soccers") retrofit: Retrofit): CompetitionApiService {
+        return retrofit.create(CompetitionApiService::class.java)
     }
 }
