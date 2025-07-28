@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="8dp"
+    android:background="?android:attr/selectableItemBackground"
+    android:minHeight="48dp">
+
+    <!-- Position -->
+    <TextView
+        android:id="@+id/position_text"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:gravity="center"
+        android:textSize="12sp"
+        android:textColor="@color/white"
+        android:fontFamily="@font/mulish_bold"
+        android:background="@drawable/position_normal_bg"
+        tools:text="1" />
+
+    <!-- Team Logo -->
+    <ImageView
+        android:id="@+id/team_logo"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:scaleType="centerCrop"
+        tools:src="@drawable/ic_placeholder" />
+
+    <!-- Team Name -->
+    <TextView
+        android:id="@+id/team_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:textSize="13sp"
+        android:textColor="@color/white"
+        android:fontFamily="@font/mulish_regular"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:layout_marginEnd="8dp"
+        tools:text="Arsenal" />
+
+    <!-- Played -->
+    <TextView
+        android:id="@+id/played_text"
+        android:layout_width="24dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="11sp"
+        android:textColor="@android:color/darker_gray"
+        android:fontFamily="@font/mulish_regular"
+        tools:text="38" />
+
+    <!-- Won -->
+    <TextView
+        android:id="@+id/won_text"
+        android:layout_width="24dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="11sp"
+        android:textColor="@android:color/darker_gray"
+        android:fontFamily="@font/mulish_regular"
+        tools:text="26" />
+
+    <!-- Drawn -->
+    <TextView
+        android:id="@+id/drawn_text"
+        android:layout_width="24dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="11sp"
+        android:textColor="@android:color/darker_gray"
+        android:fontFamily="@font/mulish_regular"
+        tools:text="8" />
+
+    <!-- Lost -->
+    <TextView
+        android:id="@+id/lost_text"
+        android:layout_width="24dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="11sp"
+        android:textColor="@android:color/darker_gray"
+        android:fontFamily="@font/mulish_regular"
+        tools:text="4" />
+
+    <!-- Goals For -->
+    <TextView
+        android:id="@+id/gf_text"
+        android:layout_width="24dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="11sp"
+        android:textColor="@android:color/darker_gray"
+        android:fontFamily="@font/mulish_regular"
+        android:visibility="gone"
+        tools:text="89" />
+
+    <!-- Goals Against -->
+    <TextView
+        android:id="@+id/ga_text"
+        android:layout_width="24dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="11sp"
+        android:textColor="@android:color/darker_gray"
+        android:fontFamily="@font/mulish_regular"
+        android:visibility="gone"
+        tools:text="47" />
+
+    <!-- Goal Difference -->
+    <TextView
+        android:id="@+id/gd_text"
+        android:layout_width="32dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="11sp"
+        android:textColor="@android:color/holo_green_dark"
+        android:fontFamily="@font/mulish_bold"
+        tools:text="+42" />
+
+    <!-- Points -->
+    <TextView
+        android:id="@+id/points_text"
+        android:layout_width="32dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="12sp"
+        android:textColor="@color/white"
+        android:fontFamily="@font/mulish_bold"
+        tools:text="86" />
+
+    <!-- Form -->
+    <TextView
+        android:id="@+id/form_text"
+        android:layout_width="36dp"
+        android:layout_height="16dp"
+        android:gravity="center"
+        android:textSize="9sp"
+        android:textColor="@color/white"
+        android:fontFamily="@font/mulish_bold"
+        android:background="@drawable/form_good_bg"
+        android:layout_marginStart="4dp"
+        android:visibility="gone"
+        tools:text="WWDWL"
+        tools:visibility="visible" />
+
+</LinearLayout>

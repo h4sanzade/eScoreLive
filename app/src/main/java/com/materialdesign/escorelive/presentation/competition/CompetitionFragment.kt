@@ -1,4 +1,4 @@
-// CompetitionFragment.kt - Updated with Region Grouping
+// CompetitionFragment.kt - Fixed with Standings Support
 package com.materialdesign.escorelive.presentation.competition
 
 import android.os.Bundle
@@ -19,6 +19,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.bumptech.glide.Glide
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.data.remote.dto.Competition
@@ -26,6 +27,7 @@ import com.materialdesign.escorelive.data.remote.dto.CompetitionTab
 import com.materialdesign.escorelive.databinding.FragmentCompetitionBinding
 import com.materialdesign.escorelive.presentation.adapters.CompetitionAdapter
 import com.materialdesign.escorelive.presentation.adapters.RegionCompetitionAdapter
+import com.materialdesign.escorelive.presentation.adapters.StandingsAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -38,6 +40,9 @@ class CompetitionFragment : Fragment() {
     private val viewModel: CompetitionViewModel by viewModels()
     private lateinit var competitionAdapter: CompetitionAdapter
     private lateinit var regionAdapter: RegionCompetitionAdapter
+
+    // Bottom sheet for standings
+    private var standingsBottomSheetDialog: BottomSheetDialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -210,6 +215,36 @@ class CompetitionFragment : Fragment() {
                 }
             }
         }
+
+        // Observe standings data
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.standingsData.collect { standings ->
+                    updateStandingsBottomSheet(standings)
+                }
+            }
+        }
+
+        // Observe standings loading state
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.standingsLoading.collect { isLoading ->
+                    updateStandingsLoadingState(isLoading)
+                }
+            }
+        }
+
+        // Observe standings errors
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.standingsError.collect { error ->
+                    error?.let {
+                        showError(it)
+                        viewModel.clearStandingsError()
+                    }
+                }
+            }
+        }
     }
 
     private fun updateUI(state: com.materialdesign.escorelive.data.remote.dto.CompetitionUiState) {
@@ -311,7 +346,99 @@ class CompetitionFragment : Fragment() {
 
     private fun showStandingsBottomSheet(competition: Competition) {
         Toast.makeText(context, "Loading ${competition.name} standings...", Toast.LENGTH_SHORT).show()
+
+        // Create the bottom sheet
+        createStandingsBottomSheet(competition)
+
+        // Load standings data
         viewModel.loadCompetitionStandings(competition)
+    }
+
+    private fun createStandingsBottomSheet(competition: Competition) {
+        val bottomSheetView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.bottom_sheet_standings, null)
+
+        standingsBottomSheetDialog = BottomSheetDialog(requireContext()).apply {
+            setContentView(bottomSheetView)
+
+            // Setup bottom sheet views
+            val titleView = bottomSheetView.findViewById<TextView>(R.id.standings_title)
+            val seasonView = bottomSheetView.findViewById<TextView>(R.id.standings_season)
+            val leagueLogoView = bottomSheetView.findViewById<ImageView>(R.id.league_logo)
+            val closeButton = bottomSheetView.findViewById<ImageView>(R.id.close_button)
+            val recyclerView = bottomSheetView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.standings_recycler_view)
+
+            // Set competition info
+            titleView.text = "${competition.name} Standings"
+            seasonView.text = "Season ${competition.season ?: "2024"}"
+
+            // Load league logo
+            Glide.with(this@CompetitionFragment)
+                .load(competition.logoUrl)
+                .placeholder(R.drawable.ic_competition)
+                .into(leagueLogoView)
+
+            // Setup RecyclerView
+            val standingsAdapter = StandingsAdapter()
+            recyclerView.apply {
+                adapter = standingsAdapter
+                layoutManager = LinearLayoutManager(context)
+                setHasFixedSize(true)
+            }
+
+            // Close button
+            closeButton.setOnClickListener {
+                dismiss()
+            }
+
+            // Show the bottom sheet
+            show()
+        }
+    }
+
+    private fun updateStandingsBottomSheet(standings: List<com.materialdesign.escorelive.data.remote.TeamStanding>) {
+        standingsBottomSheetDialog?.let { dialog ->
+            if (dialog.isShowing) {
+                val bottomSheetView = dialog.findViewById<View>(android.R.id.content)
+                val recyclerView = bottomSheetView?.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.standings_recycler_view)
+                val adapter = recyclerView?.adapter as? StandingsAdapter
+
+                adapter?.submitList(standings)
+
+                // Hide loading and show data
+                val progressBar = bottomSheetView?.findViewById<ProgressBar>(R.id.standings_progress_bar)
+                val emptyState = bottomSheetView?.findViewById<LinearLayout>(R.id.standings_empty_state)
+
+                progressBar?.visibility = View.GONE
+
+                if (standings.isEmpty()) {
+                    emptyState?.visibility = View.VISIBLE
+                    recyclerView?.visibility = View.GONE
+                } else {
+                    emptyState?.visibility = View.GONE
+                    recyclerView?.visibility = View.VISIBLE
+                }
+            }
+        }
+    }
+
+    private fun updateStandingsLoadingState(isLoading: Boolean) {
+        standingsBottomSheetDialog?.let { dialog ->
+            if (dialog.isShowing) {
+                val bottomSheetView = dialog.findViewById<View>(android.R.id.content)
+                val progressBar = bottomSheetView?.findViewById<ProgressBar>(R.id.standings_progress_bar)
+                val recyclerView = bottomSheetView?.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.standings_recycler_view)
+                val emptyState = bottomSheetView?.findViewById<LinearLayout>(R.id.standings_empty_state)
+
+                if (isLoading) {
+                    progressBar?.visibility = View.VISIBLE
+                    recyclerView?.visibility = View.GONE
+                    emptyState?.visibility = View.GONE
+                } else {
+                    progressBar?.visibility = View.GONE
+                }
+            }
+        }
     }
 
     private fun onCompetitionClick(competition: Competition) {
