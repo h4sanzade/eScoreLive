@@ -1,52 +1,61 @@
-// CompetitionApiService.kt
 package com.materialdesign.escorelive.data.remote
 
 import com.materialdesign.escorelive.data.remote.dto.LeaguesApiResponse
+import com.materialdesign.escorelive.data.remote.dto.CountriesApiResponse
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Query
 
-/**
- * Retrofit service interface for SoccersAPI competitions
- */
+
 interface CompetitionApiService {
 
     companion object {
-        const val BASE_URL = "https://api.soccersapi.com/v2.2/"
-        const val USERNAME = "h4sanzade"
-        const val TOKEN = "c660199e0f3aa383e4bc220b3b6a9db7"
+        const val API_KEY = "8767b67b14200a87603b7211cf4239dd"
+        const val API_HOST = "v3.football.api-sports.io"
     }
 
-    /**
-     * Get all leagues/competitions
-     * URL: https://api.soccersapi.com/v2.2/leagues/?user=h4sanzade&token=c660199e0f3aa383e4bc220b3b6a9db7&t=list
-     */
-    @GET("leagues/")
+
+    @GET("leagues")
     suspend fun getAllLeagues(
-        @Query("user") user: String = USERNAME,
-        @Query("token") token: String = TOKEN,
-        @Query("t") type: String = "list"
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST
     ): Response<LeaguesApiResponse>
 
-    /**
-     * Search leagues by name or country
-     */
-    @GET("leagues/")
-    suspend fun searchLeagues(
-        @Query("user") user: String = USERNAME,
-        @Query("token") token: String = TOKEN,
-        @Query("t") type: String = "search",
-        @Query("name") searchTerm: String
-    ): Response<LeaguesApiResponse>
 
-    /**
-     * Get leagues by country
-     */
-    @GET("leagues/")
+    @GET("leagues")
     suspend fun getLeaguesByCountry(
-        @Query("user") user: String = USERNAME,
-        @Query("token") token: String = TOKEN,
-        @Query("t") type: String = "list",
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST,
         @Query("country") country: String
+    ): Response<LeaguesApiResponse>
+
+    @GET("leagues")
+    suspend fun searchLeagues(
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST,
+        @Query("search") searchTerm: String
+    ): Response<LeaguesApiResponse>
+
+
+    @GET("leagues")
+    suspend fun getLeagueById(
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST,
+        @Query("id") leagueId: Int
+    ): Response<LeaguesApiResponse>
+
+    @GET("countries")
+    suspend fun getCountries(
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST
+    ): Response<CountriesApiResponse>
+
+
+    @GET("leagues")
+    suspend fun getCurrentSeasonLeagues(
+        @Header("X-RapidAPI-Key") apiKey: String = API_KEY,
+        @Header("X-RapidAPI-Host") host: String = API_HOST,
+        @Query("current") current: Boolean = true
     ): Response<LeaguesApiResponse>
 }

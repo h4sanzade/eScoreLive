@@ -1,11 +1,10 @@
-// FilterLeaguesViewModel.kt
 package com.materialdesign.escorelive.presentation.filter
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.materialdesign.escorelive.data.local.AccountDataStore
+import com.materialdesign.escorelive.presentation.account.AccountDataStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -41,7 +40,6 @@ class FilterLeaguesViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                // Load mock data for demo
                 loadMockLeagues()
             } catch (e: Exception) {
                 _error.value = "Failed to load leagues: ${e.message}"
@@ -130,7 +128,6 @@ class FilterLeaguesViewModel @Inject constructor(
     }
 }
 
-// Data class for League
 data class League(
     val id: String,
     val name: String,

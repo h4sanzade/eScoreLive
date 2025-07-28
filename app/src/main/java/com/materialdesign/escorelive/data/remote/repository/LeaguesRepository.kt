@@ -100,7 +100,6 @@ class LeaguesRepository @Inject constructor(
     }
 }
 
-// API Service interface
 interface LeaguesApiService {
 
     @retrofit2.http.GET("leagues")
@@ -117,7 +116,6 @@ interface LeaguesApiService {
     ): retrofit2.Response<LeaguesApiResponse>
 }
 
-// API Response models
 data class LeaguesApiResponse(
     val status: String,
     val message: String?,

@@ -1,4 +1,4 @@
-// CompetitionFragment.kt - Final version with SwipeRefreshLayout
+// CompetitionFragment.kt - Updated with Region Grouping
 package com.materialdesign.escorelive.presentation.competition
 
 import android.os.Bundle
@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.Toast
+import android.widget.TextView
+import android.widget.ImageView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -17,11 +19,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
+import com.bumptech.glide.Glide
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.data.remote.dto.Competition
 import com.materialdesign.escorelive.data.remote.dto.CompetitionTab
 import com.materialdesign.escorelive.databinding.FragmentCompetitionBinding
 import com.materialdesign.escorelive.presentation.adapters.CompetitionAdapter
+import com.materialdesign.escorelive.presentation.adapters.RegionCompetitionAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -33,6 +37,7 @@ class CompetitionFragment : Fragment() {
 
     private val viewModel: CompetitionViewModel by viewModels()
     private lateinit var competitionAdapter: CompetitionAdapter
+    private lateinit var regionAdapter: RegionCompetitionAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,22 +57,48 @@ class CompetitionFragment : Fragment() {
         setupSwipeRefresh()
         setupBottomNavigation()
         observeViewModel()
+
+        showLoadingMessage()
     }
 
     private fun setupRecyclerView() {
+        // Regular competition adapter for Top and Favorites tabs
         competitionAdapter = CompetitionAdapter(
             onCompetitionClick = { competition ->
                 onCompetitionClick(competition)
             },
             onFavoriteClick = { competition ->
                 viewModel.toggleFavorite(competition)
+                showFavoriteMessage(competition)
+            },
+            onStandingsClick = { competition ->
+                showStandingsBottomSheet(competition)
             }
         )
 
-        binding.swipeRefreshLayout.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.competitions_recycler_view)?.apply {
-            adapter = competitionAdapter
+        // Region adapter for Region tab (shows countries with their leagues)
+        regionAdapter = RegionCompetitionAdapter(
+            onCompetitionClick = { competition ->
+                onCompetitionClick(competition)
+            },
+            onFavoriteClick = { competition ->
+                viewModel.toggleFavorite(competition)
+                showFavoriteMessage(competition)
+            },
+            onCountryHeaderClick = { country ->
+                Toast.makeText(context, "Showing leagues for $country", Toast.LENGTH_SHORT).show()
+            },
+            onStandingsClick = { competition ->
+                showStandingsBottomSheet(competition)
+            }
+        )
+
+        val recyclerView = binding.swipeRefreshLayout.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.competitions_recycler_view)
+        recyclerView?.apply {
             layoutManager = LinearLayoutManager(context)
             setHasFixedSize(true)
+            // Start with regular adapter
+            adapter = competitionAdapter
         }
     }
 
@@ -81,14 +112,28 @@ class CompetitionFragment : Fragment() {
                     else -> CompetitionTab.TOP
                 }
                 viewModel.selectTab(selectedTab)
+                updateTabDescription(selectedTab)
+                switchAdapter(selectedTab)
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
 
-        // Set default selected tab
         binding.tabLayout.selectTab(binding.tabLayout.getTabAt(0))
+    }
+
+    private fun switchAdapter(tab: CompetitionTab) {
+        val recyclerView = binding.swipeRefreshLayout.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.competitions_recycler_view)
+
+        when (tab) {
+            CompetitionTab.REGION -> {
+                recyclerView?.adapter = regionAdapter
+            }
+            else -> {
+                recyclerView?.adapter = competitionAdapter
+            }
+        }
     }
 
     private fun setupSearchBar() {
@@ -96,14 +141,16 @@ class CompetitionFragment : Fragment() {
             val query = editable?.toString() ?: ""
             viewModel.onSearchQueryChanged(query)
         }
+
+        updateSearchHint(CompetitionTab.TOP)
     }
 
     private fun setupSwipeRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
+            showRefreshMessage()
             viewModel.refresh()
         }
 
-        // Customize swipe refresh colors
         binding.swipeRefreshLayout.setColorSchemeResources(
             R.color.accent_color,
             R.color.accent_color,
@@ -124,10 +171,7 @@ class CompetitionFragment : Fragment() {
                     }
                     true
                 }
-                R.id.competitionFragment -> {
-                    // Already here
-                    true
-                }
+                R.id.competitionFragment -> true
                 R.id.newsFragment -> {
                     try {
                         findNavController().navigate(R.id.action_competition_to_news)
@@ -157,43 +201,60 @@ class CompetitionFragment : Fragment() {
                 }
             }
         }
+
+        // Observe regional data separately
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.regionalCompetitions.collect { regionalData ->
+                    regionAdapter.submitRegionalData(regionalData)
+                }
+            }
+        }
     }
 
     private fun updateUI(state: com.materialdesign.escorelive.data.remote.dto.CompetitionUiState) {
-        // Update loading state
         val progressBar = binding.swipeRefreshLayout.findViewById<ProgressBar>(R.id.progress_bar)
         progressBar?.visibility = if (state.isLoading) View.VISIBLE else View.GONE
 
-        // Update swipe refresh state
         if (binding.swipeRefreshLayout.isRefreshing && !state.isLoading) {
             binding.swipeRefreshLayout.isRefreshing = false
         }
 
-        // Update competitions list
-        competitionAdapter.submitList(state.filteredCompetitions)
+        // Update appropriate adapter based on selected tab
+        when (state.selectedTab) {
+            CompetitionTab.REGION -> {
+                // Regional data is handled by separate observer
+            }
+            else -> {
+                competitionAdapter.submitList(state.filteredCompetitions) {
+                    binding.swipeRefreshLayout.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.competitions_recycler_view)?.scrollToPosition(0)
+                }
+            }
+        }
 
-        // Update empty state
-        val isEmpty = state.filteredCompetitions.isEmpty() && !state.isLoading
+        val isEmpty = when (state.selectedTab) {
+            CompetitionTab.REGION -> regionAdapter.itemCount == 0 && !state.isLoading
+            else -> state.filteredCompetitions.isEmpty() && !state.isLoading
+        }
+
         val emptyStateLayout = binding.swipeRefreshLayout.findViewById<LinearLayout>(R.id.empty_state_layout)
         val recyclerView = binding.swipeRefreshLayout.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.competitions_recycler_view)
 
         emptyStateLayout?.visibility = if (isEmpty) View.VISIBLE else View.GONE
         recyclerView?.visibility = if (isEmpty) View.GONE else View.VISIBLE
 
-        // Handle errors
         state.error?.let { error ->
             showError(error)
             viewModel.clearError()
         }
 
-        // Update search query in UI if needed
         if (binding.searchEditText.text.toString() != state.searchQuery) {
             binding.searchEditText.setText(state.searchQuery)
             binding.searchEditText.setSelection(state.searchQuery.length)
         }
 
-        // Update empty state message based on selected tab
         updateEmptyStateMessage(state.selectedTab)
+        updateHeaderWithCount(state, regionAdapter.itemCount)
     }
 
     private fun updateEmptyStateMessage(selectedTab: CompetitionTab) {
@@ -204,11 +265,11 @@ class CompetitionFragment : Fragment() {
         when (selectedTab) {
             CompetitionTab.TOP -> {
                 titleView?.text = "No top competitions found"
-                messageView?.text = "Try refreshing or check your connection"
+                messageView?.text = "Top leagues and tournaments will appear here"
             }
             CompetitionTab.REGION -> {
-                titleView?.text = "No regional competitions found"
-                messageView?.text = "Try searching for a specific region or country"
+                titleView?.text = "No competitions by region"
+                messageView?.text = "Leagues grouped by country will appear here"
             }
             CompetitionTab.FAVORITES -> {
                 titleView?.text = "No favorite competitions"
@@ -217,39 +278,88 @@ class CompetitionFragment : Fragment() {
         }
     }
 
-    private fun onCompetitionClick(competition: Competition) {
-        // Show selected competition
-        Toast.makeText(
-            context,
-            "Selected: ${competition.name} (${competition.country})",
-            Toast.LENGTH_SHORT
-        ).show()
+    private fun updateHeaderWithCount(state: com.materialdesign.escorelive.data.remote.dto.CompetitionUiState, regionCount: Int) {
+        val count = when (state.selectedTab) {
+            CompetitionTab.REGION -> regionCount
+            else -> state.filteredCompetitions.size
+        }
 
-        // TODO: Navigate to competition details
-        // Example navigation:
-        // try {
-        //     val action = CompetitionFragmentDirections
-        //         .actionCompetitionToCompetitionDetail(competition.id, competition.name)
-        //     findNavController().navigate(action)
-        // } catch (e: Exception) {
-        //     showError("Failed to open competition details")
-        // }
+        val tabName = when (state.selectedTab) {
+            CompetitionTab.TOP -> "Top Competitions"
+            CompetitionTab.REGION -> "By Region"
+            CompetitionTab.FAVORITES -> "Favorites"
+        }
+
+        if (count > 0) {
+            binding.headerTitle.text = "$tabName ($count)"
+        } else {
+            binding.headerTitle.text = tabName
+        }
+    }
+
+    private fun updateTabDescription(selectedTab: CompetitionTab) {
+        updateSearchHint(selectedTab)
+    }
+
+    private fun updateSearchHint(tab: CompetitionTab) {
+        binding.searchEditText.hint = when (tab) {
+            CompetitionTab.TOP -> "Search top competitions..."
+            CompetitionTab.REGION -> "Search by country or league name..."
+            CompetitionTab.FAVORITES -> "Search your favorites..."
+        }
+    }
+
+    private fun showStandingsBottomSheet(competition: Competition) {
+        Toast.makeText(context, "Loading ${competition.name} standings...", Toast.LENGTH_SHORT).show()
+        viewModel.loadCompetitionStandings(competition)
+    }
+
+    private fun onCompetitionClick(competition: Competition) {
+        val message = when {
+            competition.currentSeason -> "${competition.name} (Current Season)"
+            !competition.season.isNullOrEmpty() -> "${competition.name} (${competition.season})"
+            else -> competition.name
+        }
+
+        Toast.makeText(context, "$message - ${competition.country}", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showFavoriteMessage(competition: Competition) {
+        val message = if (competition.isFavorite) {
+            "${competition.name} removed from favorites"
+        } else {
+            "${competition.name} added to favorites"
+        }
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun showError(message: String) {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
+    private fun showLoadingMessage() {
+        Toast.makeText(context, "Loading competitions from Football API...", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showRefreshMessage() {
+        Toast.makeText(context, "Refreshing competitions...", Toast.LENGTH_SHORT).show()
+    }
+
     override fun onResume() {
         super.onResume()
-        // Refresh data when returning to the fragment
         if (::competitionAdapter.isInitialized) {
             competitionAdapter.notifyDataSetChanged()
+        }
+        if (::regionAdapter.isInitialized) {
+            regionAdapter.notifyDataSetChanged()
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        standingsBottomSheetDialog?.dismiss()
+        standingsBottomSheetDialog = null
+        viewModel.clearStandingsData()
         _binding = null
     }
 }

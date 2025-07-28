@@ -36,7 +36,6 @@ class AuthDataStore @Inject constructor(
         preferences[IS_GUEST_MODE] ?: false
     }
 
-    // Get user data
     val userData: Flow<UserData> = dataStore.data.map { preferences ->
         UserData(
             userId = preferences[USER_ID] ?: "",

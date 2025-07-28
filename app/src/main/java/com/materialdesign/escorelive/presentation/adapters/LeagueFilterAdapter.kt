@@ -1,4 +1,3 @@
-// LeagueFilterAdapter.kt
 package com.materialdesign.escorelive.presentation.adapters
 
 import android.view.LayoutInflater

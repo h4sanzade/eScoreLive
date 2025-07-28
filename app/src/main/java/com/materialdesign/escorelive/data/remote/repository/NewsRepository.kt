@@ -68,7 +68,6 @@ class NewsRepository @Inject constructor(
                                     !newsItem.title.contains("[Removed]", ignoreCase = true)
                         }
 
-                        // Cache the results
                         if (refresh || currentPage == 1) {
                             newsCache[category] = filteredNews
                         } else {

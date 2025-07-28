@@ -1,4 +1,3 @@
-// NetworkModule.kt - Updated to include CompetitionApiService
 package com.materialdesign.escorelive.di
 
 import com.materialdesign.escorelive.data.remote.CompetitionApiService
@@ -22,7 +21,6 @@ object NetworkModule {
 
     private const val FOOTBALL_BASE_URL = "https://v3.football.api-sports.io/"
     private const val NEWS_BASE_URL = "https://newsapi.org/v2/"
-    private const val SOCCERS_API_BASE_URL = "https://api.soccersapi.com/v2.2/"
 
     @Provides
     @Singleton
@@ -63,17 +61,6 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    @Named("soccers")
-    fun provideSoccersApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(SOCCERS_API_BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
-
-    @Provides
-    @Singleton
     fun provideFootballApiService(@Named("football") retrofit: Retrofit): FootballApiService {
         return retrofit.create(FootballApiService::class.java)
     }
@@ -83,10 +70,9 @@ object NetworkModule {
     fun provideNewsApiService(@Named("news") retrofit: Retrofit): NewsApiService {
         return retrofit.create(NewsApiService::class.java)
     }
-
     @Provides
     @Singleton
-    fun provideCompetitionApiService(@Named("soccers") retrofit: Retrofit): CompetitionApiService {
+    fun provideCompetitionApiService(@Named("football") retrofit: Retrofit): CompetitionApiService {
         return retrofit.create(CompetitionApiService::class.java)
     }
 }

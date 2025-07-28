@@ -1,160 +1,240 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="2dp"
-    app:cardCornerRadius="0dp"
-    app:cardElevation="0dp"
-    app:cardBackgroundColor="@color/card_background">
+    android:orientation="vertical"
+    android:background="@color/background_color">
 
-    <LinearLayout
+    <!-- Header -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="8dp">
+        android:padding="16dp"
+        android:background="@color/card_background">
 
-        <!-- Position -->
-        <TextView
-            android:id="@+id/position_text"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:text="1"
-            android:textSize="12sp"
-            android:textColor="@color/white"
-            android:fontFamily="@font/mulish_bold"
-            android:gravity="center"
-            android:background="@drawable/position_champions_bg" />
+        <!-- Drag Handle -->
+        <View
+            android:id="@+id/drag_handle"
+            android:layout_width="40dp"
+            android:layout_height="4dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/drag_handle_bg"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Team -->
+        <!-- League Logo -->
+        <ImageView
+            android:id="@+id/league_logo"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/drag_handle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:src="@drawable/ic_placeholder" />
+
+        <!-- Title and Season -->
         <LinearLayout
+            android:id="@+id/title_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp">
-
-            <ImageView
-                android:id="@+id/team_logo"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginEnd="6dp"
-                tools:src="@drawable/ic_placeholder" />
+            android:orientation="vertical"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintStart_toEndOf="@id/league_logo"
+            app:layout_constraintTop_toBottomOf="@id/drag_handle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/close_button">
 
             <TextView
-                android:id="@+id/team_name"
-                android:layout_width="0dp"
+                android:id="@+id/standings_title"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Arsenal"
-                android:textSize="12sp"
+                android:text="Premier League Standings"
+                android:textSize="16sp"
                 android:textColor="@color/white"
                 android:fontFamily="@font/mulish_bold"
                 android:maxLines="1"
                 android:ellipsize="end" />
 
+            <TextView
+                android:id="@+id/standings_season"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Season 2024/25"
+                android:textSize="12sp"
+                android:textColor="@android:color/darker_gray"
+                android:fontFamily="@font/mulish_regular"
+                android:layout_marginTop="2dp" />
+
         </LinearLayout>
 
-        <!-- Stats -->
-        <TextView
-            android:id="@+id/played_text"
-            android:layout_width="24dp"
-            android:layout_height="wrap_content"
-            android:text="28"
-            android:textSize="12sp"
-            android:textColor="@android:color/darker_gray"
-            android:fontFamily="@font/mulish_regular"
-            android:textAlignment="center" />
-
-        <TextView
-            android:id="@+id/won_text"
-            android:layout_width="24dp"
-            android:layout_height="wrap_content"
-            android:text="21"
-            android:textSize="12sp"
-            android:textColor="@android:color/holo_green_light"
-            android:fontFamily="@font/mulish_regular"
-            android:textAlignment="center" />
-
-        <TextView
-            android:id="@+id/drawn_text"
-            android:layout_width="24dp"
-            android:layout_height="wrap_content"
-            android:text="4"
-            android:textSize="12sp"
-            android:textColor="@android:color/darker_gray"
-            android:fontFamily="@font/mulish_regular"
-            android:textAlignment="center" />
-
-        <TextView
-            android:id="@+id/lost_text"
-            android:layout_width="24dp"
-            android:layout_height="wrap_content"
-            android:text="3"
-            android:textSize="12sp"
-            android:textColor="@android:color/holo_red_light"
-            android:fontFamily="@font/mulish_regular"
-            android:textAlignment="center" />
-
-        <!-- Hidden stats for full table view -->
-        <TextView
-            android:id="@+id/gf_text"
-            android:layout_width="24dp"
-            android:layout_height="wrap_content"
-            android:text="68"
-            android:textSize="12sp"
-            android:textColor="@android:color/darker_gray"
-            android:fontFamily="@font/mulish_regular"
-            android:textAlignment="center"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/ga_text"
-            android:layout_width="24dp"
-            android:layout_height="wrap_content"
-            android:text="24"
-            android:textSize="12sp"
-            android:textColor="@android:color/darker_gray"
-            android:fontFamily="@font/mulish_regular"
-            android:textAlignment="center"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/gd_text"
+        <!-- Close Button -->
+        <ImageView
+            android:id="@+id/close_button"
             android:layout_width="32dp"
-            android:layout_height="wrap_content"
-            android:text="+44"
-            android:textSize="12sp"
-            android:textColor="@android:color/holo_green_dark"
-            android:fontFamily="@font/mulish_regular"
-            android:textAlignment="center" />
+            android:layout_height="32dp"
+            android:src="@drawable/ic_close"
+            android:tint="@android:color/darker_gray"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="6dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/drag_handle"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Table Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
+        android:background="@color/background_color">
+
+        <!-- Position Header -->
         <TextView
-            android:id="@+id/points_text"
-            android:layout_width="32dp"
+            android:layout_width="24dp"
             android:layout_height="wrap_content"
-            android:text="67"
-            android:textSize="12sp"
-            android:textColor="@color/white"
+            android:text="#"
+            android:textSize="11sp"
+            android:textColor="@android:color/darker_gray"
             android:fontFamily="@font/mulish_bold"
             android:textAlignment="center" />
 
-        <!-- Form -->
+        <!-- Team Header -->
         <TextView
-            android:id="@+id/form_text"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="WWDWL"
-            android:textSize="10sp"
+            android:layout_weight="2"
+            android:text="Team"
+            android:textSize="11sp"
             android:textColor="@android:color/darker_gray"
-            android:fontFamily="@font/mulish_regular"
-            android:layout_marginStart="4dp"
-            android:visibility="gone" />
+            android:fontFamily="@font/mulish_bold"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
+
+        <!-- Stats Headers -->
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="P"
+            android:textSize="11sp"
+            android:textColor="@android:color/darker_gray"
+            android:fontFamily="@font/mulish_bold"
+            android:textAlignment="center" />
+
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="W"
+            android:textSize="11sp"
+            android:textColor="@android:color/darker_gray"
+            android:fontFamily="@font/mulish_bold"
+            android:textAlignment="center" />
+
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="D"
+            android:textSize="11sp"
+            android:textColor="@android:color/darker_gray"
+            android:fontFamily="@font/mulish_bold"
+            android:textAlignment="center" />
+
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="L"
+            android:textSize="11sp"
+            android:textColor="@android:color/darker_gray"
+            android:fontFamily="@font/mulish_bold"
+            android:textAlignment="center" />
+
+        <TextView
+            android:layout_width="32dp"
+            android:layout_height="wrap_content"
+            android:text="GD"
+            android:textSize="11sp"
+            android:textColor="@android:color/darker_gray"
+            android:fontFamily="@font/mulish_bold"
+            android:textAlignment="center" />
+
+        <TextView
+            android:layout_width="32dp"
+            android:layout_height="wrap_content"
+            android:text="PTS"
+            android:textSize="11sp"
+            android:textColor="@android:color/darker_gray"
+            android:fontFamily="@font/mulish_bold"
+            android:textAlignment="center" />
 
     </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:alpha="0.3"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp" />
+
+    <!-- Standings RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/standings_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:maxHeight="400dp"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp"
+        tools:listitem="@layout/item_standing" />
+
+    <!-- Loading and Empty States -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp">
+
+        <ProgressBar
+            android:id="@+id/standings_progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/standings_empty_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_standings"
+                android:tint="@android:color/darker_gray"
+                android:alpha="0.5"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No standings data available"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                android:fontFamily="@font/mulish_regular" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</LinearLayout>

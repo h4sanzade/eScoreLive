@@ -1,11 +1,10 @@
-// AccountModule.kt
 package com.materialdesign.escorelive.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.materialdesign.escorelive.data.local.AccountDataStore
+import com.materialdesign.escorelive.presentation.account.AccountDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

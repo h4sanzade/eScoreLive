@@ -1,4 +1,3 @@
-// FilterLeaguesFragment.kt
 package com.materialdesign.escorelive.presentation.filter
 
 import android.os.Bundle
@@ -65,7 +64,6 @@ class FilterLeaguesFragment : Fragment() {
     }
 
     private fun setupUI() {
-        // Setup search
         binding.searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -78,25 +76,21 @@ class FilterLeaguesFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        // Observe leagues list
         viewModel.leagues.observe(viewLifecycleOwner, Observer { leagues ->
             leagueAdapter.submitList(leagues)
             updateEmptyState(leagues.isEmpty())
         })
 
-        // Observe selected leagues
         viewModel.selectedLeagues.observe(viewLifecycleOwner, Observer { selectedLeagues ->
             leagueAdapter.updateSelectedLeagues(selectedLeagues)
             updateSelectedCount(selectedLeagues.size)
         })
 
-        // Observe loading state
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
             binding.loadingProgressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
             binding.leaguesRecyclerView.visibility = if (isLoading) View.GONE else View.VISIBLE
         })
 
-        // Observe error messages
         viewModel.error.observe(viewLifecycleOwner, Observer { error ->
             error?.let {
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
@@ -104,7 +98,6 @@ class FilterLeaguesFragment : Fragment() {
             }
         })
 
-        // Observe save completion
         viewModel.saveCompleted.observe(viewLifecycleOwner, Observer { completed ->
             if (completed) {
                 findNavController().popBackStack()
@@ -113,12 +106,10 @@ class FilterLeaguesFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        // Close button
         binding.closeButton.setOnClickListener {
             findNavController().popBackStack()
         }
 
-        // Done button
         binding.doneButton.setOnClickListener {
             viewModel.saveSelectedLeagues()
         }

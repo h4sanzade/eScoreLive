@@ -20,14 +20,11 @@ class AuthRepository @Inject constructor(
             try {
                 Log.d("AuthRepository", "Attempting login for: $username")
 
-                // Check if credentials match stored registration data
                 val isValidCredentials = authDataStore.validateLogin(username, password)
 
                 if (isValidCredentials) {
-                    // Get user data from DataStore
                     val userData = authDataStore.userData.first()
 
-                    // Create User object
                     val user = User(
                         id = userData.userId.toLongOrNull() ?: System.currentTimeMillis(),
                         username = userData.username,
@@ -40,7 +37,6 @@ class AuthRepository @Inject constructor(
                         refreshToken = generateMockToken()
                     )
 
-                    // Save login session
                     authDataStore.saveUserLogin(
                         userData.copy(
                             accessToken = user.accessToken,
@@ -72,7 +68,6 @@ class AuthRepository @Inject constructor(
             try {
                 Log.d("AuthRepository", "Attempting registration for: $username")
 
-                // Save registration data to DataStore
                 authDataStore.saveUserRegistration(
                     firstName = firstName,
                     lastName = lastName,
@@ -151,7 +146,6 @@ class AuthRepository @Inject constructor(
     }
 
     fun clearAllData() {
-        // This should be called in a coroutine
         Log.d("AuthRepository", "All auth data cleared")
     }
 

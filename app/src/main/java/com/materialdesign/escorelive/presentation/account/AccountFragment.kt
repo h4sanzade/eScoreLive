@@ -34,7 +34,6 @@ class AccountFragment : Fragment() {
 
     private val viewModel: AccountViewModel by viewModels()
 
-    // Image picker launcher
     private val imagePickerLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -45,7 +44,6 @@ class AccountFragment : Fragment() {
         }
     }
 
-    // Permission launcher for storage access
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -72,44 +70,36 @@ class AccountFragment : Fragment() {
         observeViewModel()
         setupClickListeners()
 
-        // Load initial data
         viewModel.loadUserData()
     }
 
     private fun setupUI() {
-        // Set bottom navigation selected item to account
         binding.bottomNavigation.selectedItemId = R.id.accountFragment
 
-        // Ensure the account content is visible and others are hidden
         showAccountContent()
     }
 
     private fun showAccountContent() {
-        // Account content is the main layout in fragment_account.xml
-        // No need to toggle visibility as this is the account fragment
+
     }
 
     private fun observeViewModel() {
-        // Observe user data
         viewModel.userData.observe(viewLifecycleOwner, Observer { userData ->
             userData?.let {
                 binding.userFullName.text = "${it.firstName} ${it.lastName}".trim()
 
-                // Load profile image if available
                 if (it.profileImageUri.isNotEmpty()) {
                     loadProfileImage(it.profileImageUri)
                 }
             }
         })
 
-        // Observe favorites counts
         viewModel.favoriteCounts.observe(viewLifecycleOwner, Observer { counts ->
             binding.competitionsCount.text = counts.competitions.toString()
             binding.teamsCount.text = counts.teams.toString()
             binding.playersCount.text = counts.players.toString()
         })
 
-        // Observe settings
         viewModel.appSettings.observe(viewLifecycleOwner, Observer { settings ->
             binding.notificationsSwitch.isChecked = settings.notificationsEnabled
             binding.darkThemeSwitch.isChecked = settings.darkThemeEnabled
@@ -118,12 +108,10 @@ class AccountFragment : Fragment() {
             updateSelectedLeaguesText(settings.selectedLeagues)
         })
 
-        // Observe loading state
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
             binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         })
 
-        // Observe error messages
         viewModel.error.observe(viewLifecycleOwner, Observer { error ->
             error?.let {
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
@@ -131,7 +119,6 @@ class AccountFragment : Fragment() {
             }
         })
 
-        // Observe logout event
         viewModel.logoutEvent.observe(viewLifecycleOwner, Observer { shouldLogout ->
             if (shouldLogout) {
                 handleLogout()
@@ -140,44 +127,36 @@ class AccountFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        // Profile image click
         binding.profileImageCard.setOnClickListener {
             requestImagePermissionAndPick()
         }
 
-        // Notifications switch
         binding.notificationsSwitch.setOnCheckedChangeListener { _, isChecked ->
             viewModel.updateNotificationsSetting(isChecked)
         }
 
-        // Dark theme switch
         binding.darkThemeSwitch.setOnCheckedChangeListener { _, isChecked ->
             viewModel.updateDarkThemeSetting(isChecked)
         }
 
-        // Filter matches row
         binding.filterMatchesRow.setOnClickListener {
             openFilterLeaguesScreen()
         }
 
-        // Language row
         binding.languageRow.setOnClickListener {
             openLanguageSelector()
         }
 
-        // Logout button
         binding.logoutButton.setOnClickListener {
             viewModel.logout()
         }
 
-        // Bottom navigation - Only handle navigation between main tabs
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.homeFragment -> {
                     try {
                         findNavController().navigate(R.id.action_account_to_home)
                     } catch (e: Exception) {
-                        // Handle navigation error silently
                     }
                     true
                 }
@@ -185,7 +164,6 @@ class AccountFragment : Fragment() {
                     try {
                         findNavController().navigate(R.id.action_account_to_competition)
                     } catch (e: Exception) {
-                        // Handle navigation error silently
                     }
                     true
                 }
@@ -193,12 +171,10 @@ class AccountFragment : Fragment() {
                     try {
                         findNavController().navigate(R.id.action_account_to_news)
                     } catch (e: Exception) {
-                        // Handle navigation error silently
                     }
                     true
                 }
                 R.id.accountFragment -> {
-                    // Already here, do nothing
                     true
                 }
                 else -> false
@@ -241,10 +217,8 @@ class AccountFragment : Fragment() {
 
     private fun handleImageSelection(uri: Uri) {
         try {
-            // Save the image URI to DataStore
             viewModel.updateProfileImage(uri.toString())
 
-            // Load the image immediately
             loadProfileImage(uri.toString())
 
             Toast.makeText(context, "Profile photo updated!", Toast.LENGTH_SHORT).show()
@@ -267,7 +241,6 @@ class AccountFragment : Fragment() {
                 .apply(requestOptions)
                 .into(binding.profileImage)
 
-            // Remove tint when real image is loaded
             binding.profileImage.imageTintList = null
         } catch (e: Exception) {
             // Keep default image with tint
@@ -285,7 +258,6 @@ class AccountFragment : Fragment() {
     }
 
     private fun openLanguageSelector() {
-        // Create a simple language selection dialog
         val languages = arrayOf("English", "Turkish", "Spanish", "French", "German")
         val currentLanguage = binding.selectedLanguageText.text.toString()
         val selectedIndex = languages.indexOf(currentLanguage)
@@ -314,11 +286,9 @@ class AccountFragment : Fragment() {
             .setTitle("Log Out")
             .setMessage("Are you sure you want to log out?")
             .setPositiveButton("Log Out") { _, _ ->
-                // Navigate to login screen or handle logout
                 try {
                     findNavController().navigate(R.id.action_account_to_login)
                 } catch (e: Exception) {
-                    // Handle navigation error - close app or go to login activity
                     requireActivity().finish()
                 }
             }

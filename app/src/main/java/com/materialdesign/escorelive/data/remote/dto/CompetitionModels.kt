@@ -1,42 +1,59 @@
-
 package com.materialdesign.escorelive.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
-
-
 data class LeaguesApiResponse(
-    @SerializedName("success")
-    val success: Int,
-    @SerializedName("data")
-    val data: List<CompetitionDto>
+    val response: List<LeagueResponseDto>
 )
 
+data class CountriesApiResponse(
+    val response: List<CountryDto>
+)
 
-data class CompetitionDto(
-    @SerializedName("league_id")
-    val leagueId: String,
-    @SerializedName("name")
+data class LeagueResponseDto(
+    val league: LeagueDto,
+    val country: CountryDto,
+    val seasons: List<SeasonDto>
+)
+
+data class LeagueDto(
+    val id: Int,
     val name: String,
-    @SerializedName("shortCode")
-    val shortCode: String?,
-    @SerializedName("country")
-    val country: String,
-    @SerializedName("flag")
-    val flag: String?,
-    @SerializedName("logo")
-    val logo: String?,
-    @SerializedName("season")
-    val season: String?,
-    @SerializedName("season_start")
-    val seasonStart: String?,
-    @SerializedName("season_end")
-    val seasonEnd: String?,
-    @SerializedName("is_cup")
-    val isCup: Int? = 0,
-    @SerializedName("type")
-    val type: String? = "league"
+    val type: String, // "League", "Cup"
+    val logo: String
 )
 
+data class CountryDto(
+    val name: String,
+    val code: String?,
+    val flag: String?
+)
+
+data class SeasonDto(
+    val year: Int,
+    val start: String,
+    val end: String,
+    val current: Boolean,
+    val coverage: CoverageDto?
+)
+
+data class CoverageDto(
+    val fixtures: FixtureCoverageDto?,
+    val standings: Boolean,
+    val players: Boolean,
+    val top_scorers: Boolean,
+    val top_assists: Boolean,
+    val top_cards: Boolean,
+    val injuries: Boolean,
+    val predictions: Boolean,
+    val odds: Boolean
+)
+
+data class FixtureCoverageDto(
+    val events: Boolean,
+    val lineups: Boolean,
+    val statistics_fixtures: Boolean,
+    val statistics_players: Boolean
+)
 
 data class Competition(
     val id: String,
@@ -51,9 +68,9 @@ data class Competition(
     val isCup: Boolean = false,
     val type: CompetitionType = CompetitionType.LEAGUE,
     val isTopCompetition: Boolean = false,
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val currentSeason: Boolean = false
 )
-
 
 enum class CompetitionType(val displayName: String) {
     LEAGUE("League"),
@@ -62,13 +79,11 @@ enum class CompetitionType(val displayName: String) {
     INTERNATIONAL("International")
 }
 
-
 enum class CompetitionTab {
     TOP,
     REGION,
     FAVORITES
 }
-
 
 data class CompetitionUiState(
     val competitions: List<Competition> = emptyList(),

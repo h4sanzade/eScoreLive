@@ -1,12 +1,11 @@
-// CompetitionRepository.kt
 package com.materialdesign.escorelive.data.remote.repository
 
 import android.content.Context
 import android.util.Log
 import com.materialdesign.escorelive.data.remote.CompetitionApiService
 import com.materialdesign.escorelive.data.remote.dto.Competition
-import com.materialdesign.escorelive.data.remote.dto.CompetitionDto
 import com.materialdesign.escorelive.data.remote.dto.CompetitionType
+import com.materialdesign.escorelive.data.remote.dto.LeagueResponseDto
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -23,21 +22,21 @@ class CompetitionRepository @Inject constructor(
         private const val TAG = "CompetitionRepository"
         private const val FAVORITES_PREF = "competition_favorites"
 
-        // Top competitions based on popularity
         private val TOP_COMPETITION_IDS = setOf(
             "39", "140", "78", "135", "61", // Premier League, La Liga, Bundesliga, Serie A, Ligue 1
             "2", "3", "848", // Champions League, Europa League, Europa Conference League
             "4", "1", "21", // World Cup, UEFA Nations League, Confederations Cup
-            "203", "342", "88", "94" // Turkish Super League, Azerbaijan Premier League, Eredivisie, Primeira Liga
+            "203", "342", "88", "94", // Turkish Super League, Azerbaijan Premier League, Eredivisie, Primeira Liga
+            "13", "16", "17", // Copa Libertadores, Copa America, AFC Asian Cup
+            "45", "144", "179", // FA Cup, Copa del Rey, DFB Pokal
+            "81", "137", "262" // DFB Pokal, Coppa Italia, Coupe de France
         )
     }
 
     private val competitionsCache = mutableMapOf<String, List<Competition>>()
     private var allCompetitions: List<Competition> = emptyList()
 
-    /**
-     * Get all competitions from API
-     */
+
     suspend fun getAllCompetitions(forceRefresh: Boolean = false): Result<List<Competition>> {
         return withContext(Dispatchers.IO) {
             try {
@@ -46,8 +45,8 @@ class CompetitionRepository @Inject constructor(
                     return@withContext Result.success(allCompetitions)
                 }
 
-                Log.d(TAG, "Fetching competitions from API...")
-                Log.d(TAG, "API URL: https://api.soccersapi.com/v2.2/leagues/?user=h4sanzade&token=c660199e0f3aa383e4bc220b3b6a9db7&t=list")
+                Log.d(TAG, "Fetching competitions from Football API...")
+                Log.d(TAG, "API URL: https://v3.football.api-sports.io/leagues")
 
                 val response = apiService.getAllLeagues()
                 Log.d(TAG, "API Response Code: ${response.code()}")
@@ -57,20 +56,20 @@ class CompetitionRepository @Inject constructor(
                     val apiResponse = response.body()
                     Log.d(TAG, "Response body: $apiResponse")
 
-                    if (apiResponse?.success == 1) {
-                        Log.d(TAG, "API returned ${apiResponse.data.size} competitions")
+                    if (apiResponse != null) {
+                        Log.d(TAG, "API returned ${apiResponse.response.size} competitions")
 
-                        val competitions = apiResponse.data.mapNotNull { dto ->
-                            Log.d(TAG, "Processing competition: ${dto.name} - ${dto.country}")
-                            mapDtoToCompetition(dto)
+                        val competitions = apiResponse.response.mapNotNull { leagueResponse ->
+                            Log.d(TAG, "Processing competition: ${leagueResponse.league.name} - ${leagueResponse.country.name}")
+                            mapResponseToCompetition(leagueResponse)
                         }.sortedBy { it.name }
 
                         allCompetitions = competitions
                         Log.d(TAG, "Successfully loaded ${competitions.size} competitions")
                         Result.success(competitions)
                     } else {
-                        Log.e(TAG, "API returned success=${apiResponse?.success}, data size=${apiResponse?.data?.size}")
-                        Result.failure(Exception("API returned success=0"))
+                        Log.e(TAG, "API returned null response")
+                        Result.failure(Exception("API returned null response"))
                     }
                 } else {
                     val errorBody = response.errorBody()?.string()
@@ -86,9 +85,40 @@ class CompetitionRepository @Inject constructor(
         }
     }
 
-    /**
-     * Search competitions by name or country
-     */
+    suspend fun getCurrentSeasonCompetitions(): Result<List<Competition>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                Log.d(TAG, "Fetching current season competitions...")
+
+                val response = apiService.getCurrentSeasonLeagues()
+
+                if (response.isSuccessful) {
+                    val apiResponse = response.body()
+                    if (apiResponse != null) {
+                        val competitions = apiResponse.response.mapNotNull { leagueResponse ->
+                            // Only include leagues with current season
+                            val currentSeason = leagueResponse.seasons.find { it.current }
+                            if (currentSeason != null) {
+                                mapResponseToCompetition(leagueResponse)
+                            } else null
+                        }.sortedBy { it.name }
+
+                        Log.d(TAG, "Successfully loaded ${competitions.size} current season competitions")
+                        Result.success(competitions)
+                    } else {
+                        Result.failure(Exception("API returned null response"))
+                    }
+                } else {
+                    Result.failure(Exception("API Error: ${response.code()}"))
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Exception in getCurrentSeasonCompetitions", e)
+                Result.failure(e)
+            }
+        }
+    }
+
+
     suspend fun searchCompetitions(query: String): Result<List<Competition>> {
         return withContext(Dispatchers.IO) {
             try {
@@ -98,7 +128,6 @@ class CompetitionRepository @Inject constructor(
 
                 Log.d(TAG, "Searching competitions with query: '$query'")
 
-                // First try to filter from cached data
                 if (allCompetitions.isNotEmpty()) {
                     val filteredCompetitions = allCompetitions.filter { competition ->
                         competition.name.contains(query, ignoreCase = true) ||
@@ -112,20 +141,19 @@ class CompetitionRepository @Inject constructor(
                     }
                 }
 
-                // If not found in cache, try API search
                 val response = apiService.searchLeagues(searchTerm = query)
 
                 if (response.isSuccessful) {
                     val apiResponse = response.body()
-                    if (apiResponse?.success == 1) {
-                        val competitions = apiResponse.data.mapNotNull { dto ->
-                            mapDtoToCompetition(dto)
+                    if (apiResponse != null) {
+                        val competitions = apiResponse.response.mapNotNull { leagueResponse ->
+                            mapResponseToCompetition(leagueResponse)
                         }.sortedBy { it.name }
 
                         Log.d(TAG, "API search returned ${competitions.size} competitions")
                         Result.success(competitions)
                     } else {
-                        Log.e(TAG, "Search API returned success=0")
+                        Log.e(TAG, "Search API returned null response")
                         Result.failure(Exception("No competitions found for '$query'"))
                     }
                 } else {
@@ -139,9 +167,37 @@ class CompetitionRepository @Inject constructor(
         }
     }
 
-    /**
-     * Get top competitions
-     */
+
+    suspend fun getCompetitionsByCountry(country: String): Result<List<Competition>> {
+        return withContext(Dispatchers.IO) {
+            try {
+                Log.d(TAG, "Getting competitions for country: $country")
+
+                val response = apiService.getLeaguesByCountry(country = country)
+
+                if (response.isSuccessful) {
+                    val apiResponse = response.body()
+                    if (apiResponse != null) {
+                        val competitions = apiResponse.response.mapNotNull { leagueResponse ->
+                            mapResponseToCompetition(leagueResponse)
+                        }.sortedBy { it.name }
+
+                        Log.d(TAG, "Found ${competitions.size} competitions for country: $country")
+                        Result.success(competitions)
+                    } else {
+                        Result.failure(Exception("No competitions found for country: $country"))
+                    }
+                } else {
+                    Result.failure(Exception("API Error: ${response.code()}"))
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Exception in getCompetitionsByCountry", e)
+                Result.failure(e)
+            }
+        }
+    }
+
+
     suspend fun getTopCompetitions(): Result<List<Competition>> {
         return getAllCompetitions().map { competitions ->
             competitions.filter { competition ->
@@ -153,18 +209,14 @@ class CompetitionRepository @Inject constructor(
         }
     }
 
-    /**
-     * Get competitions grouped by region
-     */
+
     suspend fun getCompetitionsByRegion(): Result<Map<String, List<Competition>>> {
         return getAllCompetitions().map { competitions ->
             competitions.groupBy { it.country }.toSortedMap()
         }
     }
 
-    /**
-     * Get favorite competitions
-     */
+
     suspend fun getFavoriteCompetitions(): Result<List<Competition>> {
         return getAllCompetitions().map { competitions ->
             val favoriteIds = getFavoriteCompetitionIds()
@@ -174,9 +226,7 @@ class CompetitionRepository @Inject constructor(
         }
     }
 
-    /**
-     * Add competition to favorites
-     */
+
     fun addToFavorites(competitionId: String) {
         val favorites = getFavoriteCompetitionIds().toMutableSet()
         favorites.add(competitionId)
@@ -184,9 +234,6 @@ class CompetitionRepository @Inject constructor(
         Log.d(TAG, "Added competition $competitionId to favorites")
     }
 
-    /**
-     * Remove competition from favorites
-     */
     fun removeFromFavorites(competitionId: String) {
         val favorites = getFavoriteCompetitionIds().toMutableSet()
         favorites.remove(competitionId)
@@ -194,24 +241,18 @@ class CompetitionRepository @Inject constructor(
         Log.d(TAG, "Removed competition $competitionId from favorites")
     }
 
-    /**
-     * Check if competition is in favorites
-     */
+
     fun isFavorite(competitionId: String): Boolean {
         return getFavoriteCompetitionIds().contains(competitionId)
     }
 
-    /**
-     * Get favorite competition IDs from SharedPreferences
-     */
+
     private fun getFavoriteCompetitionIds(): Set<String> {
         val prefs = context.getSharedPreferences(FAVORITES_PREF, Context.MODE_PRIVATE)
         return prefs.getStringSet("favorite_ids", emptySet()) ?: emptySet()
     }
 
-    /**
-     * Save favorite competition IDs to SharedPreferences
-     */
+
     private fun saveFavoriteCompetitionIds(favoriteIds: Set<String>) {
         val prefs = context.getSharedPreferences(FAVORITES_PREF, Context.MODE_PRIVATE)
         prefs.edit()
@@ -219,40 +260,43 @@ class CompetitionRepository @Inject constructor(
             .apply()
     }
 
-    /**
-     * Map DTO to domain model
-     */
-    private fun mapDtoToCompetition(dto: CompetitionDto): Competition? {
+
+    private fun mapResponseToCompetition(leagueResponse: LeagueResponseDto): Competition? {
         return try {
+            val league = leagueResponse.league
+            val country = leagueResponse.country
+            val currentSeason = leagueResponse.seasons.find { it.current }
+
             Competition(
-                id = dto.leagueId,
-                name = dto.name,
-                shortCode = dto.shortCode,
-                country = dto.country,
-                flagUrl = dto.flag,
-                logoUrl = dto.logo,
-                season = dto.season,
-                seasonStart = dto.seasonStart,
-                seasonEnd = dto.seasonEnd,
-                isCup = dto.isCup == 1,
+                id = league.id.toString(),
+                name = league.name,
+                shortCode = null,
+                country = country.name,
+                flagUrl = country.flag,
+                logoUrl = league.logo,
+                season = currentSeason?.year?.toString(),
+                seasonStart = currentSeason?.start,
+                seasonEnd = currentSeason?.end,
+                isCup = league.type.equals("Cup", ignoreCase = true),
                 type = when {
-                    dto.isCup == 1 -> CompetitionType.CUP
-                    dto.type?.lowercase()?.contains("international") == true -> CompetitionType.INTERNATIONAL
-                    dto.type?.lowercase()?.contains("tournament") == true -> CompetitionType.TOURNAMENT
+                    league.type.equals("Cup", ignoreCase = true) -> CompetitionType.CUP
+                    league.name.contains("International", ignoreCase = true) -> CompetitionType.INTERNATIONAL
+                    league.name.contains("World", ignoreCase = true) -> CompetitionType.INTERNATIONAL
+                    league.name.contains("Champions", ignoreCase = true) -> CompetitionType.TOURNAMENT
+                    league.name.contains("Europa", ignoreCase = true) -> CompetitionType.TOURNAMENT
                     else -> CompetitionType.LEAGUE
                 },
-                isTopCompetition = TOP_COMPETITION_IDS.contains(dto.leagueId),
-                isFavorite = isFavorite(dto.leagueId)
+                isTopCompetition = TOP_COMPETITION_IDS.contains(league.id.toString()),
+                isFavorite = isFavorite(league.id.toString()),
+                currentSeason = currentSeason?.current ?: false
             )
         } catch (e: Exception) {
-            Log.e(TAG, "Error mapping competition DTO: ${dto.name}", e)
+            Log.e(TAG, "Error mapping competition: ${leagueResponse.league.name}", e)
             null
         }
     }
 
-    /**
-     * Clear cache
-     */
+
     fun clearCache() {
         allCompetitions = emptyList()
         competitionsCache.clear()

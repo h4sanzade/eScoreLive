@@ -1,5 +1,4 @@
-// AccountDataStore.kt
-package com.materialdesign.escorelive.data.local
+package com.materialdesign.escorelive.presentation.account
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -8,9 +7,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import com.materialdesign.escorelive.presentation.account.AppSettings
-import com.materialdesign.escorelive.presentation.account.FavoriteCounts
-import com.materialdesign.escorelive.presentation.account.UserData
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
