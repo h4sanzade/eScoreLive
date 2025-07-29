@@ -20,6 +20,7 @@ class AccountDataStore @Inject constructor(
         private val FIRST_NAME = stringPreferencesKey("first_name")
         private val LAST_NAME = stringPreferencesKey("last_name")
         private val EMAIL = stringPreferencesKey("email")
+        private val USERNAME = stringPreferencesKey("username")
         private val PROFILE_IMAGE_URI = stringPreferencesKey("profile_image_uri")
 
         private val COMPETITIONS_COUNT = intPreferencesKey("competitions_count")
@@ -38,6 +39,7 @@ class AccountDataStore @Inject constructor(
                 firstName = preferences[FIRST_NAME] ?: "",
                 lastName = preferences[LAST_NAME] ?: "",
                 email = preferences[EMAIL] ?: "",
+                username = preferences[USERNAME] ?: "",
                 profileImageUri = preferences[PROFILE_IMAGE_URI] ?: ""
             )
         }.first()
@@ -46,12 +48,14 @@ class AccountDataStore @Inject constructor(
     suspend fun saveUserData(
         firstName: String,
         lastName: String,
-        email: String
+        email: String,
+        username: String = ""
     ) {
         dataStore.edit { preferences ->
             preferences[FIRST_NAME] = firstName
             preferences[LAST_NAME] = lastName
             preferences[EMAIL] = email
+            preferences[USERNAME] = username
         }
     }
 
@@ -64,9 +68,9 @@ class AccountDataStore @Inject constructor(
     suspend fun getFavoriteCounts(): FavoriteCounts {
         return dataStore.data.map { preferences ->
             FavoriteCounts(
-                competitions = preferences[COMPETITIONS_COUNT] ?: 5,
-                teams = preferences[TEAMS_COUNT] ?: 12,
-                players = preferences[PLAYERS_COUNT] ?: 28
+                competitions = preferences[COMPETITIONS_COUNT] ?: 0,
+                teams = preferences[TEAMS_COUNT] ?: 0,
+                players = preferences[PLAYERS_COUNT] ?: 0
             )
         }.first()
     }
@@ -169,6 +173,7 @@ class AccountDataStore @Inject constructor(
             preferences.remove(FIRST_NAME)
             preferences.remove(LAST_NAME)
             preferences.remove(EMAIL)
+            preferences.remove(USERNAME)
             preferences.remove(PROFILE_IMAGE_URI)
             preferences.remove(COMPETITIONS_COUNT)
             preferences.remove(TEAMS_COUNT)
@@ -176,3 +181,24 @@ class AccountDataStore @Inject constructor(
         }
     }
 }
+
+data class UserData(
+    val firstName: String = "",
+    val lastName: String = "",
+    val email: String = "",
+    val username: String = "",
+    val profileImageUri: String = ""
+)
+
+data class FavoriteCounts(
+    val competitions: Int = 0,
+    val teams: Int = 0,
+    val players: Int = 0
+)
+
+data class AppSettings(
+    val notificationsEnabled: Boolean = true,
+    val darkThemeEnabled: Boolean = true,
+    val selectedLanguage: String = "English",
+    val selectedLeagues: List<String> = emptyList()
+)

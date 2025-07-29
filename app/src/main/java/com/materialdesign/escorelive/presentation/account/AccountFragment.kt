@@ -1,4 +1,5 @@
-// AccountFragment.kt
+// AccountFragment.kt - Debug versiyonu
+
 package com.materialdesign.escorelive.presentation.account
 
 import android.Manifest
@@ -13,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -75,18 +77,18 @@ class AccountFragment : Fragment() {
 
     private fun setupUI() {
         binding.bottomNavigation.selectedItemId = R.id.accountFragment
-
         showAccountContent()
     }
 
     private fun showAccountContent() {
-
+        // Empty for now
     }
 
     private fun observeViewModel() {
         viewModel.userData.observe(viewLifecycleOwner, Observer { userData ->
             userData?.let {
                 binding.userFullName.text = "${it.firstName} ${it.lastName}".trim()
+                binding.usernameText.text = "@${it.username}"
 
                 if (it.profileImageUri.isNotEmpty()) {
                     loadProfileImage(it.profileImageUri)
@@ -127,8 +129,27 @@ class AccountFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
+        Log.d("AccountFragment", "Setting up click listeners")
+
         binding.profileImageCard.setOnClickListener {
             requestImagePermissionAndPick()
+        }
+
+        // Favorite competitions click - DEBUG
+        binding.competitionsCount.setOnClickListener {
+            Log.d("AccountFragment", "Competitions count clicked!")
+            navigateToFavoriteCompetitions()
+        }
+
+        // Favorite teams click - DEBUG
+        binding.teamsCount.setOnClickListener {
+            Log.d("AccountFragment", "Teams count clicked!")
+            navigateToFavoriteTeams()
+        }
+
+        // Players count click (disabled since no functionality)
+        binding.playersCount.setOnClickListener {
+            Log.d("AccountFragment", "Players count clicked!")
         }
 
         binding.notificationsSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -157,6 +178,7 @@ class AccountFragment : Fragment() {
                     try {
                         findNavController().navigate(R.id.action_account_to_home)
                     } catch (e: Exception) {
+                        Log.e("AccountFragment", "Navigation error to home", e)
                     }
                     true
                 }
@@ -164,6 +186,7 @@ class AccountFragment : Fragment() {
                     try {
                         findNavController().navigate(R.id.action_account_to_competition)
                     } catch (e: Exception) {
+                        Log.e("AccountFragment", "Navigation error to competition", e)
                     }
                     true
                 }
@@ -171,6 +194,7 @@ class AccountFragment : Fragment() {
                     try {
                         findNavController().navigate(R.id.action_account_to_news)
                     } catch (e: Exception) {
+                        Log.e("AccountFragment", "Navigation error to news", e)
                     }
                     true
                 }
@@ -179,6 +203,40 @@ class AccountFragment : Fragment() {
                 }
                 else -> false
             }
+        }
+    }
+
+    private fun navigateToFavoriteCompetitions() {
+        try {
+            Log.d("AccountFragment", "Attempting to navigate to favorite competitions")
+            findNavController().navigate(R.id.action_account_to_favoriteCompetitions)
+            Log.d("AccountFragment", "Navigation to favorite competitions successful")
+        } catch (e: Exception) {
+            Log.e("AccountFragment", "Navigation error to favorite competitions", e)
+
+            // Fallback - create a simple dialog for now
+            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Favorite Competitions")
+                .setMessage("Feature under development. Coming soon!")
+                .setPositiveButton("OK", null)
+                .show()
+        }
+    }
+
+    private fun navigateToFavoriteTeams() {
+        try {
+            Log.d("AccountFragment", "Attempting to navigate to favorite teams")
+            findNavController().navigate(R.id.action_account_to_favoriteTeams)
+            Log.d("AccountFragment", "Navigation to favorite teams successful")
+        } catch (e: Exception) {
+            Log.e("AccountFragment", "Navigation error to favorite teams", e)
+
+            // Fallback - create a simple dialog for now
+            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Favorite Teams")
+                .setMessage("Feature under development. Coming soon!")
+                .setPositiveButton("OK", null)
+                .show()
         }
     }
 
@@ -207,7 +265,6 @@ class AccountFragment : Fragment() {
         }
     }
 
-
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
             type = "image/*"
@@ -218,9 +275,7 @@ class AccountFragment : Fragment() {
     private fun handleImageSelection(uri: Uri) {
         try {
             viewModel.updateProfileImage(uri.toString())
-
             loadProfileImage(uri.toString())
-
             Toast.makeText(context, "Profile photo updated!", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Toast.makeText(context, "Failed to update profile photo", Toast.LENGTH_SHORT).show()
@@ -243,7 +298,6 @@ class AccountFragment : Fragment() {
 
             binding.profileImage.imageTintList = null
         } catch (e: Exception) {
-            // Keep default image with tint
             binding.profileImage.setImageResource(R.drawable.ic_account)
             binding.profileImage.imageTintList = ContextCompat.getColorStateList(requireContext(), R.color.accent_color)
         }
@@ -253,7 +307,6 @@ class AccountFragment : Fragment() {
         try {
             findNavController().navigate(R.id.action_account_to_filterLeagues)
         } catch (e: Exception) {
-            Toast.makeText(context, "Opening league filters...", Toast.LENGTH_SHORT).show()
         }
     }
 

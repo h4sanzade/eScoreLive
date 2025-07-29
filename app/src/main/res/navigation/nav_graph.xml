@@ -54,6 +54,26 @@
 
     </fragment>
 
+    <action
+        android:id="@+id/action_account_to_favoriteCompetitions"
+        app:destination="@id/favoriteCompetitionsFragment" />
+
+    <action
+        android:id="@+id/action_account_to_favoriteTeams"
+        app:destination="@id/favoriteTeamsFragment" />
+
+    <fragment
+        android:id="@+id/favoriteCompetitionsFragment"
+        android:name="com.materialdesign.escorelive.presentation.account.FavoriteCompetitionsFragment"
+        android:label="Favorite Competitions"
+        tools:layout="@layout/fragment_favorite_competitions" />
+
+    <fragment
+        android:id="@+id/favoriteTeamsFragment"
+        android:name="com.materialdesign.escorelive.presentation.account.FavoriteTeamsFragment"
+        android:label="Favorite Teams"
+        tools:layout="@layout/fragment_favorite_teams" />
+
     <!-- Competition Fragment -->
     <fragment
         android:id="@+id/competitionFragment"

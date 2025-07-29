@@ -88,8 +88,8 @@ class CompetitionViewModel @Inject constructor(
                 val leagueId = competition.id.toInt()
                 val currentYear = Calendar.getInstance().get(Calendar.YEAR)
 
-                // Try multiple seasons: 2025, 2024, 2023
-                val seasonsToTry = listOf(2025, 2024, 2023, currentYear)
+                // Try 2024/25 season first, then others
+                val seasonsToTry = listOf(2024, 2025, 2023, currentYear)
                 var standingsFound = false
 
                 for (season in seasonsToTry) {
@@ -155,7 +155,7 @@ class CompetitionViewModel @Inject constructor(
 
                         val fallbackStandings = createZeroStandings(teams)
                         _standingsData.value = fallbackStandings
-                        _standingsError.value = "Season 2025/26 not started yet. Showing team list with zero stats."
+                        _standingsError.value = "Season 2024/25 not started yet. Showing team list with zero stats."
                         return
                     }
                 }
@@ -186,7 +186,7 @@ class CompetitionViewModel @Inject constructor(
 
                                 val fallbackStandings = createZeroStandings(teams.toList())
                                 _standingsData.value = fallbackStandings
-                                _standingsError.value = "Season 2025/26 not started yet. Showing team list with zero stats."
+                                _standingsError.value = "Season 2024/25 not started yet. Showing team list with zero stats."
                                 return
                             }
                         }
@@ -207,7 +207,7 @@ class CompetitionViewModel @Inject constructor(
         if (basicTeams.isNotEmpty()) {
             val fallbackStandings = createZeroStandings(basicTeams)
             _standingsData.value = fallbackStandings
-            _standingsError.value = "Season 2025/26 not started yet. Showing basic team list."
+            _standingsError.value = "Season 2024/25 not started yet. Showing basic team list."
         } else {
             _standingsError.value = "No team data available for ${competition.name}"
             _standingsData.value = emptyList()
@@ -264,8 +264,6 @@ class CompetitionViewModel @Inject constructor(
             )
         }
     }
-
-    // Rest of the existing functions remain the same...
 
     fun loadCompetitions(forceRefresh: Boolean = false) {
         viewModelScope.launch {
@@ -346,6 +344,20 @@ class CompetitionViewModel @Inject constructor(
             )
 
             updateFilteredCompetitions()
+
+            // Update account competitions count
+            updateAccountCompetitionsCount()
+        }
+    }
+
+    private suspend fun updateAccountCompetitionsCount() {
+        try {
+            val favoriteCompetitionsCount = getFavoriteIds().size
+            // You'll need to inject AccountDataStore here or get it through another way
+            // For now, we'll leave this as a placeholder
+            Log.d(TAG, "Favorite competitions count: $favoriteCompetitionsCount")
+        } catch (e: Exception) {
+            Log.e(TAG, "Error updating account competitions count", e)
         }
     }
 

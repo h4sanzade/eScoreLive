@@ -103,6 +103,17 @@
                         android:textSize="22sp"
                         android:textColor="@color/white"
                         android:fontFamily="@font/mulish_bold"
+                        android:layout_marginBottom="4dp" />
+
+                    <!-- Username -->
+                    <TextView
+                        android:id="@+id/usernameText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@username"
+                        android:textSize="16sp"
+                        android:textColor="@color/accent_color"
+                        android:fontFamily="@font/mulish_regular"
                         android:layout_marginBottom="8dp" />
 
                     <TextView
@@ -147,13 +158,17 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="12dp">
 
                         <TextView
                             android:id="@+id/competitionsCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="5"
+                            android:text="0"
                             android:textSize="28sp"
                             android:textColor="@color/accent_color"
                             android:fontFamily="@font/mulish_bold" />
@@ -182,13 +197,17 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="12dp">
 
                         <TextView
                             android:id="@+id/teamsCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="12"
+                            android:text="0"
                             android:textSize="28sp"
                             android:textColor="@color/accent_color"
                             android:fontFamily="@font/mulish_bold" />
@@ -217,13 +236,17 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="12dp">
 
                         <TextView
                             android:id="@+id/playersCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="28"
+                            android:text="0"
                             android:textSize="28sp"
                             android:textColor="@color/accent_color"
                             android:fontFamily="@font/mulish_bold" />

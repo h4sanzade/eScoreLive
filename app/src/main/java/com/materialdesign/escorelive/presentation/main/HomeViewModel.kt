@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.materialdesign.escorelive.domain.model.Match
+import com.materialdesign.escorelive.presentation.account.AccountDataStore
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -20,6 +21,7 @@ import kotlinx.coroutines.withContext
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: FootballRepository,
+    private val accountDataStore: AccountDataStore,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -77,6 +79,7 @@ class HomeViewModel @Inject constructor(
         try {
             favoriteTeamIds.add(teamId)
             saveFavoriteTeamIds()
+            updateAccountTeamsCount()
             loadFavoriteTeamMatches()
             Log.d("HomeViewModel", "Added team $teamId to favorites")
         } catch (e: Exception) {
@@ -88,10 +91,27 @@ class HomeViewModel @Inject constructor(
         try {
             favoriteTeamIds.remove(teamId)
             saveFavoriteTeamIds()
+            updateAccountTeamsCount()
             loadFavoriteTeamMatches()
             Log.d("HomeViewModel", "Removed team $teamId from favorites")
         } catch (e: Exception) {
             Log.e("HomeViewModel", "Error removing team from favorites", e)
+        }
+    }
+
+    private fun updateAccountTeamsCount() {
+        viewModelScope.launch {
+            try {
+                val currentCounts = accountDataStore.getFavoriteCounts()
+                accountDataStore.updateFavoriteCounts(
+                    competitions = currentCounts.competitions,
+                    teams = favoriteTeamIds.size,
+                    players = currentCounts.players
+                )
+                Log.d("HomeViewModel", "Updated account teams count to: ${favoriteTeamIds.size}")
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error updating account teams count", e)
+            }
         }
     }
 
@@ -460,6 +480,7 @@ class HomeViewModel @Inject constructor(
     fun addTestFavoriteTeams() {
         favoriteTeamIds.addAll(listOf(1L, 7L, 16L)) // Arsenal, Barcelona, Galatasaray
         saveFavoriteTeamIds()
+        updateAccountTeamsCount()
         Log.d("HomeViewModel", "Added test favorite teams: $favoriteTeamIds")
         loadFavoriteTeamMatches()
     }
