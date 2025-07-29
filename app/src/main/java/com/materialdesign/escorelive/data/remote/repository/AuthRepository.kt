@@ -1,18 +1,19 @@
 package com.materialdesign.escorelive.data.remote.repository
 
-
 import com.materialdesign.escorelive.domain.model.User
 import javax.inject.Inject
 import javax.inject.Singleton
 import android.util.Log
 import com.materialdesign.escorelive.data.remote.AuthDataStore
+import com.materialdesign.escorelive.presentation.account.AccountDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.first
 
 @Singleton
 class AuthRepository @Inject constructor(
-    private val authDataStore: AuthDataStore
+    private val authDataStore: AuthDataStore,
+    private val accountDataStore: AccountDataStore
 ) {
 
     suspend fun login(username: String, password: String): Result<User> {
@@ -42,6 +43,14 @@ class AuthRepository @Inject constructor(
                             accessToken = user.accessToken,
                             refreshToken = user.refreshToken
                         )
+                    )
+
+                    // Save user data to AccountDataStore
+                    accountDataStore.saveUserData(
+                        firstName = user.firstName,
+                        lastName = user.lastName,
+                        email = user.email,
+                        username = user.username
                     )
 
                     Log.d("AuthRepository", "Login successful for: ${user.username}")
@@ -74,6 +83,14 @@ class AuthRepository @Inject constructor(
                     username = username,
                     email = email,
                     password = password
+                )
+
+                // Save user data to AccountDataStore
+                accountDataStore.saveUserData(
+                    firstName = firstName,
+                    lastName = lastName,
+                    email = email,
+                    username = username
                 )
 
                 Log.d("AuthRepository", "Registration successful for: $username")
@@ -137,6 +154,7 @@ class AuthRepository @Inject constructor(
         withContext(Dispatchers.IO) {
             try {
                 Log.d("AuthRepository", "Logging out user")
+                // Only clear login status and tokens, keep user data
                 authDataStore.logout()
                 Log.d("AuthRepository", "User logged out successfully")
             } catch (e: Exception) {

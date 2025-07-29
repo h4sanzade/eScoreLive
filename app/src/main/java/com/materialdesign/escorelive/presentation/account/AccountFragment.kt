@@ -138,18 +138,21 @@ class AccountFragment : Fragment() {
         // Favorite competitions click - DEBUG
         binding.competitionsCount.setOnClickListener {
             Log.d("AccountFragment", "Competitions count clicked!")
+            Toast.makeText(context, "Competitions clicked - navigating...", Toast.LENGTH_SHORT).show()
             navigateToFavoriteCompetitions()
         }
 
         // Favorite teams click - DEBUG
         binding.teamsCount.setOnClickListener {
             Log.d("AccountFragment", "Teams count clicked!")
+            Toast.makeText(context, "Teams clicked - navigating...", Toast.LENGTH_SHORT).show()
             navigateToFavoriteTeams()
         }
 
         // Players count click (disabled since no functionality)
         binding.playersCount.setOnClickListener {
             Log.d("AccountFragment", "Players count clicked!")
+            Toast.makeText(context, "Players feature coming soon", Toast.LENGTH_SHORT).show()
         }
 
         binding.notificationsSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -213,6 +216,7 @@ class AccountFragment : Fragment() {
             Log.d("AccountFragment", "Navigation to favorite competitions successful")
         } catch (e: Exception) {
             Log.e("AccountFragment", "Navigation error to favorite competitions", e)
+            Toast.makeText(context, "Navigation error: ${e.message}", Toast.LENGTH_LONG).show()
 
             // Fallback - create a simple dialog for now
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
@@ -230,6 +234,7 @@ class AccountFragment : Fragment() {
             Log.d("AccountFragment", "Navigation to favorite teams successful")
         } catch (e: Exception) {
             Log.e("AccountFragment", "Navigation error to favorite teams", e)
+            Toast.makeText(context, "Navigation error: ${e.message}", Toast.LENGTH_LONG).show()
 
             // Fallback - create a simple dialog for now
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
@@ -307,6 +312,7 @@ class AccountFragment : Fragment() {
         try {
             findNavController().navigate(R.id.action_account_to_filterLeagues)
         } catch (e: Exception) {
+            Toast.makeText(context, "Opening league filters...", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -339,14 +345,37 @@ class AccountFragment : Fragment() {
             .setTitle("Log Out")
             .setMessage("Are you sure you want to log out?")
             .setPositiveButton("Log Out") { _, _ ->
-                try {
-                    findNavController().navigate(R.id.action_account_to_login)
-                } catch (e: Exception) {
-                    requireActivity().finish()
-                }
+                performLogout()
             }
             .setNegativeButton("Cancel", null)
             .show()
+    }
+
+    private fun performLogout() {
+        try {
+            // Navigate to login and clear the back stack
+            findNavController().navigate(
+                R.id.action_account_to_login,
+                null,
+                androidx.navigation.NavOptions.Builder()
+                    .setPopUpTo(R.id.nav_graph, true)
+                    .build()
+            )
+        } catch (e: Exception) {
+            Log.e("AccountFragment", "Navigation error during logout", e)
+
+            // Fallback: Start login activity and finish current activity
+            try {
+                val intent = Intent(requireContext(),
+                    Class.forName("com.materialdesign.escorelive.presentation.auth.LoginActivity"))
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                requireActivity().finish()
+            } catch (ex: Exception) {
+                Log.e("AccountFragment", "Failed to start login activity", ex)
+                requireActivity().finish()
+            }
+        }
     }
 
     override fun onDestroyView() {

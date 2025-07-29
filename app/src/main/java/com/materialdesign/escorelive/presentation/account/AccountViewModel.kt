@@ -13,6 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     private val accountDataStore: AccountDataStore,
+    private val authRepository: com.materialdesign.escorelive.data.remote.repository.AuthRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -152,7 +153,8 @@ class AccountViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             try {
-                accountDataStore.clearUserData()
+                // Only clear login session, keep personal data
+                authRepository.logout()
                 _logoutEvent.value = true
             } catch (e: Exception) {
                 _error.value = "Failed to logout: ${e.message}"

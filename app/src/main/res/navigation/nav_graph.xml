@@ -5,9 +5,7 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/homeFragment">
 
-    <!-- ========== MAIN BOTTOM NAVIGATION FRAGMENTS ========== -->
 
-    <!-- Home Fragment - Ana sayfa -->
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.materialdesign.escorelive.presentation.ui.main.HomeFragment"
@@ -36,7 +34,7 @@
         <action
             android:id="@+id/action_home_to_allMatches"
             app:destination="@id/allMatchesFragment"
-           >
+            >
             <argument
                 android:name="selectedDate"
                 app:argType="string"
@@ -46,33 +44,13 @@
         <action
             android:id="@+id/action_home_to_matchDetail"
             app:destination="@id/matchDetailFragment"
-           >
+            >
             <argument
                 android:name="matchId"
                 app:argType="long" />
         </action>
 
     </fragment>
-
-    <action
-        android:id="@+id/action_account_to_favoriteCompetitions"
-        app:destination="@id/favoriteCompetitionsFragment" />
-
-    <action
-        android:id="@+id/action_account_to_favoriteTeams"
-        app:destination="@id/favoriteTeamsFragment" />
-
-    <fragment
-        android:id="@+id/favoriteCompetitionsFragment"
-        android:name="com.materialdesign.escorelive.presentation.account.FavoriteCompetitionsFragment"
-        android:label="Favorite Competitions"
-        tools:layout="@layout/fragment_favorite_competitions" />
-
-    <fragment
-        android:id="@+id/favoriteTeamsFragment"
-        android:name="com.materialdesign.escorelive.presentation.account.FavoriteTeamsFragment"
-        android:label="Favorite Teams"
-        tools:layout="@layout/fragment_favorite_teams" />
 
     <!-- Competition Fragment -->
     <fragment
@@ -120,7 +98,7 @@
         <action
             android:id="@+id/action_news_to_newsDetail"
             app:destination="@id/newsDetailFragment"
-         >
+            >
             <argument
                 android:name="newsId"
                 app:argType="long" />
@@ -184,7 +162,23 @@
         <action
             android:id="@+id/action_account_to_filterLeagues"
             app:destination="@id/filterLeaguesFragment"
-          />
+            />
+
+        <action
+            android:id="@+id/action_account_to_favoriteCompetitions"
+            app:destination="@id/favoriteCompetitionsFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+
+        <action
+            android:id="@+id/action_account_to_favoriteTeams"
+            app:destination="@id/favoriteTeamsFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
 
         <!-- Logout Action - Global Navigation -->
         <action
@@ -196,7 +190,21 @@
 
     </fragment>
 
-    <!-- ========== DETAIL & FEATURE FRAGMENTS ========== -->
+
+    <!-- Favorite Competitions Fragment -->
+    <fragment
+        android:id="@+id/favoriteCompetitionsFragment"
+        android:name="com.materialdesign.escorelive.presentation.account.FavoriteCompetitionsFragment"
+        android:label="Favorite Competitions"
+        tools:layout="@layout/fragment_favorite_competitions" />
+
+    <!-- Favorite Teams Fragment -->
+    <fragment
+        android:id="@+id/favoriteTeamsFragment"
+        android:name="com.materialdesign.escorelive.presentation.account.FavoriteTeamsFragment"
+        android:label="Favorite Teams"
+        tools:layout="@layout/fragment_favorite_teams" />
+
 
     <!-- All Matches Fragment -->
     <fragment
@@ -213,7 +221,7 @@
         <action
             android:id="@+id/action_allMatches_to_matchDetail"
             app:destination="@id/matchDetailFragment"
-        >
+            >
             <argument
                 android:name="matchId"
                 app:argType="long" />
@@ -293,9 +301,6 @@
 
     </fragment>
 
-    <!-- ========== GLOBAL ACTIONS & EXTERNAL ACTIVITIES ========== -->
-
-    <!-- Placeholder for Login Activity (External Activity Reference) -->
     <activity
         android:id="@+id/loginActivity"
         android:name="com.materialdesign.escorelive.presentation.auth.LoginActivity"
@@ -311,12 +316,12 @@
     <action
         android:id="@+id/global_action_to_teamSearch"
         app:destination="@id/teamSearchFragment"
-         />
+        />
 
     <action
         android:id="@+id/global_action_to_matchDetail"
         app:destination="@id/matchDetailFragment"
-       >
+        >
         <argument
             android:name="matchId"
             app:argType="long" />
