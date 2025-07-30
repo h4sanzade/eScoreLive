@@ -1,4 +1,3 @@
-// AccountFragment.kt - Debug versiyonu
 
 package com.materialdesign.escorelive.presentation.account
 
@@ -81,7 +80,6 @@ class AccountFragment : Fragment() {
     }
 
     private fun showAccountContent() {
-        // Empty for now
     }
 
     private fun observeViewModel() {
@@ -135,21 +133,18 @@ class AccountFragment : Fragment() {
             requestImagePermissionAndPick()
         }
 
-        // Favorite competitions click - DEBUG
         binding.competitionsCount.setOnClickListener {
             Log.d("AccountFragment", "Competitions count clicked!")
             Toast.makeText(context, "Competitions clicked - navigating...", Toast.LENGTH_SHORT).show()
             navigateToFavoriteCompetitions()
         }
 
-        // Favorite teams click - DEBUG
         binding.teamsCount.setOnClickListener {
             Log.d("AccountFragment", "Teams count clicked!")
             Toast.makeText(context, "Teams clicked - navigating...", Toast.LENGTH_SHORT).show()
             navigateToFavoriteTeams()
         }
 
-        // Players count click (disabled since no functionality)
         binding.playersCount.setOnClickListener {
             Log.d("AccountFragment", "Players count clicked!")
             Toast.makeText(context, "Players feature coming soon", Toast.LENGTH_SHORT).show()
@@ -218,7 +213,6 @@ class AccountFragment : Fragment() {
             Log.e("AccountFragment", "Navigation error to favorite competitions", e)
             Toast.makeText(context, "Navigation error: ${e.message}", Toast.LENGTH_LONG).show()
 
-            // Fallback - create a simple dialog for now
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
                 .setTitle("Favorite Competitions")
                 .setMessage("Feature under development. Coming soon!")
