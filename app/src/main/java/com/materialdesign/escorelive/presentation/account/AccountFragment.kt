@@ -230,7 +230,6 @@ class AccountFragment : Fragment() {
             Log.e("AccountFragment", "Navigation error to favorite teams", e)
             Toast.makeText(context, "Navigation error: ${e.message}", Toast.LENGTH_LONG).show()
 
-            // Fallback - create a simple dialog for now
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
                 .setTitle("Favorite Teams")
                 .setMessage("Feature under development. Coming soon!")

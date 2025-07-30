@@ -124,53 +124,8 @@
     <string name="team_not_found">Team not found</string>
     <string name="api_error">API Error</string>
     <string name="match_not_found">Match not found</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
 
-    <string name="lorem_ipsum">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
-        volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
-        dui nec risus. Maecenas non sodales nisi, vel dictum dolor. Class aptent taciti sociosqu ad
-        litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse blandit eleifend
-        diam, vel rutrum tellus vulputate quis. Aliquam eget libero aliquet, imperdiet nisl a,
-        ornare ex. Sed rhoncus est ut libero porta lobortis. Fusce in dictum tellus.\n\n
-        Suspendisse interdum ornare ante. Aliquam nec cursus lorem. Morbi id magna felis. Vivamus
-        egestas, est a condimentum egestas, turpis nisl iaculis ipsum, in dictum tellus dolor sed
-        neque. Morbi tellus erat, dapibus ut sem a, iaculis tincidunt dui. Interdum et malesuada
-        fames ac ante ipsum primis in faucibus. Curabitur et eros porttitor, ultricies urna vitae,
-        molestie nibh. Phasellus at commodo eros, non aliquet metus. Sed maximus nisl nec dolor
-        bibendum, vel congue leo egestas.\n\n
-        Sed interdum tortor nibh, in sagittis risus mollis quis. Curabitur mi odio, condimentum sit
-        amet auctor at, mollis non turpis. Nullam pretium libero vestibulum, finibus orci vel,
-        molestie quam. Fusce blandit tincidunt nulla, quis sollicitudin libero facilisis et. Integer
-        interdum nunc ligula, et fermentum metus hendrerit id. Vestibulum lectus felis, dictum at
-        lacinia sit amet, tristique id quam. Cras eu consequat dui. Suspendisse sodales nunc ligula,
-        in lobortis sem porta sed. Integer id ultrices magna, in luctus elit. Sed a pellentesque
-        est.\n\n
-        Aenean nunc velit, lacinia sed dolor sed, ultrices viverra nulla. Etiam a venenatis nibh.
-        Morbi laoreet, tortor sed facilisis varius, nibh orci rhoncus nulla, id elementum leo dui
-        non lorem. Nam mollis ipsum quis auctor varius. Quisque elementum eu libero sed commodo. In
-        eros nisl, imperdiet vel imperdiet et, scelerisque a mauris. Pellentesque varius ex nunc,
-        quis imperdiet eros placerat ac. Duis finibus orci et est auctor tincidunt. Sed non viverra
-        ipsum. Nunc quis augue egestas, cursus lorem at, molestie sem. Morbi a consectetur ipsum, a
-        placerat diam. Etiam vulputate dignissim convallis. Integer faucibus mauris sit amet finibus
-        convallis.\n\n
-        Phasellus in aliquet mi. Pellentesque habitant morbi tristique senectus et netus et
-        malesuada fames ac turpis egestas. In volutpat arcu ut felis sagittis, in finibus massa
-        gravida. Pellentesque id tellus orci. Integer dictum, lorem sed efficitur ullamcorper,
-        libero justo consectetur ipsum, in mollis nisl ex sed nisl. Donec maximus ullamcorper
-        sodales. Praesent bibendum rhoncus tellus nec feugiat. In a ornare nulla. Donec rhoncus
-        libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
-        vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
-    </string>
-    <string name="terms_text">1. USE OF FOOTBALL APPLICATION\n\nBy using the EScore Live football application, you accept these terms of use. Our application provides live football results, news and statistics.\n\n2. ACCOUNT AND REGISTRATION\n\nYou are required to provide accurate information during registration. It is your responsibility to keep your password secure. Your account may be closed if false information is provided.\n\n3. APPLICATION SERVICES\n\n- Live football match results\n- Team and player statistics\n- Football news and transfers\n- Following your favorite teams\n- League tables and fixture information\n\n4. USAGE RULES\n\nUse the application for personal use only. Using data for commercial purposes is prohibited. Spam or malicious activity will result in account closure.\n\n5. DATA ACCURACY\n\nFootball results and statistics are obtained from third-party sources. We do our best for data accuracy, but cannot guarantee 100% precision.\n\n6. INTERNET CONNECTION\n\nThe application requires an internet connection. We are not responsible for data loss that may occur due to connection problems.\n\n7. NOTIFICATIONS\n\nWe may send match start, goal and result notifications. You can turn off these notifications from settings.\n\n8. PERSONAL DATA PROTECTION\n\nYour personal data is under security. We do not share your data with third parties. We use it only for application functionality.\n\n9. SERVICE CHANGES\n\nWe reserve the right to improve or discontinue application services. We will inform you in advance about major changes.\n\n10. ACCOUNT TERMINATION\n\nYou can delete your account at any time. We reserve the right to close your account if rules are violated.\n\n11. LIMITATION OF LIABILITY\n\nWe are not responsible for any damage that may arise from using the application. The application is provided as is.\n\n12. CHANGES TO TERMS\n\nWe may update these terms at any time. Changes take effect after being announced in the application. Continued use indicates acceptance of new terms.\n\n13. CONTACT\n\nFor your questions, you can contact us through the contact section within the application.\n\nLast updated: July 2025</string>
-
-
+    <!-- Account & Profile -->
     <string name="my_account">My Account</string>
     <string name="my_favorites">My Favorites</string>
     <string name="general_settings">General Settings</string>
@@ -186,7 +141,9 @@
     <string name="language">Language</string>
     <string name="english">English</string>
     <string name="log_out">Log Out</string>
+    <string name="user_name">Huseyn</string>
 
+    <!-- Filter Leagues -->
     <string name="filter_matches_by_league">Filter Matches By League</string>
     <string name="search_leagues">Search leagues...</string>
     <string name="select_all">Select All</string>
@@ -196,5 +153,145 @@
     <string name="selected_count">%d selected</string>
     <string name="no_leagues_found">No leagues found</string>
     <string name="try_different_search">Try searching for a different league</string>
-    <string name="user_name">Huseyn</string>
+
+    <!-- Login & Registration -->
+    <string name="welcome_back_sign_in">Welcome back! Sign in to continue</string>
+    <string name="sign_in">Sign In</string>
+    <string name="username_or_email">Username or Email</string>
+    <string name="password">Password</string>
+    <string name="dont_have_account">Don\'t have an account? </string>
+    <string name="sign_up">Sign Up</string>
+    <string name="continue_as_guest">Continue as Guest</string>
+    <string name="create_account">Create Account</string>
+    <string name="create_your_account">Create Your Account</string>
+    <string name="join_football_community">Join the football community today</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="username">Username</string>
+    <string name="email">Email</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="read_accept_terms">Read and accept Terms and Conditions</string>
+    <string name="already_have_account">Already have an account? </string>
+
+    <!-- Splash Screen -->
+    <string name="live_football_experience">Live Football Experience</string>
+    <string name="developed_by_hasanzade">Developed by Hasanzade</string>
+    <string name="loading_football_world">Loading your football world...</string>
+    <string name="version">Version 1.0.0</string>
+
+    <!-- Competitions -->
+    <string name="browse_competition">Browse Competition</string>
+    <string name="search_competition_club">Search for competition, club...</string>
+    <string name="top">Top</string>
+    <string name="region">Region</string>
+    <string name="no_competitions_found">No competitions found</string>
+    <string name="try_different_competition">Try searching for a different competition</string>
+    <string name="favorite_competitions">Favorite Competitions</string>
+    <string name="competitions_count">%d competitions</string>
+    <string name="no_favorite_competitions">No favorite competitions</string>
+    <string name="add_competitions_to_favorites">Add competitions to favorites to see them here</string>
+    <string name="teams_count">%d teams</string>
+    <string name="no_favorite_teams">No favorite teams</string>
+    <string name="add_teams_to_favorites">Add teams to favorites to see them here</string>
+
+    <!-- News -->
+    <string name="football_news">Football News</string>
+    <string name="latest_football_news">Latest football news and updates</string>
+    <string name="all_news">All News</string>
+    <string name="transfers">Transfers</string>
+    <string name="matches">Matches</string>
+    <string name="injuries">Injuries</string>
+    <string name="no_news_found">No news found</string>
+    <string name="pull_down_refresh_category">Pull down to refresh or try a different category</string>
+    <string name="news_detail">News Detail</string>
+    <string name="breaking_news">Breaking News</string>
+    <string name="by_author_source">By %1$s • %2$s</string>
+    <string name="hours_ago">%d hours ago</string>
+    <string name="article">Article</string>
+    <string name="read_full_article">Read Full Article</string>
+    <string name="read_more">Read More</string>
+    <string name="coming_soon">Coming Soon</string>
+    <string name="related_articles_description">Related articles and recommended reads will appear here in future updates.</string>
+    <string name="transfer_news">Transfer News</string>
+    <string name="min_read">%d min read</string>
+    <string name="trending">Trending</string>
+    <string name="breaking">BREAKING</string>
+
+    <!-- Standings -->
+    <string name="premier_league_standings">Premier League Standings</string>
+    <string name="season_year">Season %s</string>
+    <string name="ucl">UCL</string>
+    <string name="uel">UEL</string>
+    <string name="rel">REL</string>
+    <string name="no_standings_available">No standings data available</string>
+    <string name="try_again_later">Please try again later</string>
+    <string name="arsenal_position_1">Arsenal is in position 1</string>
+
+    <!-- Terms and Conditions -->
+    <string name="terms_and_conditions">Terms and Conditions</string>
+    <string name="scroll_to_read_terms">Please scroll to read all terms to continue</string>
+    <string name="close">Close</string>
+    <string name="accept">Accept</string>
+
+    <!-- Match Events -->
+    <string name="match_minute">%d\'</string>
+    <string name="full_time">Full Time</string>
+    <string name="kickoff_today">Today, %s</string>
+
+    <!-- Competition Types -->
+    <string name="premier_league">Premier League</string>
+    <string name="england">England</string>
+    <string name="league_type">LEAGUE</string>
+    <string name="cup_type">CUP</string>
+    <string name="twenty_teams">20 Teams</string>
+    <string name="season_2024_25">2024/25</string>
+    <string name="turkey">Turkey</string>
+    <string name="competitions_5">5 competitions</string>
+    <string name="super_league">Super League</string>
+    <string name="season_2024">Season 2024</string>
+    <string name="top_badge">TOP</string>
+
+    <!-- Team Names (Examples) -->
+    <string name="arsenal">Arsenal</string>
+    <string name="chelsea">Chelsea</string>
+    <string name="manchester_united">Manchester United</string>
+    <string name="nottingham_forest">Nottingham Forest</string>
+    <string name="arsenal_football_club">Arsenal Football Club</string>
+    <string name="ars_short">ARS</string>
+    <string name="bukayo_saka">Bukayo Saka</string>
+    <string name="martin_odegaard">Martin Ødegaard</string>
+    <string name="rw_position">RW</string>
+
+    <!-- Fragment and Navigation -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <!-- Long text content -->
+
+    <string name="terms_text">1. USE OF FOOTBALL APPLICATION\n\nBy using the EScore Live football application, you accept these terms of use. Our application provides live football results, news and statistics.\n\n2. ACCOUNT AND REGISTRATION\n\nYou are required to provide accurate information during registration. It is your responsibility to keep your password secure. Your account may be closed if false information is provided.\n\n3. APPLICATION SERVICES\n\n- Live football match results\n- Team and player statistics\n- Football news and transfers\n- Following your favorite teams\n- League tables and fixture information\n\n4. USAGE RULES\n\nUse the application for personal use only. Using data for commercial purposes is prohibited. Spam or malicious activity will result in account closure.\n\n5. DATA ACCURACY\n\nFootball results and statistics are obtained from third-party sources. We do our best for data accuracy, but cannot guarantee 100% precision.\n\n6. INTERNET CONNECTION\n\nThe application requires an internet connection. We are not responsible for data loss that may occur due to connection problems.\n\n7. NOTIFICATIONS\n\nWe may send match start, goal and result notifications. You can turn off these notifications from settings.\n\n8. PERSONAL DATA PROTECTION\n\nYour personal data is under security. We do not share your data with third parties. We use it only for application functionality.\n\n9. SERVICE CHANGES\n\nWe reserve the right to improve or discontinue application services. We will inform you in advance about major changes.\n\n10. ACCOUNT TERMINATION\n\nYou can delete your account at any time. We reserve the right to close your account if rules are violated.\n\n11. LIMITATION OF LIABILITY\n\nWe are not responsible for any damage that may arise from using the application. The application is provided as is.\n\n12. CHANGES TO TERMS\n\nWe may update these terms at any time. Changes take effect after being announced in the application. Continued use indicates acceptance of new terms.\n\n13. CONTACT\n\nFor your questions, you can contact us through the contact section within the application.\n\nLast updated: July 2025</string>
+
+    <!-- Sample Content -->
+    <string name="sample_news_title">Breaking: Major transfer completed in Premier League</string>
+    <string name="sample_news_content">A major signing has been confirmed as the transfer window heats up with unexpected developments. The deal represents a significant investment in the club\'s future and demonstrates their commitment to competing at the highest level...</string>
+    <string name="sample_author_source">By John Smith • ESPN</string>
+    <string name="sample_time_ago">2 hours ago</string>
+    <string name="sample_read_time">3 min read</string>
+
+    <!-- Week days -->
+    <string name="fri">Fri</string>
+    <string name="sat">Sat</string>
+    <string name="sun">Sun</string>
+    <string name="mon">Mon</string>
+    <string name="tue">Tue</string>
+    <string name="wed">Wed</string>
+    <string name="thu">Thu</string>
+
+    <!-- Date formats -->
+    <string name="week_range_format">%s - %s</string>
+    <string name="match_date_today">Today, %s</string>
+    <string name="match_date_format">%s Mar %d</string>
+
 </resources>

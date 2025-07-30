@@ -1,0 +1,296 @@
+<resources>
+    <string name="app_name">eScoreLive</string>
+
+    <!-- Bottom Navigation -->
+    <string name="home">Ana səhifə</string>
+    <string name="competition">Liqalar</string>
+    <string name="news">Xəbərlər</string>
+    <string name="account">Profil</string>
+
+    <!-- Home Screen -->
+    <string name="upcoming_matches">Gələcək Oyunlar</string>
+    <string name="live_results">Canlı və Nəticələr</string>
+    <string name="favorite_teams">Sevimli Komandalar</string>
+    <string name="todays_upcoming">Bugünün Gələcək Oyunları</string>
+    <string name="live_now">Canlı</string>
+    <string name="see_more">Daha çox</string>
+
+    <!-- Match Status -->
+    <string name="live">CANLI</string>
+    <string name="ft">BITMƏ</string>
+    <string name="vs">QARŞI</string>
+    <string name="today">Bugün</string>
+    <string name="upcoming">Gələcək</string>
+    <string name="score">Hesab</string>
+    <string name="favorites">Sevimlilər</string>
+
+    <!-- Team Search -->
+    <string name="team_search">Komanda Axtarışı</string>
+    <string name="search_team_hint">Komanda adını axtarın...</string>
+    <string name="no_teams_found">Komanda tapılmadı</string>
+    <string name="try_different_keywords">Fərqli açar sözlər sınayın</string>
+    <string name="search_your_favorite_teams">Sevimli komandalarınızı axtarın</string>
+    <string name="find_teams_from_top_leagues">Dünya liqalarından komandalar tapın</string>
+    <string name="popular_teams">Məşhur Komandalar</string>
+    <string name="start_typing_suggestions">💡 Təkliflər üçün yazmağa başlayın...</string>
+    <string name="favorite_teams_count">%d sevimli komanda</string>
+    <string name="added_to_favorites">%s sevimlilərə əlavə edildi</string>
+    <string name="removed_from_favorites">%s sevimlilərdən silindi</string>
+    <string name="loading_standings">%s turnir cədvəli yüklənir...</string>
+    <string name="testing_search">Axtarış test edilir...</string>
+    <string name="selected_team">Seçilmiş: %s (%s)</string>
+
+    <!-- Match Details -->
+    <string name="match_details">Oyun Təfərrüatları</string>
+    <string name="summary">Xülasə</string>
+    <string name="lineup">Heyət</string>
+    <string name="statistics">Statistika</string>
+    <string name="h2h">H2H</string>
+    <string name="standings">Turnir Cədvəli</string>
+    <string name="match_events">Oyun Hadisələri</string>
+    <string name="team_lineups">Komanda Heyətləri</string>
+    <string name="match_statistics">Oyun Statistikası</string>
+    <string name="league_standings">Liqa Cədvəli</string>
+    <string name="head_to_head">Birbaşa Qarşılaşma</string>
+    <string name="no_h2h_data">H2H məlumatı yoxdur</string>
+    <string name="no_standings_data">Turnir cədvəli məlumatı yoxdur</string>
+
+    <!-- All Matches -->
+    <string name="all_matches">Bütün Oyunlar</string>
+    <string name="todays_matches">Bugünün Oyunları</string>
+    <string name="favorite_teams_matches">Sevimli Komandaların Oyunları</string>
+    <string name="results_date">Nəticələr - %s</string>
+    <string name="fixtures_date">Oyunlar - %s</string>
+    <string name="all">Hamısı</string>
+    <string name="live_filter">Canlı</string>
+    <string name="finished">Bitmiş</string>
+    <string name="no_matches_found">Oyun tapılmadı</string>
+    <string name="pull_down_to_refresh">Yeniləmək üçün aşağı çəkin</string>
+
+    <!-- Statistics -->
+    <string name="ball_possession">Top Sahibliyi</string>
+    <string name="total_shots">Ümumi Zərbələr</string>
+    <string name="shots_on_target">Hədəfə Zərbələr</string>
+    <string name="corner_kicks">Künc Zərbələri</string>
+    <string name="yellow_cards">Sarı Kartlar</string>
+    <string name="red_cards">Qırmızı Kartlar</string>
+
+    <!-- Lineup -->
+    <string name="starting_xi">Əsas Heyət</string>
+    <string name="substitute">Ehtiyat</string>
+    <string name="assist">Məhsuldar ötürmə: %s</string>
+
+    <!-- Match Actions -->
+    <string name="live_details">Canlı Təfərrüatlar</string>
+    <string name="match_report">Oyun Hesabatı</string>
+    <string name="preview">Ön baxış</string>
+    <string name="details">Təfərrüatlar</string>
+
+    <!-- Standings -->
+    <string name="pos">#</string>
+    <string name="team">Komanda</string>
+    <string name="mp">O</string>
+    <string name="w">Q</string>
+    <string name="d">B</string>
+    <string name="l">M</string>
+    <string name="gd">QF</string>
+    <string name="pts">Xal</string>
+    <string name="season">Mövsüm %d</string>
+    <string name="team_position">%s %d vəziyyətdədir</string>
+    <string name="legend">Açıqlama:</string>
+    <string name="champions_league">Çempionlar Liqası</string>
+    <string name="europa_league">Avropa Liqası</string>
+    <string name="relegation">Düşmə</string>
+
+    <!-- Notifications -->
+    <string name="notifications_clicked">Bildirişlər klikləndi</string>
+
+    <!-- Common -->
+    <string name="loading">Yüklənir...</string>
+    <string name="date_na">Tarix N/A</string>
+    <string name="tbd">TBD</string>
+
+    <!-- Events -->
+    <string name="normal_goal">Adi Qol</string>
+    <string name="yellow_card">Sarı Kart</string>
+    <string name="red_card">Qırmızı Kart</string>
+    <string name="substitution">Dəyişiklik</string>
+
+    <!-- Error Messages -->
+    <string name="failed_to_load_matches">Oyunlar yüklənə bilmədi</string>
+    <string name="failed_to_load_standings">Turnir cədvəli yüklənə bilmədi</string>
+    <string name="failed_to_load_favorite_matches">Sevimli komanda oyunları yüklənə bilmədi</string>
+    <string name="search_failed">Axtarış uğursuz oldu</string>
+    <string name="team_not_found">Komanda tapılmadı</string>
+    <string name="api_error">API Xətası</string>
+    <string name="match_not_found">Oyun tapılmadı</string>
+
+    <!-- Account & Profile -->
+    <string name="my_account">Mənim Hesabım</string>
+    <string name="my_favorites">Mənim Sevimlilərim</string>
+    <string name="general_settings">Ümumi Parametrlər</string>
+    <string name="other">Digər</string>
+    <string name="tap_to_change_photo">Şəkli dəyişmək üçün toxunun</string>
+    <string name="competitions">Yarışlar</string>
+    <string name="teams">Komandalar</string>
+    <string name="players">Oyunçular</string>
+    <string name="app_notifications">Tətbiq Bildirişləri</string>
+    <string name="dark_theme">Qaranlıq Tema</string>
+    <string name="filter_matches_by">Oyunları Filtrləyin</string>
+    <string name="all_leagues">Bütün Liqalar</string>
+    <string name="language">Dil</string>
+    <string name="english">İngilis</string>
+    <string name="log_out">Çıxış</string>
+    <string name="user_name">Hüseyn</string>
+
+    <!-- Filter Leagues -->
+    <string name="filter_matches_by_league">Oyunları Liqaya Görə Filtrləyin</string>
+    <string name="search_leagues">Liqa axtarın...</string>
+    <string name="select_all">Hamısını Seç</string>
+    <string name="clear_all">Hamısını Təmizlə</string>
+    <string name="done">Hazır</string>
+    <string name="none_selected">Heç biri seçilməyib</string>
+    <string name="selected_count">%d seçildi</string>
+    <string name="no_leagues_found">Liqa tapılmadı</string>
+    <string name="try_different_search">Fərqli liqa axtarın</string>
+
+    <!-- Login & Registration -->
+    <string name="welcome_back_sign_in">Xoş gəlmisiniz! Davam etmək üçün daxil olun</string>
+    <string name="sign_in">Daxil Ol</string>
+    <string name="username_or_email">İstifadəçi adı və ya E-poçt</string>
+    <string name="password">Şifrə</string>
+    <string name="dont_have_account">Hesabınız yoxdur? </string>
+    <string name="sign_up">Qeydiyyat</string>
+    <string name="continue_as_guest">Qonaq olaraq davam et</string>
+    <string name="create_account">Hesab Yarat</string>
+    <string name="create_your_account">Hesabınızı Yaradın</string>
+    <string name="join_football_community">Bu gün futbol icmasına qoşulun</string>
+    <string name="first_name">Ad</string>
+    <string name="last_name">Soyad</string>
+    <string name="username">İstifadəçi adı</string>
+    <string name="email">E-poçt</string>
+    <string name="confirm_password">Şifrəni Təsdiq Et</string>
+    <string name="read_accept_terms">Şərtləri və Qaydaları oxuyun və qəbul edin</string>
+    <string name="already_have_account">Artıq hesabınız var? </string>
+
+    <!-- Splash Screen -->
+    <string name="live_football_experience">Canlı Futbol Təcrübəsi</string>
+    <string name="developed_by_hasanzade">Həsənzadə tərəfindən hazırlanıb</string>
+    <string name="loading_football_world">Futbol dünyanız yüklənir...</string>
+    <string name="version">Versiya 1.0.0</string>
+
+    <!-- Competitions -->
+    <string name="browse_competition">Yarışlara Baxın</string>
+    <string name="search_competition_club">Yarış, klub axtarın...</string>
+    <string name="top">Ən Yaxşı</string>
+    <string name="region">Region</string>
+    <string name="no_competitions_found">Yarış tapılmadı</string>
+    <string name="try_different_competition">Fərqli yarış axtarın</string>
+    <string name="favorite_competitions">Sevimli Yarışlar</string>
+    <string name="competitions_count">%d yarış</string>
+    <string name="no_favorite_competitions">Sevimli yarış yoxdur</string>
+    <string name="add_competitions_to_favorites">Burada görmək üçün yarışları sevimlilərə əlavə edin</string>
+    <string name="teams_count">%d komanda</string>
+    <string name="no_favorite_teams">Sevimli komanda yoxdur</string>
+    <string name="add_teams_to_favorites">Burada görmək üçün komandaları sevimlilərə əlavə edin</string>
+
+    <!-- News -->
+    <string name="football_news">Futbol Xəbərləri</string>
+    <string name="latest_football_news">Ən son futbol xəbərləri və yeniliklər</string>
+    <string name="all_news">Bütün Xəbərlər</string>
+    <string name="transfers">Transferlər</string>
+    <string name="matches">Oyunlar</string>
+    <string name="injuries">Zədələr</string>
+    <string name="no_news_found">Xəbər tapılmadı</string>
+    <string name="pull_down_refresh_category">Yeniləmək üçün aşağı çəkin və ya fərqli kateqoriya sınayın</string>
+    <string name="news_detail">Xəbər Təfərrüatı</string>
+    <string name="breaking_news">Son Dəqiqə Xəbəri</string>
+    <string name="by_author_source">%1$s • %2$s tərəfindən</string>
+    <string name="hours_ago">%d saat əvvəl</string>
+    <string name="article">Məqalə</string>
+    <string name="read_full_article">Tam Məqaləni Oxuyun</string>
+    <string name="read_more">Daha Çox Oxuyun</string>
+    <string name="coming_soon">Tezliklə</string>
+    <string name="related_articles_description">Əlaqəli məqalələr və tövsiyə edilən oxunuşlar gələcək yeniliklərdə burada görüləcək.</string>
+    <string name="transfer_news">Transfer Xəbərləri</string>
+    <string name="min_read">%d dəqiqə oxunur</string>
+    <string name="trending">Trend</string>
+    <string name="breaking">SON DƏQİQƏ</string>
+
+    <!-- Standings -->
+    <string name="premier_league_standings">Premyer Liqa Cədvəli</string>
+    <string name="season_year">Mövsüm %s</string>
+    <string name="ucl">ÇL</string>
+    <string name="uel">AL</string>
+    <string name="rel">DÜŞ</string>
+    <string name="no_standings_available">Turnir cədvəli məlumatı yoxdur</string>
+    <string name="try_again_later">Zəhmət olmasa sonra yenidən cəhd edin</string>
+    <string name="arsenal_position_1">Arsenal 1-ci vəziyyətdədir</string>
+
+    <!-- Terms and Conditions -->
+    <string name="terms_and_conditions">Şərtlər və Qaydalar</string>
+    <string name="scroll_to_read_terms">Davam etmək üçün bütün şərtləri oxumaq lazımdır</string>
+    <string name="close">Bağla</string>
+    <string name="accept">Qəbul Et</string>
+
+    <!-- Match Events -->
+    <string name="match_minute">%d\'</string>
+    <string name="full_time">Tam Vaxt</string>
+    <string name="kickoff_today">Bugün, %s</string>
+
+    <!-- Competition Types -->
+    <string name="premier_league">Premyer Liqa</string>
+    <string name="england">İngiltərə</string>
+    <string name="league_type">LİQA</string>
+    <string name="cup_type">KUBOK</string>
+    <string name="twenty_teams">20 Komanda</string>
+    <string name="season_2024_25">2024/25</string>
+    <string name="turkey">Türkiyə</string>
+    <string name="competitions_5">5 yarış</string>
+    <string name="super_league">Super Liqa</string>
+    <string name="season_2024">Mövsüm 2024</string>
+    <string name="top_badge">ƏN YAXŞI</string>
+
+    <!-- Team Names (Examples) -->
+    <string name="arsenal">Arsenal</string>
+    <string name="chelsea">Çelsi</string>
+    <string name="manchester_united">Mançester Yunayted</string>
+    <string name="nottingham_forest">Nottinqham Forest</string>
+    <string name="arsenal_football_club">Arsenal Futbol Klubu</string>
+    <string name="ars_short">ARS</string>
+    <string name="bukayo_saka">Bukayo Saka</string>
+    <string name="martin_odegaard">Martin Ødegaard</string>
+    <string name="rw_position">SY</string>
+
+    <!-- Fragment and Navigation -->
+    <string name="hello_blank_fragment">Salam boş fraqment</string>
+    <string name="first_fragment_label">Birinci Fraqment</string>
+    <string name="second_fragment_label">İkinci Fraqment</string>
+    <string name="next">Növbəti</string>
+    <string name="previous">Əvvəlki</string>
+
+    <!-- Long text content -->
+    <string name="terms_text">1. FUTBOL TƏTBİQİNİN İSTİFADƏSİ\n\nEScore Live futbol tətbiqindən istifadə etməklə, bu istifadə şərtlərini qəbul edirsiz. Bizim tətbiqimiz canlı futbol nəticələri, xəbərlər və statistika təqdim edir.\n\n2. HESAB VƏ QEYDİYYAT\n\nQeydiyyat zamanı düzgün məlumat vermək tələb olunur. Şifrənizi təhlükəsiz saxlamaq sizin məsuliyyətinizdir. Yalan məlumat verildikdə hesabınız bağlana bilər.\n\n3. TƏTBİQ XİDMƏTLƏRİ\n\n- Canlı futbol oyun nəticələri\n- Komanda və oyunçu statistikaları\n- Futbol xəbərləri və transferləri\n- Sevimli komandalarınızı izləmək\n- Liqa cədvəlləri və oyun məlumatları\n\n4. İSTİFADƏ QAYDALARI\n\nTətbiqi yalnız şəxsi istifadə üçün istifadə edin. Məlumatları kommersiya məqsədləri üçün istifadə etmək qadağandır. Spam və ya zərərli fəaliyyət hesabın bağlanması ilə nəticələnəcək.\n\n5. MƏLUMATLARİN DÜZGÜNLÜYÜ\n\nFutbol nəticələri və statistikaları üçüncü tərəf mənbələrindən əldə edilir. Məlumatların düzgünlüyü üçün əlimizdən gələni edirik, lakin 100% dəqiqlik təmin edə bilmərik.\n\n6. İNTERNET BAĞLANTISI\n\nTətbiq internet bağlantısı tələb edir. Bağlantı problemləri səbəbiylə yarana biləcək məlumat itkisindən məsul deyilik.\n\n7. BİLDİRİŞLƏR\n\nOyun başlangıcı, qol və nəticə bildirişləri göndərə bilərik. Bu bildirişləri parametrlərdən söndürə bilərsiniz.\n\n8. ŞƏXSİ MƏLUMATLARİN QORUNMASI\n\nŞəxsi məlumatlarınız təhlükəsizlik altındadır. Məlumatlarınızı üçüncü tərəflərlə paylaşmırıq. Yalnız tətbiq funksionallığı üçün istifadə edirik.\n\n9. XİDMƏT DƏYİŞİKLİKLƏRİ\n\nTətbiq xidmətlərini təkmilləşdirmək və ya dayandırmaq hüququnu özümüzdə saxlayırıq. Böyük dəyişikliklər haqqında əvvəlcədən məlumat verəcəyik.\n\n10. HESABIN BAĞLANMASI\n\nHesabınızı istənilən vaxt silə bilərsiniz. Qaydalar pozulduqda hesabınızı bağlamaq hüququnu özümüzdə saxlayırıq.\n\n11. MƏSULİYYƏTİN MƏHDUDLAŞDIRILMASI\n\nTətbiqdən istifadə nəticəsində yarana biləcək hər hansı zərərə görə məsul deyilik. Tətbiq olduğu kimi təqdim edilir.\n\n12. ŞƏRTLƏRDƏKİ DƏYİŞİKLİKLƏR\n\nBu şərtləri istənilən vaxt yeniləyə bilərik. Dəyişikliklər tətbiqdə elan edildikdən sonra qüvvəyə minir. Davam edən istifadə yeni şərtlərin qəbul edildiyi deməkdir.\n\n13. ƏLAQƏ\n\nSuallarınız üçün tətbiqdəki əlaqə bölməsindən bizə müraciət edə bilərsiniz.\n\nSon yeniləmə: İyul 2025</string>
+
+    <!-- Sample Content -->
+    <string name="sample_news_title">Son dəqiqə: Premyer Liqada böyük transfer tamamlandı</string>
+    <string name="sample_news_content">Transfer pəncərəsinin qızışdığı bir vaxtda gözlənilməz inkişaflarla böyük transfer təsdiqləndi. Bu müqavilə klubun gələcəyinə böyük investisiya və ən yüksək səviyyədə rəqabət aparmaq öhdəliyini nümayiş etdirir...</string>
+    <string name="sample_author_source">John Smith • ESPN tərəfindən</string>
+    <string name="sample_time_ago">2 saat əvvəl</string>
+    <string name="sample_read_time">3 dəqiqə oxunur</string>
+
+    <!-- Week days -->
+    <string name="fri">Cüm</string>
+    <string name="sat">Şən</string>
+    <string name="sun">Baz</string>
+    <string name="mon">Ber</string>
+    <string name="tue">Çax</string>
+    <string name="wed">Çər</string>
+    <string name="thu">Cax</string>
+
+    <!-- Date formats -->
+    <string name="week_range_format">%s - %s</string>
+    <string name="match_date_today">Bugün, %s</string>
+    <string name="match_date_format">%s Mar %d</string>
+
+</resources>
