@@ -1,3 +1,4 @@
+// AccountFragment.kt - Fixed with proper string resources
 package com.materialdesign.escorelive.presentation.account
 
 import android.Manifest
@@ -56,7 +57,7 @@ class AccountFragment : Fragment() {
         if (isGranted) {
             openImagePicker()
         } else {
-            Toast.makeText(context, "Permission denied. Cannot access gallery.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -86,7 +87,25 @@ class AccountFragment : Fragment() {
     }
 
     private fun showAccountContent() {
-        // Account content setup
+        // Set static text with string resources
+        binding.myAccountText.text = getString(R.string.my_account)
+        binding.myFavoritesText.text = getString(R.string.my_favorites)
+        binding.generalSettingsText.text = getString(R.string.general_settings)
+        binding.otherText.text = getString(R.string.other)
+
+        // Set favorites section labels
+        binding.competitionsLabel.text = getString(R.string.competitions)
+        binding.teamsLabel.text = getString(R.string.teams)
+        binding.playersLabel.text = getString(R.string.players)
+
+        // Set settings labels
+        binding.notificationsLabel.text = getString(R.string.app_notifications)
+        binding.darkThemeLabel.text = getString(R.string.dark_theme)
+        binding.filterMatchesLabel.text = getString(R.string.filter_matches_by)
+        binding.languageLabel.text = getString(R.string.language)
+
+        // Set logout button text
+        binding.logoutButton.text = getString(R.string.log_out)
     }
 
     private fun updateLanguageDisplay() {
@@ -97,7 +116,7 @@ class AccountFragment : Fragment() {
             Log.d("AccountFragment", "Current language: $currentLanguage, Display: $languageDisplayName")
         } catch (e: Exception) {
             Log.e("AccountFragment", "Error updating language display", e)
-            binding.selectedLanguageText.text = "English"
+            binding.selectedLanguageText.text = getString(R.string.english)
         }
     }
 
@@ -143,7 +162,6 @@ class AccountFragment : Fragment() {
             }
         })
 
-        // Language change observer - YENI
         viewModel.languageChanged.observe(viewLifecycleOwner, Observer { languageChanged ->
             if (languageChanged) {
                 Log.d("AccountFragment", "Language changed detected, restarting activity")
@@ -162,19 +180,19 @@ class AccountFragment : Fragment() {
 
         binding.competitionsCount.setOnClickListener {
             Log.d("AccountFragment", "Competitions count clicked!")
-            Toast.makeText(context, "Competitions clicked - navigating...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.competitions) + " " + getString(R.string.continue_text).lowercase(), Toast.LENGTH_SHORT).show()
             navigateToFavoriteCompetitions()
         }
 
         binding.teamsCount.setOnClickListener {
             Log.d("AccountFragment", "Teams count clicked!")
-            Toast.makeText(context, "Teams clicked - navigating...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.teams) + " " + getString(R.string.continue_text).lowercase(), Toast.LENGTH_SHORT).show()
             navigateToFavoriteTeams()
         }
 
         binding.playersCount.setOnClickListener {
             Log.d("AccountFragment", "Players count clicked!")
-            Toast.makeText(context, "Players feature coming soon", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show()
         }
 
         binding.notificationsSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -189,7 +207,6 @@ class AccountFragment : Fragment() {
             openFilterLeaguesScreen()
         }
 
-        // Language selection click listener - DÜZƏLDILMIŞ
         binding.languageRow.setOnClickListener {
             Log.d("AccountFragment", "Language row clicked!")
             openLanguageSelector()
@@ -240,12 +257,12 @@ class AccountFragment : Fragment() {
             Log.d("AccountFragment", "Navigation to favorite competitions successful")
         } catch (e: Exception) {
             Log.e("AccountFragment", "Navigation error to favorite competitions", e)
-            Toast.makeText(context, "Navigation error: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, getString(R.string.error_occurred) + ": ${e.message}", Toast.LENGTH_LONG).show()
 
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Favorite Competitions")
-                .setMessage("Feature under development. Coming soon!")
-                .setPositiveButton("OK", null)
+                .setTitle(getString(R.string.favorite_competitions))
+                .setMessage(getString(R.string.coming_soon))
+                .setPositiveButton(getString(R.string.ok), null)
                 .show()
         }
     }
@@ -257,12 +274,12 @@ class AccountFragment : Fragment() {
             Log.d("AccountFragment", "Navigation to favorite teams successful")
         } catch (e: Exception) {
             Log.e("AccountFragment", "Navigation error to favorite teams", e)
-            Toast.makeText(context, "Navigation error: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, getString(R.string.error_occurred) + ": ${e.message}", Toast.LENGTH_LONG).show()
 
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Favorite Teams")
-                .setMessage("Feature under development. Coming soon!")
-                .setPositiveButton("OK", null)
+                .setTitle(getString(R.string.favorite_teams))
+                .setMessage(getString(R.string.coming_soon))
+                .setPositiveButton(getString(R.string.ok), null)
                 .show()
         }
     }
@@ -281,7 +298,7 @@ class AccountFragment : Fragment() {
             shouldShowRequestPermissionRationale(permission) -> {
                 Toast.makeText(
                     context,
-                    "Storage permission is needed to select a profile photo",
+                    getString(R.string.storage_permission_needed),
                     Toast.LENGTH_LONG
                 ).show()
                 permissionLauncher.launch(permission)
@@ -303,9 +320,9 @@ class AccountFragment : Fragment() {
         try {
             viewModel.updateProfileImage(uri.toString())
             loadProfileImage(uri.toString())
-            Toast.makeText(context, "Profile photo updated!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.profile_photo_updated), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            Toast.makeText(context, "Failed to update profile photo", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.error_occurred), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -334,7 +351,7 @@ class AccountFragment : Fragment() {
         try {
             findNavController().navigate(R.id.action_account_to_filterLeagues)
         } catch (e: Exception) {
-            Toast.makeText(context, "Opening league filters...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.loading) + "...", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -342,8 +359,7 @@ class AccountFragment : Fragment() {
         Log.d("AccountFragment", "Opening language selector...")
 
         try {
-            // Simple AlertDialog approach
-            val languages = arrayOf("English", "Azərbaycan")
+            val languages = arrayOf(getString(R.string.english), "Azərbaycan")
             val languageCodes = arrayOf("en", "az")
             val currentLanguageCode = localeManager.getLanguage(requireContext())
             val selectedIndex = languageCodes.indexOf(currentLanguageCode)
@@ -351,7 +367,7 @@ class AccountFragment : Fragment() {
             Log.d("AccountFragment", "Current language code: $currentLanguageCode, Selected index: $selectedIndex")
 
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Select Language / Dil Seçin")
+                .setTitle(getString(R.string.select_language))
                 .setSingleChoiceItems(languages, selectedIndex) { dialog, which ->
                     val selectedLanguageCode = languageCodes[which]
                     val selectedLanguageName = languages[which]
@@ -359,33 +375,25 @@ class AccountFragment : Fragment() {
                     Log.d("AccountFragment", "Selected language: $selectedLanguageName ($selectedLanguageCode)")
 
                     try {
-                        // Update language immediately
                         localeManager.setLocale(requireContext(), selectedLanguageCode)
-
-                        // Save to ViewModel
                         viewModel.updateLanguageSettings(selectedLanguageCode, selectedLanguageName)
-
-                        // Show success message
-                        Toast.makeText(requireContext(), "Language changed to $selectedLanguageName", Toast.LENGTH_SHORT).show()
-
+                        Toast.makeText(requireContext(), getString(R.string.language_changed), Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
-
-                        // Force restart activity
                         requireActivity().recreate()
 
                     } catch (e: Exception) {
                         Log.e("AccountFragment", "Error changing language", e)
-                        Toast.makeText(requireContext(), "Error changing language: ${e.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(), getString(R.string.error_occurred) + ": ${e.message}", Toast.LENGTH_LONG).show()
                     }
                 }
-                .setNegativeButton("Cancel") { dialog, _ ->
+                .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
                     dialog.dismiss()
                 }
                 .show()
 
         } catch (e: Exception) {
             Log.e("AccountFragment", "Error opening language selector", e)
-            Toast.makeText(requireContext(), "Error opening language selector: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), getString(R.string.error_occurred) + ": ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -394,18 +402,18 @@ class AccountFragment : Fragment() {
             selectedLeagues.isEmpty() -> getString(R.string.all_leagues)
             selectedLeagues.size == 1 -> selectedLeagues.first()
             selectedLeagues.size <= 3 -> selectedLeagues.joinToString(", ")
-            else -> "${selectedLeagues.take(2).joinToString(", ")} +${selectedLeagues.size - 2} more"
+            else -> "${selectedLeagues.take(2).joinToString(", ")} +${selectedLeagues.size - 2} " + getString(R.string.more)
         }
     }
 
     private fun handleLogout() {
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.log_out))
-            .setMessage("Are you sure you want to log out?")
+            .setMessage(getString(R.string.logout_confirmation))
             .setPositiveButton(getString(R.string.log_out)) { _, _ ->
                 performLogout()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
 

@@ -1,3 +1,4 @@
+<!-- Updated strings-az.xml with missing translations -->
 <resources>
     <string name="app_name">eScoreLive</string>
 
@@ -36,6 +37,7 @@
     <string name="continue_text">Davam et</string>
     <string name="back">Geri</string>
     <string name="save">Yadda saxla</string>
+    <string name="more">daha çox</string>
 
     <string name="error_occurred">Xəta baş verdi</string>
     <string name="network_error">Şəbəkə xətası. Zəhmət olmasa bağlantını yoxlayın.</string>
@@ -164,6 +166,7 @@
     <string name="english">İngilis</string>
     <string name="log_out">Çıxış</string>
     <string name="user_name">Hüseyn</string>
+    <string name="logout_confirmation">Çıxış etmək istədiyinizə əminsiniz?</string>
 
     <!-- Filter Leagues -->
     <string name="filter_matches_by_league">Oyunları Liqaya Görə Filtrləyin</string>
@@ -230,6 +233,7 @@
     <string name="by_author_source">%1$s • %2$s tərəfindən</string>
     <string name="hours_ago">%d saat əvvəl</string>
     <string name="article">Məqalə</string>
+    <string name="articles_count">%1$s • %2$d məqalə</string>
     <string name="read_full_article">Tam Məqaləni Oxuyun</string>
     <string name="read_more">Daha Çox Oxuyun</string>
     <string name="coming_soon">Tezliklə</string>

@@ -1,3 +1,4 @@
+// HomeFragment.kt - Fixed with proper string resources
 package com.materialdesign.escorelive.presentation.ui.main
 
 import android.os.Bundle
@@ -66,7 +67,6 @@ class HomeFragment : Fragment() {
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.homeFragment -> {
-                    // Already here, do nothing
                     true
                 }
                 R.id.competitionFragment -> {
@@ -80,7 +80,6 @@ class HomeFragment : Fragment() {
                     try {
                         findNavController().navigate(R.id.action_home_to_news)
                     } catch (e: Exception) {
-                        // Handle navigation error silently
                     }
                     true
                 }
@@ -88,7 +87,6 @@ class HomeFragment : Fragment() {
                     try {
                         findNavController().navigate(R.id.action_home_to_account)
                     } catch (e: Exception) {
-                        // Handle navigation error silently
                     }
                     true
                 }
@@ -111,6 +109,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupTabs() {
+        // Set tab text with string resources
+        binding.upcomingTab.text = getString(R.string.upcoming)
+        binding.scoreTab.text = getString(R.string.score)
+        binding.favoritesTab.text = getString(R.string.favorites)
+
         updateTabSelection(MatchTab.UPCOMING)
 
         binding.upcomingTab.setOnClickListener {
@@ -184,22 +187,22 @@ class HomeFragment : Fragment() {
         when (currentTab) {
             MatchTab.UPCOMING -> {
                 viewModel.loadUpcomingMatches(selectedDate)
-                updateLiveHeaderText("Upcoming Matches")
+                updateLiveHeaderText(getString(R.string.upcoming_matches))
             }
             MatchTab.SCORE -> {
                 viewModel.loadLiveAndFinishedMatches(selectedDate)
-                updateLiveHeaderText("Live & Results")
+                updateLiveHeaderText(getString(R.string.live_results))
             }
             MatchTab.FAVORITES -> {
                 loadFavoriteMatches()
-                updateLiveHeaderText("Favorite Teams")
+                updateLiveHeaderText(getString(R.string.favorite_teams))
             }
         }
     }
 
     private fun loadFavoriteMatches() {
         viewModel.loadFavoriteTeamMatches()
-        updateLiveHeaderText("Favorite Teams")
+        updateLiveHeaderText(getString(R.string.favorite_teams))
     }
 
     private fun updateLiveHeaderText(text: String) {
@@ -230,9 +233,21 @@ class HomeFragment : Fragment() {
         sundayCalendar.add(Calendar.DAY_OF_MONTH, 6)
         val sundayDate = sundayCalendar.time
 
-        binding.weekRangeText.text = "${weekRangeFormat.format(mondayDate)} - ${weekRangeFormat.format(sundayDate)}"
+        binding.weekRangeText.text = getString(R.string.week_range_format,
+            weekRangeFormat.format(mondayDate),
+            weekRangeFormat.format(sundayDate))
 
-        val dayNames = arrayOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+        // Translated day names
+        val dayNames = arrayOf(
+            getString(R.string.mon),
+            getString(R.string.tue),
+            getString(R.string.wed),
+            getString(R.string.thu),
+            getString(R.string.fri),
+            getString(R.string.sat),
+            getString(R.string.sun)
+        )
+
         val dayNameViews = listOf(
             binding.day1Name, binding.day2Name, binding.day3Name, binding.day4Name,
             binding.day5Name, binding.day6Name, binding.day7Name
@@ -251,7 +266,7 @@ class HomeFragment : Fragment() {
 
             if (calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                 calendar.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)) {
-                dayNameViews[i].text = "Today"
+                dayNameViews[i].text = getString(R.string.today)
                 todayIndex = i
             }
 
@@ -328,28 +343,28 @@ class HomeFragment : Fragment() {
             when {
                 selectedDate == today -> {
                     when (currentTab) {
-                        MatchTab.UPCOMING -> updateLiveHeaderText("Today's Upcoming")
-                        MatchTab.SCORE -> updateLiveHeaderText("Live Now")
-                        MatchTab.FAVORITES -> updateLiveHeaderText("Favorite Teams")
+                        MatchTab.UPCOMING -> updateLiveHeaderText(getString(R.string.todays_upcoming))
+                        MatchTab.SCORE -> updateLiveHeaderText(getString(R.string.live_now))
+                        MatchTab.FAVORITES -> updateLiveHeaderText(getString(R.string.favorite_teams))
                     }
                 }
                 selectedCalendar.before(todayCalendar) -> {
                     val displayDate = displayDateFormat.format(selectedCalendar.time)
                     when (currentTab) {
-                        MatchTab.FAVORITES -> updateLiveHeaderText("Favorite Teams")
-                        else -> updateLiveHeaderText("Results - $displayDate")
+                        MatchTab.FAVORITES -> updateLiveHeaderText(getString(R.string.favorite_teams))
+                        else -> updateLiveHeaderText(getString(R.string.results_date, displayDate))
                     }
                 }
                 selectedCalendar.after(todayCalendar) -> {
                     val displayDate = displayDateFormat.format(selectedCalendar.time)
                     when (currentTab) {
-                        MatchTab.FAVORITES -> updateLiveHeaderText("Favorite Teams")
-                        else -> updateLiveHeaderText("Fixtures - $displayDate")
+                        MatchTab.FAVORITES -> updateLiveHeaderText(getString(R.string.favorite_teams))
+                        else -> updateLiveHeaderText(getString(R.string.fixtures_date, displayDate))
                     }
                 }
             }
         } catch (e: Exception) {
-            updateLiveHeaderText("Matches")
+            updateLiveHeaderText(getString(R.string.matches))
         }
     }
 
@@ -405,6 +420,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
+        binding.seeMoreBtn.text = getString(R.string.see_more)
+
         binding.seeMoreBtn.setOnClickListener {
             when (currentTab) {
                 MatchTab.FAVORITES -> {
@@ -414,7 +431,7 @@ class HomeFragment : Fragment() {
                         }
                         findNavController().navigate(R.id.action_home_to_allMatches, bundle)
                     } catch (e: Exception) {
-                        Toast.makeText(context, "Opening favorite team matches...", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, getString(R.string.loading) + "...", Toast.LENGTH_SHORT).show()
                     }
                 }
                 else -> {
@@ -425,7 +442,7 @@ class HomeFragment : Fragment() {
                         }
                         findNavController().navigate(R.id.action_home_to_allMatches, bundle)
                     } catch (e: Exception) {
-                        Toast.makeText(context, "Opening matches...", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, getString(R.string.loading) + "...", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -435,12 +452,12 @@ class HomeFragment : Fragment() {
             try {
                 findNavController().navigate(R.id.action_home_to_teamSearch)
             } catch (e: Exception) {
-                Toast.makeText(context, "Opening team search...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.team_search) + "...", Toast.LENGTH_SHORT).show()
             }
         }
 
         binding.notificationId.setOnClickListener {
-            Toast.makeText(context, "Notifications clicked", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.notifications_clicked), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -451,7 +468,7 @@ class HomeFragment : Fragment() {
             }
             findNavController().navigate(R.id.action_home_to_matchDetail, bundle)
         } catch (e: Exception) {
-            Toast.makeText(context, "Opening match details...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.match_details) + "...", Toast.LENGTH_SHORT).show()
         }
     }
 

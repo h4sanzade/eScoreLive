@@ -1,3 +1,4 @@
+// NewsFragment.kt - Fixed with proper string resources
 package com.materialdesign.escorelive.presentation.news
 
 import android.os.Bundle
@@ -43,6 +44,7 @@ class NewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupUI()
         setupRecyclerView()
         setupCategoryTabs()
         setupSwipeRefresh()
@@ -50,6 +52,12 @@ class NewsFragment : Fragment() {
         setupClickListeners()
 
         Log.d("NewsFragment", "NewsFragment created and initialized")
+    }
+
+    private fun setupUI() {
+        // Set header texts with string resources
+        binding.newsHeaderTitle.text = getString(R.string.football_news)
+        binding.newsDescription.text = getString(R.string.latest_football_news)
     }
 
     private fun setupRecyclerView() {
@@ -83,6 +91,12 @@ class NewsFragment : Fragment() {
     }
 
     private fun setupCategoryTabs() {
+        // Set category tab texts with string resources
+        binding.categoryAll.text = getString(R.string.all_news)
+        binding.categoryTransfers.text = getString(R.string.transfers)
+        binding.categoryMatches.text = getString(R.string.matches)
+        binding.categoryInjuries.text = getString(R.string.injuries)
+
         updateCategorySelection(NewsCategory.ALL)
 
         binding.categoryAll.setOnClickListener {
@@ -199,14 +213,14 @@ class NewsFragment : Fragment() {
             binding.newsRecyclerView.visibility = View.GONE
 
             val categoryText = when (currentCategory) {
-                NewsCategory.TRANSFERS -> "transfer news"
-                NewsCategory.MATCHES -> "match reports"
-                NewsCategory.INJURIES -> "injury news"
-                NewsCategory.ALL -> "news"
+                NewsCategory.TRANSFERS -> getString(R.string.transfers).lowercase()
+                NewsCategory.MATCHES -> getString(R.string.matches).lowercase()
+                NewsCategory.INJURIES -> getString(R.string.injuries).lowercase()
+                NewsCategory.ALL -> getString(R.string.news).lowercase()
             }
 
-            binding.emptyStateTitle.text = "No $categoryText found"
-            binding.emptyStateMessage.text = "Pull down to refresh or try a different category"
+            binding.emptyStateTitle.text = getString(R.string.no_news_found).replace("news", categoryText)
+            binding.emptyStateMessage.text = getString(R.string.pull_down_refresh_category)
         } else {
             binding.emptyStateLayout.visibility = View.GONE
             binding.newsRecyclerView.visibility = View.VISIBLE
@@ -215,7 +229,7 @@ class NewsFragment : Fragment() {
 
     private fun updateNewsCount(count: Int) {
         val categoryName = viewModel.getCurrentCategoryString()
-        binding.newsDescription.text = "$categoryName • $count articles"
+        binding.newsDescription.text = getString(R.string.articles_count, categoryName, count)
     }
 
     private fun onNewsClick(newsItem: NewsItem) {
@@ -235,7 +249,7 @@ class NewsFragment : Fragment() {
             findNavController().navigate(R.id.action_news_to_newsDetail, bundle)
         } catch (e: Exception) {
             Log.e("NewsFragment", "Error navigating to news detail", e)
-            Toast.makeText(context, "Opening news: ${newsItem.title}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.loading) + ": ${newsItem.title}", Toast.LENGTH_SHORT).show()
         }
     }
 
