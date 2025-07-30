@@ -1,4 +1,3 @@
-// NewsFragment.kt - Fixed with proper string resources
 package com.materialdesign.escorelive.presentation.news
 
 import android.os.Bundle
@@ -55,8 +54,8 @@ class NewsFragment : Fragment() {
     }
 
     private fun setupUI() {
-        // Set header texts with string resources
-        binding.newsHeaderTitle.text = getString(R.string.football_news)
+        // Fix: Use correct binding references from fragment_news.xml
+        binding.newsTitle.text = getString(R.string.football_news)
         binding.newsDescription.text = getString(R.string.latest_football_news)
     }
 
@@ -177,6 +176,7 @@ class NewsFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
+        // No additional click listeners needed for now
     }
 
     private fun selectCategory(category: NewsCategory) {

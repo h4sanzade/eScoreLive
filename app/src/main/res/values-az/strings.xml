@@ -167,7 +167,6 @@
     <string name="log_out">Çıxış</string>
     <string name="user_name">Hüseyn</string>
     <string name="logout_confirmation">Çıxış etmək istədiyinizə əminsiniz?</string>
-
     <!-- Filter Leagues -->
     <string name="filter_matches_by_league">Oyunları Liqaya Görə Filtrləyin</string>
     <string name="search_leagues">Liqa axtarın...</string>

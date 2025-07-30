@@ -159,6 +159,9 @@
     <string name="app_notifications">App Notifications</string>
     <string name="dark_theme">Dark Theme</string>
     <string name="filter_matches_by">Filter Matches By</string>
+    <string name="more">More</string>
+    <string name="logout_confirmation">Are you sure you want to log out?</string>
+    <string name="articles_count">%1$s • %2$d articles</string>
     <string name="all_leagues">All Leagues</string>
     <string name="language">Language</string>
     <string name="english">English</string>
