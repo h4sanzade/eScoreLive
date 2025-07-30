@@ -1,4 +1,3 @@
-
 package com.materialdesign.escorelive.presentation.account
 
 import android.Manifest
@@ -25,7 +24,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.FragmentAccountBinding
+import com.materialdesign.escorelive.utils.LocaleManager
+import com.materialdesign.escorelive.utils.LanguageSelectorDialog
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AccountFragment : Fragment() {
@@ -34,6 +36,9 @@ class AccountFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: AccountViewModel by viewModels()
+
+    @Inject
+    lateinit var localeManager: LocaleManager
 
     private val imagePickerLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -77,9 +82,23 @@ class AccountFragment : Fragment() {
     private fun setupUI() {
         binding.bottomNavigation.selectedItemId = R.id.accountFragment
         showAccountContent()
+        updateLanguageDisplay()
     }
 
     private fun showAccountContent() {
+        // Account content setup
+    }
+
+    private fun updateLanguageDisplay() {
+        try {
+            val currentLanguage = localeManager.getLanguage(requireContext())
+            val languageDisplayName = localeManager.getLanguageDisplayName(requireContext(), currentLanguage)
+            binding.selectedLanguageText.text = languageDisplayName
+            Log.d("AccountFragment", "Current language: $currentLanguage, Display: $languageDisplayName")
+        } catch (e: Exception) {
+            Log.e("AccountFragment", "Error updating language display", e)
+            binding.selectedLanguageText.text = "English"
+        }
     }
 
     private fun observeViewModel() {
@@ -103,7 +122,6 @@ class AccountFragment : Fragment() {
         viewModel.appSettings.observe(viewLifecycleOwner, Observer { settings ->
             binding.notificationsSwitch.isChecked = settings.notificationsEnabled
             binding.darkThemeSwitch.isChecked = settings.darkThemeEnabled
-            binding.selectedLanguageText.text = settings.selectedLanguage
 
             updateSelectedLeaguesText(settings.selectedLeagues)
         })
@@ -122,6 +140,15 @@ class AccountFragment : Fragment() {
         viewModel.logoutEvent.observe(viewLifecycleOwner, Observer { shouldLogout ->
             if (shouldLogout) {
                 handleLogout()
+            }
+        })
+
+        // Language change observer - YENI
+        viewModel.languageChanged.observe(viewLifecycleOwner, Observer { languageChanged ->
+            if (languageChanged) {
+                Log.d("AccountFragment", "Language changed detected, restarting activity")
+                requireActivity().recreate()
+                viewModel.clearLanguageChanged()
             }
         })
     }
@@ -162,7 +189,9 @@ class AccountFragment : Fragment() {
             openFilterLeaguesScreen()
         }
 
+        // Language selection click listener - DÜZƏLDILMIŞ
         binding.languageRow.setOnClickListener {
+            Log.d("AccountFragment", "Language row clicked!")
             openLanguageSelector()
         }
 
@@ -310,23 +339,59 @@ class AccountFragment : Fragment() {
     }
 
     private fun openLanguageSelector() {
-        val languages = arrayOf("English", "Turkish", "Spanish", "French", "German")
-        val currentLanguage = binding.selectedLanguageText.text.toString()
-        val selectedIndex = languages.indexOf(currentLanguage)
+        Log.d("AccountFragment", "Opening language selector...")
 
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("Select Language")
-            .setSingleChoiceItems(languages, selectedIndex) { dialog, which ->
-                viewModel.updateLanguageSetting(languages[which])
-                dialog.dismiss()
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
+        try {
+            // Simple AlertDialog approach
+            val languages = arrayOf("English", "Azərbaycan")
+            val languageCodes = arrayOf("en", "az")
+            val currentLanguageCode = localeManager.getLanguage(requireContext())
+            val selectedIndex = languageCodes.indexOf(currentLanguageCode)
+
+            Log.d("AccountFragment", "Current language code: $currentLanguageCode, Selected index: $selectedIndex")
+
+            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Select Language / Dil Seçin")
+                .setSingleChoiceItems(languages, selectedIndex) { dialog, which ->
+                    val selectedLanguageCode = languageCodes[which]
+                    val selectedLanguageName = languages[which]
+
+                    Log.d("AccountFragment", "Selected language: $selectedLanguageName ($selectedLanguageCode)")
+
+                    try {
+                        // Update language immediately
+                        localeManager.setLocale(requireContext(), selectedLanguageCode)
+
+                        // Save to ViewModel
+                        viewModel.updateLanguageSettings(selectedLanguageCode, selectedLanguageName)
+
+                        // Show success message
+                        Toast.makeText(requireContext(), "Language changed to $selectedLanguageName", Toast.LENGTH_SHORT).show()
+
+                        dialog.dismiss()
+
+                        // Force restart activity
+                        requireActivity().recreate()
+
+                    } catch (e: Exception) {
+                        Log.e("AccountFragment", "Error changing language", e)
+                        Toast.makeText(requireContext(), "Error changing language: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+
+        } catch (e: Exception) {
+            Log.e("AccountFragment", "Error opening language selector", e)
+            Toast.makeText(requireContext(), "Error opening language selector: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun updateSelectedLeaguesText(selectedLeagues: List<String>) {
         binding.selectedLeaguesText.text = when {
-            selectedLeagues.isEmpty() -> "All Leagues"
+            selectedLeagues.isEmpty() -> getString(R.string.all_leagues)
             selectedLeagues.size == 1 -> selectedLeagues.first()
             selectedLeagues.size <= 3 -> selectedLeagues.joinToString(", ")
             else -> "${selectedLeagues.take(2).joinToString(", ")} +${selectedLeagues.size - 2} more"
@@ -335,9 +400,9 @@ class AccountFragment : Fragment() {
 
     private fun handleLogout() {
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("Log Out")
+            .setTitle(getString(R.string.log_out))
             .setMessage("Are you sure you want to log out?")
-            .setPositiveButton("Log Out") { _, _ ->
+            .setPositiveButton(getString(R.string.log_out)) { _, _ ->
                 performLogout()
             }
             .setNegativeButton("Cancel", null)
@@ -346,7 +411,6 @@ class AccountFragment : Fragment() {
 
     private fun performLogout() {
         try {
-            // Navigate to login and clear the back stack
             findNavController().navigate(
                 R.id.action_account_to_login,
                 null,
@@ -357,7 +421,6 @@ class AccountFragment : Fragment() {
         } catch (e: Exception) {
             Log.e("AccountFragment", "Navigation error during logout", e)
 
-            // Fallback: Start login activity and finish current activity
             try {
                 val intent = Intent(requireContext(),
                     Class.forName("com.materialdesign.escorelive.presentation.auth.LoginActivity"))

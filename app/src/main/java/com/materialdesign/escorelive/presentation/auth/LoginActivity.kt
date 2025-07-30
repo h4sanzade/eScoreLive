@@ -4,21 +4,22 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import com.materialdesign.escorelive.R
 import com.materialdesign.escorelive.databinding.ActivityLoginBinding
 import com.materialdesign.escorelive.presentation.main.MainActivity
 import com.materialdesign.escorelive.data.remote.AuthDataStore
+import com.materialdesign.escorelive.base.BaseActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private val viewModel: AuthViewModel by viewModels()
@@ -56,7 +57,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-
+        // UI setup
     }
 
     private fun observeViewModel() {
@@ -80,10 +81,10 @@ class LoginActivity : AppCompatActivity() {
         viewModel.validationError.observe(this, Observer { error ->
             when (error) {
                 is ValidationError.EmptyUsername -> {
-                    binding.usernameTextInputLayout.error = "Username or email is required"
+                    binding.usernameTextInputLayout.error = getString(R.string.username_or_email) + " is required"
                 }
                 is ValidationError.EmptyPassword -> {
-                    binding.passwordTextInputLayout.error = "Password is required"
+                    binding.passwordTextInputLayout.error = getString(R.string.password) + " is required"
                 }
                 else -> {
                     clearErrors()
@@ -143,7 +144,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun hideLoading() {
         binding.loginButton.isEnabled = true
-        binding.loginButton.text = "Login"
+        binding.loginButton.text = getString(R.string.sign_in)
         binding.progressBar.visibility = android.view.View.GONE
     }
 

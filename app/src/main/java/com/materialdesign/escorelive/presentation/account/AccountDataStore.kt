@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import com.materialdesign.escorelive.utils.LocaleManager
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -30,6 +31,7 @@ class AccountDataStore @Inject constructor(
         private val NOTIFICATIONS_ENABLED = booleanPreferencesKey("notifications_enabled")
         private val DARK_THEME_ENABLED = booleanPreferencesKey("dark_theme_enabled")
         private val SELECTED_LANGUAGE = stringPreferencesKey("selected_language")
+        private val SELECTED_LANGUAGE_CODE = stringPreferencesKey("selected_language_code")
         private val SELECTED_LEAGUES = stringSetPreferencesKey("selected_leagues")
     }
 
@@ -109,6 +111,7 @@ class AccountDataStore @Inject constructor(
                 notificationsEnabled = preferences[NOTIFICATIONS_ENABLED] ?: true,
                 darkThemeEnabled = preferences[DARK_THEME_ENABLED] ?: true,
                 selectedLanguage = preferences[SELECTED_LANGUAGE] ?: "English",
+                selectedLanguageCode = preferences[SELECTED_LANGUAGE_CODE] ?: LocaleManager.LANGUAGE_ENGLISH,
                 selectedLeagues = preferences[SELECTED_LEAGUES]?.toList() ?: emptyList()
             )
         }.first()
@@ -129,6 +132,19 @@ class AccountDataStore @Inject constructor(
     suspend fun saveLanguageSetting(language: String) {
         dataStore.edit { preferences ->
             preferences[SELECTED_LANGUAGE] = language
+        }
+    }
+
+    suspend fun saveLanguageCodeSetting(languageCode: String) {
+        dataStore.edit { preferences ->
+            preferences[SELECTED_LANGUAGE_CODE] = languageCode
+        }
+    }
+
+    suspend fun saveLanguageSettings(language: String, languageCode: String) {
+        dataStore.edit { preferences ->
+            preferences[SELECTED_LANGUAGE] = language
+            preferences[SELECTED_LANGUAGE_CODE] = languageCode
         }
     }
 
@@ -153,6 +169,12 @@ class AccountDataStore @Inject constructor(
     suspend fun getSelectedLanguage(): String {
         return dataStore.data.map { preferences ->
             preferences[SELECTED_LANGUAGE] ?: "English"
+        }.first()
+    }
+
+    suspend fun getSelectedLanguageCode(): String {
+        return dataStore.data.map { preferences ->
+            preferences[SELECTED_LANGUAGE_CODE] ?: LocaleManager.LANGUAGE_ENGLISH
         }.first()
     }
 
@@ -187,7 +209,7 @@ class AccountDataStore @Inject constructor(
             // Only clear app settings and session-related data
             preferences.remove(NOTIFICATIONS_ENABLED)
             preferences.remove(DARK_THEME_ENABLED)
-            preferences.remove(SELECTED_LANGUAGE)
+            // Don't clear language settings as they should persist
             preferences.remove(SELECTED_LEAGUES)
         }
     }
@@ -211,5 +233,6 @@ data class AppSettings(
     val notificationsEnabled: Boolean = true,
     val darkThemeEnabled: Boolean = true,
     val selectedLanguage: String = "English",
+    val selectedLanguageCode: String = LocaleManager.LANGUAGE_ENGLISH,
     val selectedLeagues: List<String> = emptyList()
 )

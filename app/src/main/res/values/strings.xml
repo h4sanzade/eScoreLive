@@ -7,6 +7,28 @@
     <string name="news">News</string>
     <string name="account">Profile</string>
 
+    <string name="select_language">Select Language</string>
+    <string name="language_changed">Language changed successfully</string>
+    <string name="restart_required">Please restart the app to apply language changes</string>
+    <string name="cancel">Cancel</string>
+    <string name="apply">Apply</string>
+
+    <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="continue_text">Continue</string>
+    <string name="back">Back</string>
+    <string name="save">Save</string>
+
+    <string name="error_occurred">An error occurred</string>
+    <string name="network_error">Network error. Please check your connection.</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="storage_permission_needed">Storage permission is needed to select a profile photo</string>
+
+    <string name="profile_photo_updated">Profile photo updated!</string>
+    <string name="settings_saved">Settings saved successfully</string>
+    <string name="changes_applied">Changes applied successfully</string>
+
     <!-- Home Screen -->
     <string name="upcoming_matches">Upcoming Matches</string>
     <string name="live_results">Live &amp; Results</string>
@@ -271,6 +293,8 @@
 
     <!-- Long text content -->
 
+
+
     <string name="terms_text">1. USE OF FOOTBALL APPLICATION\n\nBy using the EScore Live football application, you accept these terms of use. Our application provides live football results, news and statistics.\n\n2. ACCOUNT AND REGISTRATION\n\nYou are required to provide accurate information during registration. It is your responsibility to keep your password secure. Your account may be closed if false information is provided.\n\n3. APPLICATION SERVICES\n\n- Live football match results\n- Team and player statistics\n- Football news and transfers\n- Following your favorite teams\n- League tables and fixture information\n\n4. USAGE RULES\n\nUse the application for personal use only. Using data for commercial purposes is prohibited. Spam or malicious activity will result in account closure.\n\n5. DATA ACCURACY\n\nFootball results and statistics are obtained from third-party sources. We do our best for data accuracy, but cannot guarantee 100% precision.\n\n6. INTERNET CONNECTION\n\nThe application requires an internet connection. We are not responsible for data loss that may occur due to connection problems.\n\n7. NOTIFICATIONS\n\nWe may send match start, goal and result notifications. You can turn off these notifications from settings.\n\n8. PERSONAL DATA PROTECTION\n\nYour personal data is under security. We do not share your data with third parties. We use it only for application functionality.\n\n9. SERVICE CHANGES\n\nWe reserve the right to improve or discontinue application services. We will inform you in advance about major changes.\n\n10. ACCOUNT TERMINATION\n\nYou can delete your account at any time. We reserve the right to close your account if rules are violated.\n\n11. LIMITATION OF LIABILITY\n\nWe are not responsible for any damage that may arise from using the application. The application is provided as is.\n\n12. CHANGES TO TERMS\n\nWe may update these terms at any time. Changes take effect after being announced in the application. Continued use indicates acceptance of new terms.\n\n13. CONTACT\n\nFor your questions, you can contact us through the contact section within the application.\n\nLast updated: July 2025</string>
 
     <!-- Sample Content -->
@@ -293,5 +317,7 @@
     <string name="week_range_format">%s - %s</string>
     <string name="match_date_today">Today, %s</string>
     <string name="match_date_format">%s Mar %d</string>
+
+
 
 </resources>

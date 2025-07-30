@@ -4,11 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Observer
 import com.materialdesign.escorelive.databinding.ActivityRegisterBinding
+import com.materialdesign.escorelive.base.BaseActivity
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.core.content.ContextCompat
 import com.materialdesign.escorelive.R
@@ -19,12 +19,11 @@ import android.view.View
 import android.view.ViewTreeObserver
 
 @AndroidEntryPoint
-class RegisterActivity : AppCompatActivity() {
+class RegisterActivity : BaseActivity() {
 
     private lateinit var binding: ActivityRegisterBinding
     private val viewModel: AuthViewModel by viewModels()
 
-    private lateinit var termsOverlayView: View
     private var termsAccepted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,21 +43,18 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        termsOverlayView = findViewById(R.id.terms_overlay)
-
         updateRegisterButtonState(false)
-
         updateTermsText()
     }
 
     private fun updateTermsText() {
         if (termsAccepted) {
-            binding.termsText.text = "✓ Terms and Conditions accepted"
+            binding.termsText.text = "✓ " + getString(R.string.read_accept_terms) + " accepted"
             binding.termsText.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light))
             binding.termsCheckbox.isChecked = true
             binding.termsCheckbox.isEnabled = false
         } else {
-            binding.termsText.text = "Read and accept Terms and Conditions"
+            binding.termsText.text = getString(R.string.read_accept_terms)
             binding.termsText.setTextColor(ContextCompat.getColor(this, R.color.accent_color))
             binding.termsCheckbox.isChecked = false
             binding.termsCheckbox.isEnabled = false
@@ -66,65 +62,84 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun showTermsDialog() {
-        termsOverlayView.visibility = View.VISIBLE
+        // Find the terms overlay in the current layout
+        val termsOverlay = findViewById<View>(R.id.terms_overlay)
 
-        val termsScrollView = termsOverlayView.findViewById<ScrollView>(R.id.terms_scroll_view)
-        val scrollInstruction = termsOverlayView.findViewById<TextView>(R.id.scroll_instruction)
-        val closeButton = termsOverlayView.findViewById<Button>(R.id.close_button)
-        val acceptButton = termsOverlayView.findViewById<Button>(R.id.accept_button)
+        if (termsOverlay != null) {
+            termsOverlay.visibility = View.VISIBLE
 
-        var hasScrolledToBottom = false
+            val termsScrollView = termsOverlay.findViewById<ScrollView>(R.id.terms_scroll_view)
+            val scrollInstruction = termsOverlay.findViewById<TextView>(R.id.scroll_instruction)
+            val closeButton = termsOverlay.findViewById<Button>(R.id.close_button)
+            val acceptButton = termsOverlay.findViewById<Button>(R.id.accept_button)
 
-        termsScrollView.viewTreeObserver.addOnScrollChangedListener(object : ViewTreeObserver.OnScrollChangedListener {
-            override fun onScrollChanged() {
-                val view = termsScrollView.getChildAt(0)
-                if (view != null) {
-                    val scrollY = termsScrollView.scrollY
-                    val diff = (view.bottom - (termsScrollView.height + scrollY))
+            var hasScrolledToBottom = false
 
-                    if (diff <= 10 && !hasScrolledToBottom) {
-                        hasScrolledToBottom = true
-                        enableAcceptButton(acceptButton, scrollInstruction)
-                        termsScrollView.viewTreeObserver.removeOnScrollChangedListener(this)
+            termsScrollView?.viewTreeObserver?.addOnScrollChangedListener(object : ViewTreeObserver.OnScrollChangedListener {
+                override fun onScrollChanged() {
+                    val view = termsScrollView.getChildAt(0)
+                    if (view != null) {
+                        val scrollY = termsScrollView.scrollY
+                        val diff = (view.bottom - (termsScrollView.height + scrollY))
+
+                        if (diff <= 10 && !hasScrolledToBottom) {
+                            hasScrolledToBottom = true
+                            enableAcceptButton(acceptButton, scrollInstruction)
+                            termsScrollView.viewTreeObserver.removeOnScrollChangedListener(this)
+                        }
                     }
                 }
-            }
-        })
+            })
 
-        closeButton.setOnClickListener {
-            hideTermsDialog()
-        }
-
-        acceptButton.setOnClickListener {
-            if (hasScrolledToBottom) {
-                termsAccepted = true
-                updateTermsText()
-                updateRegisterButtonState(true)
+            closeButton?.setOnClickListener {
                 hideTermsDialog()
-                Toast.makeText(this, "Terms accepted!", Toast.LENGTH_SHORT).show()
             }
-        }
 
-        termsOverlayView.alpha = 0f
-        termsOverlayView.animate().alpha(1f).setDuration(300).start()
+            acceptButton?.setOnClickListener {
+                if (hasScrolledToBottom) {
+                    termsAccepted = true
+                    updateTermsText()
+                    updateRegisterButtonState(true)
+                    hideTermsDialog()
+                    Toast.makeText(this, "Terms accepted!", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            termsOverlay.alpha = 0f
+            termsOverlay.animate().alpha(1f).setDuration(300).start()
+        } else {
+            // Fallback: Simple dialog
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(getString(R.string.terms_and_conditions))
+                .setMessage("By using this app, you agree to our terms and conditions. Do you accept?")
+                .setPositiveButton("Accept") { _, _ ->
+                    termsAccepted = true
+                    updateTermsText()
+                    updateRegisterButtonState(true)
+                    Toast.makeText(this, "Terms accepted!", Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
     }
 
     private fun hideTermsDialog() {
-        termsOverlayView.animate()
-            .alpha(0f)
-            .setDuration(200)
-            .withEndAction {
-                termsOverlayView.visibility = View.GONE
+        val termsOverlay = findViewById<View>(R.id.terms_overlay)
+        termsOverlay?.animate()
+            ?.alpha(0f)
+            ?.setDuration(200)
+            ?.withEndAction {
+                termsOverlay.visibility = View.GONE
             }
-            .start()
+            ?.start()
     }
 
-    private fun enableAcceptButton(acceptButton: Button, scrollInstruction: TextView) {
-        acceptButton.isEnabled = true
-        acceptButton.backgroundTintList = ContextCompat.getColorStateList(this, R.color.accent_color)
+    private fun enableAcceptButton(acceptButton: Button?, scrollInstruction: TextView?) {
+        acceptButton?.isEnabled = true
+        acceptButton?.backgroundTintList = ContextCompat.getColorStateList(this, R.color.accent_color)
 
-        scrollInstruction.text = "Now you can accept the terms"
-        scrollInstruction.setTextColor(ContextCompat.getColor(this, R.color.accent_color))
+        scrollInstruction?.text = "Now you can accept the terms"
+        scrollInstruction?.setTextColor(ContextCompat.getColor(this, R.color.accent_color))
     }
 
     private fun updateRegisterButtonState(enabled: Boolean) {
@@ -132,7 +147,7 @@ class RegisterActivity : AppCompatActivity() {
 
         if (enabled) {
             binding.registerButton.backgroundTintList = ContextCompat.getColorStateList(this, R.color.accent_color)
-            binding.registerButton.text = "Create Account"
+            binding.registerButton.text = getString(R.string.create_account)
         } else {
             binding.registerButton.backgroundTintList = ContextCompat.getColorStateList(this, android.R.color.darker_gray)
             binding.registerButton.text = "Accept Terms to Continue"
@@ -161,22 +176,22 @@ class RegisterActivity : AppCompatActivity() {
             clearErrors()
             when (error) {
                 is ValidationError.EmptyFirstName -> {
-                    binding.firstNameTextInputLayout.error = "First name is required"
+                    binding.firstNameTextInputLayout.error = getString(R.string.first_name) + " is required"
                 }
                 is ValidationError.EmptyLastName -> {
-                    binding.lastNameTextInputLayout.error = "Last name is required"
+                    binding.lastNameTextInputLayout.error = getString(R.string.last_name) + " is required"
                 }
                 is ValidationError.EmptyUsername -> {
-                    binding.usernameTextInputLayout.error = "Username is required"
+                    binding.usernameTextInputLayout.error = getString(R.string.username) + " is required"
                 }
                 is ValidationError.EmptyEmail -> {
-                    binding.emailTextInputLayout.error = "Email is required"
+                    binding.emailTextInputLayout.error = getString(R.string.email) + " is required"
                 }
                 is ValidationError.InvalidEmail -> {
                     binding.emailTextInputLayout.error = "Please enter a valid email"
                 }
                 is ValidationError.EmptyPassword -> {
-                    binding.passwordTextInputLayout.error = "Password is required"
+                    binding.passwordTextInputLayout.error = getString(R.string.password) + " is required"
                 }
                 is ValidationError.WeakPassword -> {
                     binding.passwordTextInputLayout.error = "Password must be at least 6 characters"
@@ -280,12 +295,9 @@ class RegisterActivity : AppCompatActivity() {
         finish()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
     override fun onBackPressed() {
-        if (termsOverlayView.visibility == View.VISIBLE) {
+        val termsOverlay = findViewById<View>(R.id.terms_overlay)
+        if (termsOverlay?.visibility == View.VISIBLE) {
             hideTermsDialog()
         } else {
             super.onBackPressed()

@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import android.content.Context
+import com.materialdesign.escorelive.utils.LocaleManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -14,6 +15,7 @@ import javax.inject.Inject
 class AccountViewModel @Inject constructor(
     private val accountDataStore: AccountDataStore,
     private val authRepository: com.materialdesign.escorelive.data.remote.repository.AuthRepository,
+    private val localeManager: LocaleManager,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -35,6 +37,9 @@ class AccountViewModel @Inject constructor(
     private val _logoutEvent = MutableLiveData<Boolean>()
     val logoutEvent: LiveData<Boolean> = _logoutEvent
 
+    private val _languageChanged = MutableLiveData<Boolean>()
+    val languageChanged: LiveData<Boolean> = _languageChanged
+
     fun loadUserData() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -47,6 +52,14 @@ class AccountViewModel @Inject constructor(
 
                 val settings = accountDataStore.getAppSettings()
                 _appSettings.value = settings
+
+                // Update locale based on saved language preference
+                val currentLanguageCode = localeManager.getLanguage(context)
+                val savedLanguageCode = settings.selectedLanguageCode
+
+                if (currentLanguageCode != savedLanguageCode) {
+                    localeManager.setLocale(context, savedLanguageCode)
+                }
 
             } catch (e: Exception) {
                 _error.value = "Failed to load user data: ${e.message}"
@@ -139,6 +152,30 @@ class AccountViewModel @Inject constructor(
         }
     }
 
+    fun updateLanguageSettings(languageCode: String, languageDisplayName: String) {
+        viewModelScope.launch {
+            try {
+                // Update locale in LocaleManager
+                localeManager.setLocale(context, languageCode)
+
+                // Save to DataStore
+                accountDataStore.saveLanguageSettings(languageDisplayName, languageCode)
+
+                // Update UI state
+                _appSettings.value = _appSettings.value?.copy(
+                    selectedLanguage = languageDisplayName,
+                    selectedLanguageCode = languageCode
+                )
+
+                // Notify that language changed
+                _languageChanged.value = true
+
+            } catch (e: Exception) {
+                _error.value = "Failed to save language settings: ${e.message}"
+            }
+        }
+    }
+
     fun updateSelectedLeagues(leagues: List<String>) {
         viewModelScope.launch {
             try {
@@ -150,10 +187,28 @@ class AccountViewModel @Inject constructor(
         }
     }
 
+    fun getCurrentLanguageCode(): String {
+        return localeManager.getLanguage(context)
+    }
+
+    fun getAvailableLanguages(): List<com.materialdesign.escorelive.utils.LanguageItem> {
+        return localeManager.getAvailableLanguages()
+    }
+
+    fun changeLanguage(languageCode: String) {
+        viewModelScope.launch {
+            try {
+                val languageDisplayName = localeManager.getLanguageDisplayName(context, languageCode)
+                updateLanguageSettings(languageCode, languageDisplayName)
+            } catch (e: Exception) {
+                _error.value = "Failed to change language: ${e.message}"
+            }
+        }
+    }
+
     fun logout() {
         viewModelScope.launch {
             try {
-                // Only clear login session, keep personal data
                 authRepository.logout()
                 _logoutEvent.value = true
             } catch (e: Exception) {
@@ -164,5 +219,9 @@ class AccountViewModel @Inject constructor(
 
     fun clearError() {
         _error.value = null
+    }
+
+    fun clearLanguageChanged() {
+        _languageChanged.value = false
     }
 }

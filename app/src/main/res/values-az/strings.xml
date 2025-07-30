@@ -22,7 +22,29 @@
     <string name="today">Bugün</string>
     <string name="upcoming">Gələcək</string>
     <string name="score">Hesab</string>
-    <string name="favorites">Sevimlilər</string>
+    <string name="favorites">Favoriler</string>
+
+    <string name="select_language">Dili seçin</string>
+    <string name="language_changed">Dil uğurla dəyişdirildi</string>
+    <string name="restart_required">Dəyişikliklərin tətbiqi üçün tətbiqi yenidən başladın</string>
+    <string name="cancel">Ləğv et</string>
+    <string name="apply">Tətbiq et</string>
+
+    <string name="ok">OK</string>
+    <string name="yes">Bəli</string>
+    <string name="no">Xeyr</string>
+    <string name="continue_text">Davam et</string>
+    <string name="back">Geri</string>
+    <string name="save">Yadda saxla</string>
+
+    <string name="error_occurred">Xəta baş verdi</string>
+    <string name="network_error">Şəbəkə xətası. Zəhmət olmasa bağlantını yoxlayın.</string>
+    <string name="permission_denied">İcazə rədd edildi</string>
+    <string name="storage_permission_needed">Profil şəklini seçmək üçün yaddaş icazəsi tələb olunur</string>
+
+    <string name="profile_photo_updated">Profil şəkli yeniləndi!</string>
+    <string name="settings_saved">Tənzimləmələr uğurla yadda saxlanıldı</string>
+    <string name="changes_applied">Dəyişikliklər uğurla tətbiq olundu</string>
 
     <!-- Team Search -->
     <string name="team_search">Komanda Axtarışı</string>
