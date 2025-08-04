@@ -203,7 +203,6 @@ class CompetitionRepository @Inject constructor(
             competitions.filter { competition ->
                 TOP_COMPETITION_IDS.contains(competition.id) || competition.isTopCompetition
             }.sortedWith(compareBy<Competition> { competition ->
-                // Sort by predefined order first
                 TOP_COMPETITION_IDS.indexOf(competition.id).takeIf { it >= 0 } ?: Int.MAX_VALUE
             }.thenBy { it.name })
         }

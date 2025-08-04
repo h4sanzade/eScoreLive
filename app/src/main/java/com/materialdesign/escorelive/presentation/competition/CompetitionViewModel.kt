@@ -44,7 +44,6 @@ class CompetitionViewModel @Inject constructor(
     private val _regionalCompetitions = MutableStateFlow<Map<String, List<Competition>>>(emptyMap())
     val regionalCompetitions: StateFlow<Map<String, List<Competition>>> = _regionalCompetitions.asStateFlow()
 
-    // Enhanced standings data with fallback
     private val _standingsData = MutableStateFlow<List<TeamStanding>>(emptyList())
     val standingsData: StateFlow<List<TeamStanding>> = _standingsData.asStateFlow()
 
@@ -110,7 +109,6 @@ class CompetitionViewModel @Inject constructor(
                     }
                 }
 
-                // If no standings found, try to get teams from API and create fallback
                 if (!standingsFound) {
                     Log.d(TAG, "No standings found, trying to get teams from API for ${competition.name}")
                     createFallbackStandingsFromAPI(competition, leagueId, seasonsToTry)
@@ -133,12 +131,10 @@ class CompetitionViewModel @Inject constructor(
     ) {
         Log.d(TAG, "Creating fallback standings from API for: ${competition.name}")
 
-        // Try to get teams from API for different seasons
         for (season in seasonsToTry) {
             try {
                 Log.d(TAG, "Trying to get teams for season $season")
 
-                // Use searchTeamsAdvanced as a fallback to get teams for the league
                 val teamsResult = footballRepository.searchTeamsAdvanced("league:$leagueId")
 
                 teamsResult.onSuccess { teamSearchResults ->
@@ -160,7 +156,6 @@ class CompetitionViewModel @Inject constructor(
                     }
                 }
 
-                // Alternative: Try to get teams by making a fixtures call and extracting teams
                 try {
                     val fixturesResult = footballRepository.getMatchesByLeague(leagueId, season)
 
@@ -217,7 +212,6 @@ class CompetitionViewModel @Inject constructor(
     private fun createZeroStandings(teams: List<com.materialdesign.escorelive.data.remote.dto.TeamData>): List<TeamStanding> {
         Log.d(TAG, "Creating zero standings for ${teams.size} teams")
 
-        // Shuffle teams randomly so it's not always alphabetical
         val shuffledTeams = teams.shuffled()
 
         return shuffledTeams.mapIndexed { index, teamData ->
@@ -345,7 +339,6 @@ class CompetitionViewModel @Inject constructor(
 
             updateFilteredCompetitions()
 
-            // Update account competitions count
             updateAccountCompetitionsCount()
         }
     }
@@ -353,8 +346,7 @@ class CompetitionViewModel @Inject constructor(
     private suspend fun updateAccountCompetitionsCount() {
         try {
             val favoriteCompetitionsCount = getFavoriteIds().size
-            // You'll need to inject AccountDataStore here or get it through another way
-            // For now, we'll leave this as a placeholder
+
             Log.d(TAG, "Favorite competitions count: $favoriteCompetitionsCount")
         } catch (e: Exception) {
             Log.e(TAG, "Error updating account competitions count", e)

@@ -62,26 +62,21 @@ class StandingsAdapter : ListAdapter<TeamStanding, StandingsAdapter.StandingView
             setupGoalDifference(standing.goalsDiff)
             setupTeamForm(standing.form)
 
-            // Add entrance animation
             addEntranceAnimation()
         }
 
         private fun setupPositionBackground(rank: Int) {
             val (backgroundRes, textColorRes) = when (rank) {
                 in 1..4 -> {
-                    // Champions League qualification (green)
                     Pair(R.drawable.position_champions_bg, android.R.color.white)
                 }
                 in 5..6 -> {
-                    // Europa League qualification (blue)
                     Pair(R.drawable.position_europa_bg, android.R.color.white)
                 }
                 in 18..20 -> {
-                    // Relegation zone (red)
                     Pair(R.drawable.position_relegation_bg, android.R.color.white)
                 }
                 else -> {
-                    // Normal position (default)
                     Pair(R.drawable.position_normal_bg, android.R.color.black)
                 }
             }
@@ -89,7 +84,6 @@ class StandingsAdapter : ListAdapter<TeamStanding, StandingsAdapter.StandingView
             positionText.setBackgroundResource(backgroundRes)
             positionText.setTextColor(ContextCompat.getColor(itemView.context, textColorRes))
 
-            // Add special animation for top 3 positions
             if (rank <= 3) {
                 positionText.animate()
                     .scaleX(1.1f)
@@ -131,7 +125,6 @@ class StandingsAdapter : ListAdapter<TeamStanding, StandingsAdapter.StandingView
                 val formColor = calculateFormColor(recentForm)
                 formText.setTextColor(ContextCompat.getColor(itemView.context, formColor))
 
-                // Add form background
                 val formBgRes = when {
                     recentForm.count { it == 'W' } >= 4 -> R.drawable.form_excellent_bg
                     recentForm.count { it == 'W' } >= 2 -> R.drawable.form_good_bg

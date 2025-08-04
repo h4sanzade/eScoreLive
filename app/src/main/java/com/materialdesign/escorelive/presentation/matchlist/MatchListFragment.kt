@@ -54,7 +54,6 @@ class MatchListFragment : Fragment() {
         setupClickListeners()
         setupSwipeRefresh()
 
-        // Check if this is favorites mode
         val selectedDate = arguments?.getString("selectedDate") ?: dateFormat.format(Date())
         val isFavoritesMode = selectedDate == "FAVORITES_MODE"
 

@@ -20,7 +20,6 @@ object FixtureMapper {
             null
         }
 
-        // Determine match state
         val isLive = fixtureData.fixture.status.short in listOf("LIVE", "1H", "2H", "HT")
         val isFinished = fixtureData.fixture.status.short in listOf("FT", "AET", "PEN", "PST", "CANC", "ABD", "AWD", "WO")
         val isUpcoming = fixtureData.fixture.status.short in listOf("NS", "TBD")

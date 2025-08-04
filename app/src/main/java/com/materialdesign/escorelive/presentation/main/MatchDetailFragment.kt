@@ -99,7 +99,6 @@ class MatchDetailFragment : Fragment() {
             stats?.let { updateStatistics(it) }
         })
 
-        // H2H Observer
         viewModel.h2hMatches.observe(viewLifecycleOwner, Observer { h2hMatches ->
             if (h2hMatches.isNotEmpty()) {
                 h2hAdapter.submitList(h2hMatches)
@@ -110,8 +109,6 @@ class MatchDetailFragment : Fragment() {
                 binding.h2hEmptyState.visibility = View.VISIBLE
             }
         })
-
-        // Standings Observer
         viewModel.standings.observe(viewLifecycleOwner, Observer { standings ->
             if (standings.isNotEmpty()) {
                 standingsAdapter.submitList(standings)
@@ -137,7 +134,6 @@ class MatchDetailFragment : Fragment() {
 
     private fun updateMatchInfo(match: Match) {
         with(binding) {
-            // Teams
             homeTeamName.text = match.homeTeam.name
             awayTeamName.text = match.awayTeam.name
 

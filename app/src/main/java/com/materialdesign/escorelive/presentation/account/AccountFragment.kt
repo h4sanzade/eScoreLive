@@ -274,26 +274,20 @@ class AccountFragment : Fragment() {
         try {
             Log.d("AccountFragment", "Attempting to navigate to favorite competitions")
 
-            // Show immediate feedback
             Toast.makeText(context, getString(R.string.competitions) + " - " + getString(R.string.loading), Toast.LENGTH_SHORT).show()
 
-            // Try navigation with proper action
             findNavController().navigate(R.id.action_account_to_favoriteCompetitions)
             Log.d("AccountFragment", "Navigation to favorite competitions successful")
 
         } catch (e: Exception) {
             Log.e("AccountFragment", "Navigation error to favorite competitions", e)
-
-            // Show error and fallback dialog
             Toast.makeText(context, getString(R.string.error_occurred) + ": Navigation failed", Toast.LENGTH_LONG).show()
 
-            // Show a fallback dialog with competitions info
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.favorite_competitions))
                 .setMessage("Favorite competitions feature is available. Navigation issue detected.")
                 .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
                     dialog.dismiss()
-                    // Try alternative navigation or open a simple screen
                     showComingSoonMessage("Favorite Competitions")
                 }
                 .setNegativeButton(getString(R.string.cancel), null)
@@ -305,17 +299,14 @@ class AccountFragment : Fragment() {
         try {
             Log.d("AccountFragment", "Attempting to navigate to favorite teams")
 
-            // Show immediate feedback
             Toast.makeText(context, getString(R.string.teams) + " - " + getString(R.string.loading), Toast.LENGTH_SHORT).show()
 
-            // Try navigation with proper action
             findNavController().navigate(R.id.action_account_to_favoriteTeams)
             Log.d("AccountFragment", "Navigation to favorite teams successful")
 
         } catch (e: Exception) {
             Log.e("AccountFragment", "Navigation error to favorite teams", e)
 
-            // Show error and fallback dialog
             Toast.makeText(context, getString(R.string.error_occurred) + ": Navigation failed", Toast.LENGTH_LONG).show()
 
             // Show a fallback dialog with teams info

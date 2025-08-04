@@ -52,8 +52,6 @@ class AccountViewModel @Inject constructor(
 
                 val settings = accountDataStore.getAppSettings()
                 _appSettings.value = settings
-
-                // Update locale based on saved language preference
                 val currentLanguageCode = localeManager.getLanguage(context)
                 val savedLanguageCode = settings.selectedLanguageCode
 
@@ -70,16 +68,12 @@ class AccountViewModel @Inject constructor(
     }
 
     private suspend fun loadActualFavoriteCounts(): FavoriteCounts {
-        // Get actual favorite teams count
         val teamsCount = getFavoriteTeamsCount()
 
-        // Get actual favorite competitions count
         val competitionsCount = getFavoriteCompetitionsCount()
 
-        // Players remains 0 as requested
         val playersCount = 0
 
-        // Update the stored counts
         accountDataStore.updateFavoriteCounts(competitionsCount, teamsCount, playersCount)
 
         return FavoriteCounts(
@@ -155,19 +149,15 @@ class AccountViewModel @Inject constructor(
     fun updateLanguageSettings(languageCode: String, languageDisplayName: String) {
         viewModelScope.launch {
             try {
-                // Update locale in LocaleManager
                 localeManager.setLocale(context, languageCode)
 
-                // Save to DataStore
                 accountDataStore.saveLanguageSettings(languageDisplayName, languageCode)
 
-                // Update UI state
                 _appSettings.value = _appSettings.value?.copy(
                     selectedLanguage = languageDisplayName,
                     selectedLanguageCode = languageCode
                 )
 
-                // Notify that language changed
                 _languageChanged.value = true
 
             } catch (e: Exception) {

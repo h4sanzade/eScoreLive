@@ -53,12 +53,10 @@ class FavoriteCompetitionsViewModel @Inject constructor(
             try {
                 competitionRepository.removeFromFavorites(competition.id)
 
-                // Remove from current list immediately
                 val currentList = _favoriteCompetitions.value?.toMutableList() ?: mutableListOf()
                 currentList.removeAll { it.id == competition.id }
                 _favoriteCompetitions.value = currentList
 
-                // Update account count
                 updateAccountCompetitionsCount(currentList.size)
 
             } catch (e: Exception) {
@@ -76,7 +74,6 @@ class FavoriteCompetitionsViewModel @Inject constructor(
                 players = currentCounts.players
             )
         } catch (e: Exception) {
-            // Handle error silently
         }
     }
 

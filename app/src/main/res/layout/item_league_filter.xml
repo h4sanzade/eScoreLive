@@ -1,79 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:background="?android:attr/selectableItemBackground"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/card_background"
+    android:foreground="?android:attr/selectableItemBackground"
     android:clickable="true"
-    android:focusable="true"
-    android:padding="16dp">
+    android:focusable="true">
 
-    <androidx.cardview.widget.CardView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        app:cardCornerRadius="6dp"
-        app:cardElevation="2dp"
-        app:cardBackgroundColor="@color/card_background"
-        android:layout_marginEnd="16dp">
-
-        <ImageView
-            android:id="@+id/leagueFlagImage"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            tools:src="@drawable/ic_placeholder" />
-
-    </androidx.cardview.widget.CardView>
-
-    <!-- League Info -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp">
 
-        <TextView
-            android:id="@+id/leagueName"
+        <androidx.cardview.widget.CardView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/white"
+            android:layout_marginEnd="16dp">
+
+            <ImageView
+                android:id="@+id/leagueFlagImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                tools:src="@drawable/ic_placeholder" />
+
+        </androidx.cardview.widget.CardView>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/leagueName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Premier League"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/mulish_bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/leagueCountry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="England"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray"
+                android:fontFamily="@font/mulish_regular"
+                android:layout_marginTop="2dp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Premier League"
-            android:textSize="16sp"
-            android:textColor="@color/white"
-            android:fontFamily="@font/mulish_bold"
-            android:maxLines="1"
-            android:ellipsize="end" />
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginStart="12dp">
 
-        <TextView
-            android:id="@+id/leagueCountry"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="England"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray"
-            android:fontFamily="@font/mulish_regular"
-            android:layout_marginTop="2dp"
-            android:maxLines="1"
-            android:ellipsize="end" />
+            <CheckBox
+                android:id="@+id/leagueCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="@android:color/holo_red_light"
+                android:checked="false" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-    <!-- Checkbox -->
-    <CheckBox
-        android:id="@+id/leagueCheckbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:buttonTint="@color/accent_color"
-        android:checked="false" />
-
     <View
+        android:id="@+id/selectedBorder"
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@android:color/darker_gray"
-        android:alpha="0.2"
-        android:layout_marginStart="72dp" />
-</LinearLayout>
+        android:layout_height="2dp"
+        android:background="@android:color/holo_red_light"
+        android:layout_gravity="bottom"
+        android:visibility="gone" />
 
+</androidx.cardview.widget.CardView>

@@ -54,7 +54,6 @@ class NewsFragment : Fragment() {
     }
 
     private fun setupUI() {
-        // Fix: Use correct binding references from fragment_news.xml
         binding.newsTitle.text = getString(R.string.football_news)
         binding.newsDescription.text = getString(R.string.latest_football_news)
     }
@@ -90,7 +89,6 @@ class NewsFragment : Fragment() {
     }
 
     private fun setupCategoryTabs() {
-        // Set category tab texts with string resources
         binding.categoryAll.text = getString(R.string.all_news)
         binding.categoryTransfers.text = getString(R.string.transfers)
         binding.categoryMatches.text = getString(R.string.matches)
@@ -176,7 +174,6 @@ class NewsFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        // No additional click listeners needed for now
     }
 
     private fun selectCategory(category: NewsCategory) {

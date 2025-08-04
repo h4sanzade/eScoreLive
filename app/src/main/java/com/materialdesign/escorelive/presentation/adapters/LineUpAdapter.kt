@@ -100,7 +100,6 @@ class LineupAdapter : ListAdapter<LineupPlayer, LineupAdapter.LineupViewHolder>(
 
             playerNumber.setBackgroundResource(R.drawable.jersey_number_bg)
 
-            // Position-based styling
             val positionColor = when (player.position.uppercase()) {
                 "GK" -> android.R.color.holo_orange_light
                 in listOf("CB", "LB", "RB", "LWB", "RWB") -> android.R.color.holo_blue_light

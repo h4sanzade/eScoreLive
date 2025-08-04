@@ -353,7 +353,7 @@ class FootballRepository @Inject constructor(
                         continue
                     }
                 }
-                popularLeagues.firstOrNull() // Fallback
+                popularLeagues.firstOrNull()
             }
         }
     }

@@ -45,7 +45,6 @@ class AuthRepository @Inject constructor(
                         )
                     )
 
-                    // Save user data to AccountDataStore
                     accountDataStore.saveUserData(
                         firstName = user.firstName,
                         lastName = user.lastName,
@@ -85,7 +84,6 @@ class AuthRepository @Inject constructor(
                     password = password
                 )
 
-                // Save user data to AccountDataStore
                 accountDataStore.saveUserData(
                     firstName = firstName,
                     lastName = lastName,

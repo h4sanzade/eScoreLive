@@ -44,7 +44,6 @@ object NewsMapper {
     }
 
     private fun cleanTitle(title: String): String {
-        // Remove common suffixes from news titles
         return title
             .replace(Regex(" - .*$"), "")
             .replace(Regex(" \\| .*$"), "")
@@ -65,7 +64,6 @@ object NewsMapper {
         val content = title + " " + description
 
         return when {
-            // Transfer related keywords
             content.contains("transfer") ||
                     content.contains("signing") ||
                     content.contains("contract") ||

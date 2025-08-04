@@ -125,8 +125,8 @@ class NewsDetailFragment : Fragment() {
 
     private fun formatNewsContent(content: String): String {
         return content
-            .replace(Regex("\\[\\+\\d+ chars\\]"), "") // Remove "[+123 chars]"
-            .replace(Regex("….*"), "...") // Clean up truncated content
+            .replace(Regex("\\[\\+\\d+ chars\\]"), "")
+            .replace(Regex("….*"), "...")
             .replace("\n\n", "\n")
             .trim()
     }

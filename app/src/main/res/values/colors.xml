@@ -81,6 +81,13 @@
 
 
 
+    <color name="filter_red_primary">#FF0000</color>
+    <color name="filter_red_light">#FF6B6B</color>
+    <color name="filter_red_dark">#CC0000</color>
+
+
+    <color name="selected_border_color">#FF0000</color>
+
 
 </resources>
 

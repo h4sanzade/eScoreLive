@@ -109,7 +109,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupTabs() {
-        // Set tab text with string resources
         binding.upcomingTab.text = getString(R.string.upcoming)
         binding.scoreTab.text = getString(R.string.score)
         binding.favoritesTab.text = getString(R.string.favorites)
@@ -237,7 +236,6 @@ class HomeFragment : Fragment() {
             weekRangeFormat.format(mondayDate),
             weekRangeFormat.format(sundayDate))
 
-        // Translated day names
         val dayNames = arrayOf(
             getString(R.string.mon),
             getString(R.string.tue),
@@ -396,7 +394,6 @@ class HomeFragment : Fragment() {
                     liveMatchesAdapter.submitList(liveAndFinished)
                 }
                 MatchTab.FAVORITES -> {
-                    // Handled separately
                 }
             }
         })
@@ -408,7 +405,6 @@ class HomeFragment : Fragment() {
         })
 
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
-            // Handle loading state if needed
         })
 
         viewModel.error.observe(viewLifecycleOwner, Observer { error ->

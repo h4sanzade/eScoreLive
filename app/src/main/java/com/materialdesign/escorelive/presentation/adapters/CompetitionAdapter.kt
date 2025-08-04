@@ -54,18 +54,15 @@ class CompetitionAdapter(
             setupCompetitionStats(competition)
             setupStandingsButton(competition)
 
-            // Add current season indicator
             if (competition.currentSeason) {
                 addCurrentSeasonIndicator()
             }
 
-            // Click listeners
             root.setOnClickListener {
                 onCompetitionClick(competition)
                 addClickAnimation()
             }
 
-            // Long click for standings (if supported)
             root.setOnLongClickListener {
                 if (onStandingsClick != null && competition.type == CompetitionType.LEAGUE) {
                     onStandingsClick.invoke(competition)
@@ -82,22 +79,19 @@ class CompetitionAdapter(
 
         @RequiresApi(Build.VERSION_CODES.O)
         private fun setupStandingsButton(competition: Competition) = with(binding) {
-            // Add a standings button for leagues (not for cups or tournaments)
             if (competition.type == CompetitionType.LEAGUE && onStandingsClick != null) {
-                // We can add a standings button or use long press
-                // For now, we'll use long press and show a hint
+
                 root.tooltipText = "Long press to view standings"
             }
         }
 
         private fun loadCompetitionImage(imageView: ImageView, logoUrl: String?, flagUrl: String?) {
-            // Prioritize league logo over country flag
             val imageUrl = logoUrl ?: flagUrl
 
             val requestOptions = RequestOptions()
                 .placeholder(R.drawable.ic_placeholder)
                 .error(R.drawable.ic_competition)
-                .centerInside() // Use centerInside for better logo display
+                .centerInside()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .timeout(10000)
 
@@ -144,7 +138,6 @@ class CompetitionAdapter(
                     ContextCompat.getColor(root.context, R.color.accent_color)
                 )
 
-                // Add favorite animation
                 favoriteButton.animate()
                     .scaleX(1.2f)
                     .scaleY(1.2f)
@@ -166,7 +159,6 @@ class CompetitionAdapter(
         }
 
         private fun setupCompetitionStats(competition: Competition) = with(binding) {
-            // Season info
             if (!competition.season.isNullOrEmpty()) {
                 seasonInfo.text = "Season ${competition.season}"
                 seasonInfo.visibility = View.VISIBLE
@@ -180,7 +172,6 @@ class CompetitionAdapter(
                 seasonInfo.visibility = View.GONE
             }
 
-            // Teams count based on known competitions
             if (competition.isTopCompetition) {
                 teamsCount.text = getTeamsCount(competition.name, competition.id)
                 teamsCount.visibility = if (teamsCount.text.isNotEmpty()) View.VISIBLE else View.GONE
@@ -220,7 +211,6 @@ class CompetitionAdapter(
         }
 
         private fun addCurrentSeasonIndicator() = with(binding) {
-            // Add a subtle indicator for current season
             seasonInfo.setTextColor(ContextCompat.getColor(root.context, R.color.accent_color))
             seasonInfo.animate()
                 .alpha(0.8f)

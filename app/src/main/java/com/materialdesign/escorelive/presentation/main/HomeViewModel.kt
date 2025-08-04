@@ -147,7 +147,6 @@ class HomeViewModel @Inject constructor(
                         _upcomingMatches.value = sortedMatches
                         Log.d("HomeViewModel", "Loaded ${upcomingMatches.size} upcoming matches for date: $date")
 
-                        // Debug: Log first few matches
                         sortedMatches.take(3).forEach { match ->
                             Log.d("HomeViewModel", "Upcoming: ${match.homeTeam.name} vs ${match.awayTeam.name} at ${match.kickoffTimeFormatted}")
                         }
@@ -263,7 +262,6 @@ class HomeViewModel @Inject constructor(
                         _liveMatches.value = actuallyLive
                         Log.d("HomeViewModel", "Loaded ${actuallyLive.size} live matches")
 
-                        // Debug: Log live matches
                         actuallyLive.take(3).forEach { match ->
                             Log.d("HomeViewModel", "Live: ${match.homeTeam.name} vs ${match.awayTeam.name} - ${match.matchMinute}")
                         }
@@ -295,7 +293,6 @@ class HomeViewModel @Inject constructor(
                     .onSuccess { matches ->
                         Log.d("HomeViewModel", "Loaded ${matches.size} matches for date: $date")
 
-                        // Debug: Log matches by status
                         val liveCount = matches.count { it.isLive }
                         val upcomingCount = matches.count { it.isUpcoming }
                         val finishedCount = matches.count { it.isFinished }

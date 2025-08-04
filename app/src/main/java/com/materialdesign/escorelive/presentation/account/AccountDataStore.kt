@@ -203,13 +203,10 @@ class AccountDataStore @Inject constructor(
         }
     }
 
-    // Add this method to only clear session data, not personal data
     suspend fun clearSessionData() {
         dataStore.edit { preferences ->
-            // Only clear app settings and session-related data
             preferences.remove(NOTIFICATIONS_ENABLED)
             preferences.remove(DARK_THEME_ENABLED)
-            // Don't clear language settings as they should persist
             preferences.remove(SELECTED_LEAGUES)
         }
     }
