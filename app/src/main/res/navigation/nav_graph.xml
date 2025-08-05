@@ -12,7 +12,6 @@
         android:label="Home"
         tools:layout="@layout/fragment_main_menu">
 
-        <!-- Bottom Navigation Actions -->
         <action
             android:id="@+id/action_home_to_competition"
             app:destination="@id/competitionFragment" />
@@ -25,7 +24,6 @@
             android:id="@+id/action_home_to_account"
             app:destination="@id/accountFragment" />
 
-        <!-- Feature Actions -->
         <action
             android:id="@+id/action_home_to_teamSearch"
             app:destination="@id/teamSearchFragment"
@@ -52,14 +50,12 @@
 
     </fragment>
 
-    <!-- Competition Fragment -->
     <fragment
         android:id="@+id/competitionFragment"
         android:name="com.materialdesign.escorelive.presentation.competition.CompetitionFragment"
         android:label="Competition"
         tools:layout="@layout/fragment_competition">
 
-        <!-- Bottom Navigation Actions -->
         <action
             android:id="@+id/action_competition_to_home"
             app:destination="@id/homeFragment" />
@@ -74,14 +70,12 @@
 
     </fragment>
 
-    <!-- News Fragment -->
     <fragment
         android:id="@+id/newsFragment"
         android:name="com.materialdesign.escorelive.presentation.news.NewsFragment"
         android:label="News"
         tools:layout="@layout/fragment_news">
 
-        <!-- Bottom Navigation Actions -->
         <action
             android:id="@+id/action_news_to_home"
             app:destination="@id/homeFragment" />
@@ -94,7 +88,6 @@
             android:id="@+id/action_news_to_account"
             app:destination="@id/accountFragment" />
 
-        <!-- News Detail Action -->
         <action
             android:id="@+id/action_news_to_newsDetail"
             app:destination="@id/newsDetailFragment"
@@ -138,14 +131,12 @@
 
     </fragment>
 
-    <!-- Account Fragment -->
     <fragment
         android:id="@+id/accountFragment"
         android:name="com.materialdesign.escorelive.presentation.account.AccountFragment"
         android:label="Account"
         tools:layout="@layout/fragment_account">
 
-        <!-- Bottom Navigation Actions -->
         <action
             android:id="@+id/action_account_to_home"
             app:destination="@id/homeFragment" />
@@ -158,7 +149,6 @@
             android:id="@+id/action_account_to_news"
             app:destination="@id/newsFragment" />
 
-        <!-- Account Feature Actions -->
         <action
             android:id="@+id/action_account_to_filterLeagues"
             app:destination="@id/filterLeaguesFragment"
@@ -180,7 +170,6 @@
             app:popEnterAnim="@android:anim/slide_in_left"
             app:popExitAnim="@android:anim/slide_out_right" />
 
-        <!-- Logout Action - Global Navigation -->
         <action
             android:id="@+id/action_account_to_login"
             app:destination="@id/loginActivity"
@@ -191,14 +180,12 @@
     </fragment>
 
 
-    <!-- Favorite Competitions Fragment -->
     <fragment
         android:id="@+id/favoriteCompetitionsFragment"
         android:name="com.materialdesign.escorelive.presentation.account.FavoriteCompetitionsFragment"
         android:label="Favorite Competitions"
         tools:layout="@layout/fragment_favorite_competitions" />
 
-    <!-- Favorite Teams Fragment -->
     <fragment
         android:id="@+id/favoriteTeamsFragment"
         android:name="com.materialdesign.escorelive.presentation.account.FavoriteTeamsFragment"
@@ -206,7 +193,6 @@
         tools:layout="@layout/fragment_favorite_teams" />
 
 
-    <!-- All Matches Fragment -->
     <fragment
         android:id="@+id/allMatchesFragment"
         android:name="com.materialdesign.escorelive.presentation.ui.matchlist.MatchListFragment"
