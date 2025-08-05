@@ -42,7 +42,6 @@ class FilterLeaguesFragment : Fragment() {
         observeViewModel()
         setupClickListeners()
 
-        // Load leagues data
         viewModel.loadLeagues()
     }
 

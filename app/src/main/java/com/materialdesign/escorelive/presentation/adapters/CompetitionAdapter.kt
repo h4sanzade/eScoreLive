@@ -1,4 +1,3 @@
-// CompetitionAdapter.kt - Updated with Standings Support
 package com.materialdesign.escorelive.presentation.adapters
 
 import android.os.Build
@@ -46,7 +45,6 @@ class CompetitionAdapter(
             competitionName.text = competition.name
             regionName.text = competition.country
 
-            // Load competition logo (prioritize league logo over country flag)
             loadCompetitionImage(flagImage, competition.logoUrl, competition.flagUrl)
 
             setupCompetitionType(competition)
@@ -163,7 +161,6 @@ class CompetitionAdapter(
                 seasonInfo.text = "Season ${competition.season}"
                 seasonInfo.visibility = View.VISIBLE
 
-                // Add league indicator for standings
                 if (competition.type == CompetitionType.LEAGUE) {
                     seasonInfo.text = "${seasonInfo.text} • Long press for table"
                     seasonInfo.setTextColor(ContextCompat.getColor(root.context, R.color.accent_color))
@@ -179,7 +176,6 @@ class CompetitionAdapter(
                 teamsCount.visibility = View.GONE
             }
 
-            // Show stats container if any stat is visible
             statsContainer.visibility = if (
                 seasonInfo.visibility == View.VISIBLE ||
                 teamsCount.visibility == View.VISIBLE

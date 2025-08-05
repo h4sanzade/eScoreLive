@@ -1,4 +1,3 @@
-// CompetitionFragment.kt - Fixed with Standings Support
 package com.materialdesign.escorelive.presentation.competition
 
 import android.os.Bundle
@@ -41,7 +40,6 @@ class CompetitionFragment : Fragment() {
     private lateinit var competitionAdapter: CompetitionAdapter
     private lateinit var regionAdapter: RegionCompetitionAdapter
 
-    // Bottom sheet for standings
     private var standingsBottomSheetDialog: BottomSheetDialog? = null
 
     override fun onCreateView(
@@ -67,7 +65,6 @@ class CompetitionFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        // Regular competition adapter for Top and Favorites tabs
         competitionAdapter = CompetitionAdapter(
             onCompetitionClick = { competition ->
                 onCompetitionClick(competition)
@@ -81,7 +78,6 @@ class CompetitionFragment : Fragment() {
             }
         )
 
-        // Region adapter for Region tab (shows countries with their leagues)
         regionAdapter = RegionCompetitionAdapter(
             onCompetitionClick = { competition ->
                 onCompetitionClick(competition)
@@ -102,7 +98,6 @@ class CompetitionFragment : Fragment() {
         recyclerView?.apply {
             layoutManager = LinearLayoutManager(context)
             setHasFixedSize(true)
-            // Start with regular adapter
             adapter = competitionAdapter
         }
     }
@@ -207,7 +202,6 @@ class CompetitionFragment : Fragment() {
             }
         }
 
-        // Observe regional data separately
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.regionalCompetitions.collect { regionalData ->
@@ -216,7 +210,6 @@ class CompetitionFragment : Fragment() {
             }
         }
 
-        // Observe standings data
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.standingsData.collect { standings ->
@@ -225,7 +218,6 @@ class CompetitionFragment : Fragment() {
             }
         }
 
-        // Observe standings loading state
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.standingsLoading.collect { isLoading ->
@@ -234,7 +226,6 @@ class CompetitionFragment : Fragment() {
             }
         }
 
-        // Observe standings errors
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.standingsError.collect { error ->
@@ -255,10 +246,8 @@ class CompetitionFragment : Fragment() {
             binding.swipeRefreshLayout.isRefreshing = false
         }
 
-        // Update appropriate adapter based on selected tab
         when (state.selectedTab) {
             CompetitionTab.REGION -> {
-                // Regional data is handled by separate observer
             }
             else -> {
                 competitionAdapter.submitList(state.filteredCompetitions) {
@@ -347,10 +336,8 @@ class CompetitionFragment : Fragment() {
     private fun showStandingsBottomSheet(competition: Competition) {
         Toast.makeText(context, "Loading ${competition.name} standings...", Toast.LENGTH_SHORT).show()
 
-        // Create the bottom sheet
         createStandingsBottomSheet(competition)
 
-        // Load standings data
         viewModel.loadCompetitionStandings(competition)
     }
 
@@ -361,24 +348,20 @@ class CompetitionFragment : Fragment() {
         standingsBottomSheetDialog = BottomSheetDialog(requireContext()).apply {
             setContentView(bottomSheetView)
 
-            // Setup bottom sheet views
             val titleView = bottomSheetView.findViewById<TextView>(R.id.standings_title)
             val seasonView = bottomSheetView.findViewById<TextView>(R.id.standings_season)
             val leagueLogoView = bottomSheetView.findViewById<ImageView>(R.id.league_logo)
             val closeButton = bottomSheetView.findViewById<ImageView>(R.id.close_button)
             val recyclerView = bottomSheetView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.standings_recycler_view)
 
-            // Set competition info
             titleView.text = "${competition.name} Standings"
             seasonView.text = "Season ${competition.season ?: "2024"}"
 
-            // Load league logo
             Glide.with(this@CompetitionFragment)
                 .load(competition.logoUrl)
                 .placeholder(R.drawable.ic_competition)
                 .into(leagueLogoView)
 
-            // Setup RecyclerView
             val standingsAdapter = StandingsAdapter()
             recyclerView.apply {
                 adapter = standingsAdapter
@@ -386,12 +369,10 @@ class CompetitionFragment : Fragment() {
                 setHasFixedSize(true)
             }
 
-            // Close button
             closeButton.setOnClickListener {
                 dismiss()
             }
 
-            // Show the bottom sheet
             show()
         }
     }
@@ -405,7 +386,6 @@ class CompetitionFragment : Fragment() {
 
                 adapter?.submitList(standings)
 
-                // Hide loading and show data
                 val progressBar = bottomSheetView?.findViewById<ProgressBar>(R.id.standings_progress_bar)
                 val emptyState = bottomSheetView?.findViewById<LinearLayout>(R.id.standings_empty_state)
 

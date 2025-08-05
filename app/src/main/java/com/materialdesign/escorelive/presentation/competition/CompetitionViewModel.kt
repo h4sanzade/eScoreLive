@@ -1,4 +1,3 @@
-// CompetitionViewModel.kt - Enhanced with Smart Fallback Standings
 package com.materialdesign.escorelive.presentation.competition
 
 import androidx.lifecycle.ViewModel

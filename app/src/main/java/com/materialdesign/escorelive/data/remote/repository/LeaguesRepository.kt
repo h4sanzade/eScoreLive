@@ -1,4 +1,3 @@
-// LeaguesRepository.kt
 package com.materialdesign.escorelive.data.remote.repository
 
 import com.materialdesign.escorelive.presentation.filter.League

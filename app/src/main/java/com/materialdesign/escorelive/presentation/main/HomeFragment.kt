@@ -1,4 +1,3 @@
-// HomeFragment.kt - Fixed with proper string resources
 package com.materialdesign.escorelive.presentation.ui.main
 
 import android.os.Bundle

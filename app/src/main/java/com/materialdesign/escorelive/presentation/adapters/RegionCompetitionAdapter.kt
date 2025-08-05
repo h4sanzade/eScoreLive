@@ -1,4 +1,3 @@
-// RegionCompetitionAdapter.kt - Shows competitions grouped by country
 package com.materialdesign.escorelive.presentation.adapters
 
 import android.view.LayoutInflater
@@ -43,7 +42,6 @@ class RegionCompetitionAdapter(
     fun submitRegionalData(data: Map<String, List<Competition>>) {
         val newItems = mutableListOf<RegionItem>()
 
-        // Sort countries alphabetically, but put popular countries first
         val popularCountries = listOf("England", "Spain", "Germany", "Italy", "France", "Turkey", "Netherlands", "Portugal")
         val sortedCountries = data.keys.sortedWith { country1, country2 ->
             val priority1 = if (popularCountries.contains(country1)) popularCountries.indexOf(country1) else Int.MAX_VALUE
@@ -60,7 +58,6 @@ class RegionCompetitionAdapter(
         sortedCountries.forEach { countryName ->
             val competitions = data[countryName] ?: emptyList()
             if (competitions.isNotEmpty()) {
-                // Add country header
                 val countryFlag = competitions.firstOrNull()?.flagUrl
                 newItems.add(
                     RegionItem.CountryHeader(
@@ -71,7 +68,6 @@ class RegionCompetitionAdapter(
                     )
                 )
 
-                // Add competitions for this country
                 competitions.sortedWith(compareBy<Competition> { !it.isTopCompetition }.thenBy { it.name })
                     .forEach { competition ->
                         newItems.add(RegionItem.CompetitionItem(competition))
@@ -151,13 +147,11 @@ class RegionCompetitionAdapter(
                 countryFlag.setImageResource(R.drawable.ic_competition)
             }
 
-            // Set expand/collapse icon
             expandIcon.setImageResource(
                 if (item.isExpanded) R.drawable.ic_expand_less
                 else R.drawable.ic_expand_more
             )
 
-            // Highlight popular countries
             val popularCountries = listOf("England", "Spain", "Germany", "Italy", "France", "Turkey")
             if (popularCountries.contains(item.countryName)) {
                 countryName.setTextColor(ContextCompat.getColor(itemView.context, R.color.accent_color))
@@ -184,7 +178,6 @@ class RegionCompetitionAdapter(
         fun bind(competition: Competition) {
             competitionName.text = competition.name
 
-            // Load competition logo
             val imageUrl = competition.logoUrl ?: competition.flagUrl
             if (!imageUrl.isNullOrEmpty()) {
                 val requestOptions = RequestOptions()
@@ -210,7 +203,6 @@ class RegionCompetitionAdapter(
                 competitionType.visibility = View.GONE
             }
 
-            // Season info with standings hint for leagues
             if (!competition.season.isNullOrEmpty()) {
                 val seasonText = "Season ${competition.season}"
                 seasonInfo.text = if (competition.type == CompetitionType.LEAGUE && onStandingsClick != null) {
@@ -223,13 +215,11 @@ class RegionCompetitionAdapter(
                 seasonInfo.visibility = View.GONE
             }
 
-            // Top competition badge
             if (competition.isTopCompetition) {
                 topBadge.visibility = View.VISIBLE
                 topBadge.text = "TOP"
                 topBadge.setBackgroundResource(R.drawable.indicator_background)
 
-                // Add subtle animation for top competitions
                 topBadge.animate()
                     .alpha(0.8f)
                     .setDuration(1000)
@@ -244,16 +234,13 @@ class RegionCompetitionAdapter(
                 topBadge.visibility = View.GONE
             }
 
-            // Favorite button
             updateFavoriteButton(competition.isFavorite)
 
-            // Click listeners
             itemView.setOnClickListener {
                 onCompetitionClick(competition)
                 addClickAnimation()
             }
 
-            // Long press for standings (only for leagues)
             itemView.setOnLongClickListener {
                 if (onStandingsClick != null && competition.type == CompetitionType.LEAGUE) {
                     onStandingsClick.invoke(competition)

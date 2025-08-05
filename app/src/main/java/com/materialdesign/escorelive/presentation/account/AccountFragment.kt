@@ -1,4 +1,3 @@
-// AccountFragment.kt - Fixed with correct binding references
 package com.materialdesign.escorelive.presentation.account
 
 import android.Manifest
@@ -87,19 +86,7 @@ class AccountFragment : Fragment() {
     }
 
     private fun showAccountContent() {
-        // Fix: The layout uses different id names. Looking at fragment_account.xml,
-        // the text views are embedded in the cards and have specific layouts.
-        // We should only set text for views that actually exist in the layout.
 
-        // These text views don't exist in the layout, so we remove them:
-        // - myAccountText, myFavoritesText, generalSettingsText, otherText
-        // - competitionsLabel, teamsLabel, playersLabel
-        // - notificationsLabel, darkThemeLabel, filterMatchesLabel, languageLabel
-
-        // The actual text content is already set in the layout XML files
-        // Only dynamic content needs to be set programmatically
-
-        // Set logout button text (this exists in the layout)
         binding.logoutButton.text = getString(R.string.log_out)
     }
 
@@ -173,13 +160,11 @@ class AccountFragment : Fragment() {
             requestImagePermissionAndPick()
         }
 
-        // Make the entire competition section clickable
         binding.competitionsCount.setOnClickListener {
             Log.d("AccountFragment", "Competitions count clicked!")
             navigateToFavoriteCompetitions()
         }
 
-        // Also make the parent container clickable for competitions
         binding.competitionsCount.parent?.let { parent ->
             (parent as? View)?.setOnClickListener {
                 Log.d("AccountFragment", "Competitions section clicked!")
@@ -187,13 +172,11 @@ class AccountFragment : Fragment() {
             }
         }
 
-        // Make the entire teams section clickable
         binding.teamsCount.setOnClickListener {
             Log.d("AccountFragment", "Teams count clicked!")
             navigateToFavoriteTeams()
         }
 
-        // Also make the parent container clickable for teams
         binding.teamsCount.parent?.let { parent ->
             (parent as? View)?.setOnClickListener {
                 Log.d("AccountFragment", "Teams section clicked!")
@@ -201,13 +184,11 @@ class AccountFragment : Fragment() {
             }
         }
 
-        // Make the entire players section clickable
         binding.playersCount.setOnClickListener {
             Log.d("AccountFragment", "Players count clicked!")
             Toast.makeText(context, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show()
         }
 
-        // Also make the parent container clickable for players
         binding.playersCount.parent?.let { parent ->
             (parent as? View)?.setOnClickListener {
                 Log.d("AccountFragment", "Players section clicked!")
@@ -309,13 +290,11 @@ class AccountFragment : Fragment() {
 
             Toast.makeText(context, getString(R.string.error_occurred) + ": Navigation failed", Toast.LENGTH_LONG).show()
 
-            // Show a fallback dialog with teams info
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.favorite_teams))
                 .setMessage("Favorite teams feature is available. Navigation issue detected.")
                 .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
                     dialog.dismiss()
-                    // Try alternative navigation or open a simple screen
                     showComingSoonMessage("Favorite Teams")
                 }
                 .setNegativeButton(getString(R.string.cancel), null)
