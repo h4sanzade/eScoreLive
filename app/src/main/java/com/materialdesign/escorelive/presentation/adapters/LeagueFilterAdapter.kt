@@ -125,10 +125,10 @@ class LeagueFilterAdapter(
                 selectedBorder.visibility = View.VISIBLE
 
                 leagueName.setTextColor(
-                    ContextCompat.getColor(itemView.context, android.R.color.holo_red_light)
+                    ContextCompat.getColor(itemView.context, android.R.color.white)
                 )
                 leagueCountry.setTextColor(
-                    ContextCompat.getColor(itemView.context, android.R.color.holo_red_light)
+                    ContextCompat.getColor(itemView.context, android.R.color.white)
                 )
 
                 leagueCheckbox.buttonTintList = ContextCompat.getColorStateList(
